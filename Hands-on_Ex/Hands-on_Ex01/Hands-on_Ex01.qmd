@@ -3,7 +3,6 @@ title: "Hands-on_Ex01"
 format: html
 ---
 
-
 # Getting Started
 
 ## Install and launching R packages
@@ -309,4 +308,3 @@ ggplot(data=exam_data,
   coord_flip() +
   theme_minimal()
 ```
-
