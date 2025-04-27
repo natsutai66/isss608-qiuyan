@@ -12,27 +12,79 @@ execite:
   warning: false
 ---
 
-# 1 **Learning Outcome**
+# 1 **Learning Outcome** {style="color: deepskyblue;"}
 
 In this hands-on exercise, you will learn how to create interactive data visualisation by using functions provided by **ggiraph** and **plotlyr** packages.
 
-# 2 Getting Started
-
-First, write a code chunk to check, install and launch the following R packages:
-
--   [**ggiraph**](https://davidgohel.github.io/ggiraph/) for making ‘ggplot’ graphics interactive.
-
--   [**plotly**](https://plotly.com/r/), R library for plotting interactive statistical graphs.
-
--   [**DT**](https://rstudio.github.io/DT/) provides an R interface to the JavaScript library [DataTables](https://datatables.net/) that create interactive table on html page.
-
--   [**tidyverse**](https://www.tidyverse.org/), a family of modern R packages specially designed to support data science, analysis and communication task including creating static statistical graphs.
-
--   [**patchwork**](https://patchwork.data-imaginist.com/) for combining multiple ggplot2 graphs into one figure.
-
-The code chunk below will be used to accomplish the task.
+# 2 Getting Started {style="color: deepskyblue;"}
 
 ```{r}
 pacman::p_load(ggiraph, plotly, 
                patchwork, DT, tidyverse)
 ```
+
+# 3 Importing the data {style="color: deepskyblue;"}
+
+```{r}
+exam_data <- read_csv("data/Exam_data.csv")
+```
+
+# 4 **Interactive Data Visualisation - ggiraph methods** {style="color: deepskyblue;"}
+
+[ggiraph](https://davidgohel.github.io/ggiraph/index.html) is an htmlwidget and a ggplot2 extension. It allows ggplot graphics to be interactive.
+
+Interactive is made with [**ggplot geometries**](https://davidgohel.github.io/ggiraph/reference/index.html#section-interactive-geometries) that can understand three arguments:
+
+-   Tooltip: a column of data-sets that contain tooltips to be displayed when the mouse is over elements.
+
+-   Onclick: a column of data-sets that contain a JavaScript function to be executed when elements are clicked.
+
+-   Data_id: a column of data-sets that contain an id to be associated with elements.
+
+## **4.1 Tooltip effect with *tooltip* aesthetic** {style="color: deepskyblue;"}
+
+```{r}
+p <- ggplot(data=exam_data, 
+       aes(x = MATHS)) +
+  geom_dotplot_interactive(
+    aes(tooltip = ID),
+    stackgroups = TRUE, 
+    binwidth = 1, 
+    method = "histodot") +
+  scale_y_continuous(NULL, 
+                     breaks = NULL)
+girafe(
+  ggobj = p,
+  width_svg = 6,
+  height_svg = 6*0.618
+)
+```
+
+By hovering the mouse pointer on an data point of interest, the student’s ID will be displayed.
+
+# 5 **Displaying multiple information on tooltip** {style="color: deepskyblue;"}
+
+The content of the tooltip can be customised by including a list object as shown in the code chunk below.
+
+```{r}
+exam_data$tooltip <- c(paste0(     
+  "Name = ", exam_data$ID,         
+  "\n Class = ", exam_data$CLASS)) 
+
+p <- ggplot(data=exam_data, 
+       aes(x = MATHS)) +
+  geom_dotplot_interactive(
+    aes(tooltip = exam_data$tooltip), 
+    stackgroups = TRUE,
+    binwidth = 1,
+    method = "histodot") +
+  scale_y_continuous(NULL,               
+                     breaks = NULL)
+girafe(
+  ggobj = p,
+  width_svg = 8,
+  height_svg = 8*0.618
+)
+```
+
+By hovering the mouse pointer on an data point of interest, the student’s ID and Class will be displayed.
