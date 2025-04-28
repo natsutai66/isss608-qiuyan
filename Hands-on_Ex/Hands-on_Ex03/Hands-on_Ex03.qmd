@@ -12,24 +12,27 @@ execite:
   warning: false
 ---
 
-# 1 **Learning Outcome** {style="color: deepskyblue;"}
+# 1 **Learning Outcome**
 
 In this hands-on exercise, you will learn how to create interactive data visualisation by using functions provided by **ggiraph** and **plotlyr** packages.
 
-# 2 Getting Started {style="color: deepskyblue;"}
+# 2 Getting Started
 
 ```{r}
 pacman::p_load(ggiraph, plotly, 
                patchwork, DT, tidyverse)
 ```
 
-# 3 Importing the data {style="color: deepskyblue;"}
+# 3 Importing the data
 
 ```{r}
 exam_data <- read_csv("data/Exam_data.csv")
 ```
+```{r}
+spec(exam_data)
+```
 
-# 4 **Interactive Data Visualisation - ggiraph methods** {style="color: deepskyblue;"}
+# 4 **Interactive Data Visualisation - ggiraph methods**
 
 ggiraph is an htmlwidget and a ggplot2 extension. It allows ggplot graphics to be interactive.
 
@@ -136,7 +139,7 @@ girafe(
 :::
 ::::
 
-# 5 **Displaying multiple information on tooltip** {style="color: deepskyblue;"}
+# 5 **Displaying multiple information on tooltip**
 
 The content of the tooltip can be customised by including a list object as shown in the code chunk below.
 
@@ -163,11 +166,11 @@ girafe(
 
 By hovering the mouse pointer on an data point of interest, the student’s ID and Class will be displayed.
 
-# 6 **Interactivity** {style="color: deepskyblue;"}
+# 6 **Interactivity**
 
-## 6.1 **Customising Tooltip style** {style="color: deepskyblue;"}
+## 6.1 **Customising Tooltip style**
 
-Code chunk below uses `opts_tooltip()` of **ggiraph** to customize tooltip rendering by add css declarations.
+Code chunk below uses opts_tooltip() of ggiraph to customize tooltip rendering by add css declarations.
 
 ```{r}
 tooltip_css <- "background-color:white; #<<
@@ -194,7 +197,7 @@ girafe(
 
 Notice that the background colour of the tooltip is black and the font colour is white and bold.
 
-## 6.2 **Displaying statistics on tooltip** {style="color: deepskyblue;"}
+## 6.2 **Displaying statistics on tooltip**
 
 Code chunk below shows an advanced way to customise tooltip. In this example, a function is used to compute 90% confident interval of the mean. The derived statistics are then displayed in the tooltip.
 
@@ -225,4 +228,4 @@ girafe(ggobj = gg_point,
        height_svg = 8*0.618)
 ```
 
-## 6.3 **Hover effect with data_id aesthetic** {style="color: deepskyblue;"}
+## 6.3 **Hover effect with data_id aesthetic**
