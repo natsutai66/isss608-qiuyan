@@ -14,7 +14,7 @@ execite:
 
 # 1 **Learning Outcome** {style="color: deepskyblue;"}
 
-In this hands-on exercise, you will learn how to create interactive data visualisation by using functions provided by **ggiraph** and **plotlyr** packages.
+In this hands-on exercise, you will learn how to create interactive data visualisation by using functions provided by **ggiraph** and **plotlyr** packages.
 
 # 2 Getting Started {style="color: deepskyblue;"}
 
@@ -31,9 +31,9 @@ exam_data <- read_csv("data/Exam_data.csv")
 
 # 4 **Interactive Data Visualisation - ggiraph methods** {style="color: deepskyblue;"}
 
-[ggiraph](https://davidgohel.github.io/ggiraph/index.html) is an htmlwidget and a ggplot2 extension. It allows ggplot graphics to be interactive.
+ggiraph is an htmlwidget and a ggplot2 extension. It allows ggplot graphics to be interactive.
 
-Interactive is made with [**ggplot geometries**](https://davidgohel.github.io/ggiraph/reference/index.html#section-interactive-geometries) that can understand three arguments:
+Interactive is made with ggplot geometries that can understand three arguments:
 
 -   Tooltip: a column of data-sets that contain tooltips to be displayed when the mouse is over elements.
 
@@ -61,6 +61,80 @@ girafe(
 ```
 
 By hovering the mouse pointer on an data point of interest, the student’s ID will be displayed.
+
+:::: panel-tabset
+## Improved plot
+
+```{r}
+#| echo: false
+p <- ggplot(data = exam_data, aes(x = MATHS)) +
+  geom_dotplot_interactive(
+    aes(tooltip = ID),
+    binwidth = 1,         
+    stackgroups = TRUE,
+    dotsize = 0.8,          # Make dots bigger
+    color = "darkblue",     # Dot border color
+    fill = "skyblue",       # Dot fill color
+    method = "histodot",
+    binaxis = "x"           # Stack along x-axis
+  ) +
+  scale_y_continuous(NULL, breaks = NULL) +  # Hide y-axis
+  labs(
+    title = "Distribution of Maths Scores",
+    x = "Maths Score",
+    y = NULL
+  ) +
+  theme_minimal() +          # Cleaner background
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.text.x = element_text(size = 12),
+    axis.title.x = element_text(size = 14)
+  )
+
+girafe(
+  ggobj = p,
+  width_svg = 8,            # Slightly bigger
+  height_svg = 8 * 0.618    
+)
+```
+
+## The code
+
+::: {style="font-size: 0.8em"}
+```{r}
+#| eval: false
+p <- ggplot(data = exam_data, aes(x = MATHS)) +
+  geom_dotplot_interactive(
+    aes(tooltip = ID),
+    binwidth = 1,
+    stackgroups = TRUE,
+    dotsize = 0.8,          # Make dots bigger
+    color = "darkblue",     # Dot border color
+    fill = "skyblue",       # Dot fill color
+    method = "histodot",
+    binaxis = "x"           # Stack along x-axis
+  ) +
+  scale_y_continuous(NULL, breaks = NULL) +  # Hide y-axis
+  labs(
+    title = "Distribution of Maths Scores",
+    x = "Maths Score",
+    y = NULL
+  ) +
+  theme_minimal() +          # Cleaner background
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.text.x = element_text(size = 12),
+    axis.title.x = element_text(size = 14)
+  )
+
+girafe(
+  ggobj = p,
+  width_svg = 8,            # Slightly bigger
+  height_svg = 8 * 0.618    # Keep golden ratio
+)
+```
+:::
+::::
 
 # 5 **Displaying multiple information on tooltip** {style="color: deepskyblue;"}
 
