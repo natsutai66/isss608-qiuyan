@@ -16,10 +16,10 @@ website:
 
       - text: "In-Class Exercise"
         menu:
-          - text: "In-Class Exercise 1"
-            href: "In-Class_Exercise.html"
           - text: "In-Class Exercise 2"
-            href: "In-Class_Exercise2.html"      
+            href: "https://public.tableau.com/app/profile/qiuyan.tai/viz/In-classExercise2Superstorereport/Dashboard1"
+          - text: "In-Class Exercise 3"
+            href: "In-Class_Exercise3.html"      
 
     right:
       - href: index.qmd
