@@ -2,7 +2,7 @@
 title: "Hands-on_Ex03"
 description: "Programming Interactive Data Visualisation with R"
 author: "Tai Qiu Yan"
-date: "April 28, 2024"
+date: "April 29, 2024"
 date-modified: "last-modified"
 format: html
 editor: visual
@@ -41,7 +41,7 @@ Interactive is made with [**ggplot geometries**](https://davidgohel.github.io/gg
 
 -   Data_id: a column of data-sets that contain an id to be associated with elements.
 
-## **4.1 Tooltip effect with *tooltip* aesthetic** {style="color: deepskyblue;"}
+## **Tooltip effect with *tooltip* aesthetic** {style="color: deepskyblue;"}
 
 ```{r}
 p <- ggplot(data=exam_data, 
@@ -88,3 +88,67 @@ girafe(
 ```
 
 By hovering the mouse pointer on an data point of interest, the student’s ID and Class will be displayed.
+
+# 6 **Interactivity** {style="color: deepskyblue;"}
+
+## 6.1 **Customising Tooltip style** {style="color: deepskyblue;"}
+
+Code chunk below uses `opts_tooltip()` of **ggiraph** to customize tooltip rendering by add css declarations.
+
+```{r}
+tooltip_css <- "background-color:white; #<<
+font-style:bold; color:black;" #<<
+
+p <- ggplot(data=exam_data, 
+       aes(x = MATHS)) +
+  geom_dotplot_interactive(              
+    aes(tooltip = ID),                   
+    stackgroups = TRUE,                  
+    binwidth = 1,                        
+    method = "histodot") +               
+  scale_y_continuous(NULL,               
+                     breaks = NULL)
+girafe(                                  
+  ggobj = p,                             
+  width_svg = 6,                         
+  height_svg = 6*0.618,
+  options = list(    #<<
+    opts_tooltip(    #<<
+      css = tooltip_css)) #<<
+)   
+```
+
+Notice that the background colour of the tooltip is black and the font colour is white and bold.
+
+## 6.2 **Displaying statistics on tooltip** {style="color: deepskyblue;"}
+
+Code chunk below shows an advanced way to customise tooltip. In this example, a function is used to compute 90% confident interval of the mean. The derived statistics are then displayed in the tooltip.
+
+```{r}
+tooltip <- function(y, ymax, accuracy = .01) {
+  mean <- scales::number(y, accuracy = accuracy)
+  sem <- scales::number(ymax - y, accuracy = accuracy)
+  paste("Mean maths scores:", mean, "+/-", sem)
+}
+
+gg_point <- ggplot(data=exam_data, 
+                   aes(x = RACE),
+) +
+  stat_summary(aes(y = MATHS, 
+                   tooltip = after_stat(  
+                     tooltip(y, ymax))),  
+    fun.data = "mean_se", 
+    geom = GeomInteractiveCol,  
+    fill = "light blue"
+  ) +
+  stat_summary(aes(y = MATHS),
+    fun.data = mean_se,
+    geom = "errorbar", width = 0.2, size = 0.2
+  )
+
+girafe(ggobj = gg_point,
+       width_svg = 8,
+       height_svg = 8*0.618)
+```
+
+## 6.3 **Hover effect with data_id aesthetic** {style="color: deepskyblue;"}
