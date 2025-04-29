@@ -305,6 +305,13 @@
     "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html#hover-effect-with-data_id-aesthetic",
     "title": "Hands-on_Ex03",
     "section": "6.3 Hover effect with data_id aesthetic",
-    "text": "6.3 Hover effect with data_id aesthetic"
+    "text": "6.3 Hover effect with data_id aesthetic\nCode chunk below shows the second interactive feature of ggiraph, namely data_id.\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(           \n    aes(data_id = CLASS),             \n    stackgroups = TRUE,               \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618                      \n)  \n\n\n\n\n\nElements associated with a data_id (i.e CLASS) will be highlighted upon mouse over.\nNote that the default value of the hover css is hover_css = “fill:orange;”."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html#styling-hover-effect",
+    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html#styling-hover-effect",
+    "title": "Hands-on_Ex03",
+    "section": "6.4 Styling hover effect",
+    "text": "6.4 Styling hover effect\nIn the code chunk below, css codes are used to change the highlighting effect."
   }
 ]
