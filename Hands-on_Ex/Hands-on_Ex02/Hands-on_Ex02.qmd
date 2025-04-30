@@ -6,8 +6,8 @@ date: "April 23, 2024"
 date-modified: "last-modified"
 format: html
 editor: visual
-execite:
-  eval: ture
+execute:
+  eval: true
   echo: true
   warning: false
 ---
