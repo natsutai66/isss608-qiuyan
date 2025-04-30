@@ -83,7 +83,7 @@ p <- ggplot(data = exam_data, aes(x = MATHS)) +
     binaxis = "x"           # Stack along x-axis
   ) +
   scale_y_continuous(NULL, breaks = NULL) +  # Hide y-axis
-  labs(e
+  labs(
     title = "Distribution of Maths Scores",
     x = "Maths Score",
     y = NULL
