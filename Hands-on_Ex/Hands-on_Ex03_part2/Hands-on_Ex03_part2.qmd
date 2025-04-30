@@ -62,7 +62,7 @@ The code chunk below imports Data worksheet from GlobalPopulation Excel workbook
 
 ```{r}
 col <- c("Country", "Continent")
-globalPop <- read_xls("data/GlobalPopulation.xls",
+globalPop <- read_xls("GlobalPopulation.xls",
                       sheet="Data") %>%
   mutate_at(col, as.factor) %>%
   mutate(Year = as.integer(Year))
@@ -72,7 +72,7 @@ globalPop <- read_xls("data/GlobalPopulation.xls",
 
 ```{r}
 col <- c("Country", "Continent")
-globalPop <- read_xls("data/GlobalPopulation.xls",
+globalPop <- read_xls("GlobalPopulation.xls",
                       sheet="Data") %>%
   mutate(across(all_of(col), as.factor)) %>%
   mutate(Year = as.integer(Year))
