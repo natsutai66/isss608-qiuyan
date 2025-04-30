@@ -1,13 +1,13 @@
 ---
-title: "Hands-on_Ex03 - part 2"
+title: "Hands-on Exercise 3 part 2"
 description: "Programming Animated Statistical Graphics with R"
 author: "Tai Qiu Yan"
 date: "May 1, 2024"
 date-modified: "last-modified"
 format: html
 editor: visual
-execite:
-  eval: ture
+execute:
+  eval: true
   echo: true
   warning: false
 ---

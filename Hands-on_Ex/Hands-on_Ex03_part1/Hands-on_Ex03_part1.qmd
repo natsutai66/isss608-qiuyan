@@ -1,13 +1,13 @@
 ---
-title: "Hands-on_Ex03 - part 1"
+title: "Hands-on Exercise 3 part 1"
 description: "Programming Interactive Data Visualisation with R"
 author: "Tai Qiu Yan"
 date: "April 30, 2024"
 date-modified: "last-modified"
 format: html
 editor: visual
-execite:
-  eval: ture
+execute:
+  eval: true
   echo: true
   warning: false
 ---
@@ -69,7 +69,7 @@ By hovering the mouse pointer on an data point of interest, the student’s ID w
 :::: panel-tabset
 ## Improved plot
 
-```{r}
+```{r, warning=FALSE}
 #| echo: false
 p <- ggplot(data = exam_data, aes(x = MATHS)) +
   geom_dotplot_interactive(
@@ -134,7 +134,7 @@ p <- ggplot(data = exam_data, aes(x = MATHS)) +
 girafe(
   ggobj = p,
   width_svg = 8,            # Slightly bigger
-  height_svg = 8 * 0.618    # Keep golden ratio
+  height_svg = 8 * 0.618    
 )
 ```
 :::
@@ -144,7 +144,7 @@ girafe(
 
 The content of the tooltip can be customised by including a list object as shown in the code chunk below.
 
-```{r}
+```{r, warning=FALSE}
 exam_data$tooltip <- c(paste0(     
   "Name = ", exam_data$ID,         
   "\n Class = ", exam_data$CLASS)) 
@@ -173,7 +173,7 @@ By hovering the mouse pointer on an data point of interest, the student’s ID a
 
 Code chunk below uses opts_tooltip() of ggiraph to customize tooltip rendering by add **css** declarations.
 
-```{r}
+```{r, warning=FALSE}
 tooltip_css <- "background-color:white; #<<
 font-style:bold; color:black;" #<<
 
@@ -202,7 +202,7 @@ Notice that the background colour of the tooltip is black and the font colour is
 
 Code chunk below shows an advanced way to customise tooltip. In this example, a **function** is used to compute 90% confident interval of the mean. The derived statistics are then displayed in the tooltip.
 
-```{r}
+```{r,warning=FALSE}
 tooltip <- function(y, ymax, accuracy = .01) {
   mean <- scales::number(y, accuracy = accuracy)
   sem <- scales::number(ymax - y, accuracy = accuracy)
@@ -390,7 +390,7 @@ There are two ways to create interactive graph by using plotly, they are: by usi
 
 The tabset below shows an example a basic interactive plot created by using **plot_ly()**.
 
-```{r}
+```{r, warning=FALSE}
 plot_ly(data = exam_data, 
              x = ~MATHS, 
              y = ~ENGLISH)
@@ -402,7 +402,7 @@ In the code chunk below, color argument is mapped to a qualitative visual variab
 
 Click on the colour symbol at the legend.
 
-```{r}
+```{r, warning=FALSE}
 plot_ly(data = exam_data, 
         x = ~ENGLISH, 
         y = ~MATHS, 
