@@ -63,7 +63,13 @@ The code chunk below imports Data worksheet from GlobalPopulation Excel workbook
 
 -   **mutate** of *dplyr* package is used to convert data values of Year field into integer.
 
-![](images/clipboard-2820990220.png)
+```{r, warning=FALSE}
+col <- c("Country", "Continent")
+globalPop <- read_xls("GlobalPopulation.xls",
+                      sheet="Data") %>%
+  mutate_each_(funs(factor(.)), col) %>%
+  mutate(Year = as.integer(Year))
+```
 
 Unfortunately, mutate_each\_() was deprecated in dplyr 0.7.0. and funs() was deprecated in dplyr 0.8.0. In view of this, we will re-write the code by using mutate_at() as shown in the code chunk below.
 
@@ -189,7 +195,7 @@ gg <- ggplot(globalPop,
 ggplotly(gg)
 ```
 
-## 4.2 Building an animated bubble plot: **plot_ly()** method
+## 4.2 Building an animated bubble plot: plot_ly() method
 
 In this sub-section, an animated bubble plot is created by using **plot_ly()** method.
 
