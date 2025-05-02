@@ -282,9 +282,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="importing-dataset" class="level2">
 <h2 class="anchored" data-anchor-id="importing-dataset">2.2 Importing dataset</h2>
-<p>The code chunk below imports the dataset <code>respopagesex2024.csv</code> and load the CSV file into a dataframe named <code>population_data</code>.</p>
-<p>After import, the <code>mutate()</code> function is applied to convert the <code>Age</code> column from character to numeric format.</p>
-<p>Lastly, the <code>glimpse()</code> function provides a concise overview of the dataset’s structure, displaying column names, data types, and sample values.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Explaination</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>population_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"respopagesex2024.csv"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Age =</span> <span class="fu">as.numeric</span>(Age))</span>
@@ -301,10 +302,21 @@ $ Pop  &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 30, 10, 20, 10, 20, 30, 30, 1
 $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024,…</code></pre>
 </div>
 </div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p>The code chunk below imports the dataset <code>respopagesex2024.csv</code> and load the CSV file into a dataframe named <code>population_data</code>.</p>
+<p>After import, the <code>mutate()</code> function is applied to convert the <code>Age</code> column from character to numeric format.</p>
+<p>Lastly, the <code>glimpse()</code> function provides a concise overview of the dataset’s structure, displaying column names, data types, and sample values.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="dataset-for-visuallisation-1" class="level2">
 <h2 class="anchored" data-anchor-id="dataset-for-visuallisation-1">2.3 Dataset for visuallisation 1</h2>
-<p>The code below prepares the dataset <code>population_data</code> for visualising a population pyramid by first converting the <code>Age</code> column to numeric format. It then categorises individual ages into 5-year intervals using the <code>cut()</code> function, creating a new variable <code>AgeGroup</code> with labels such as “0–4”, “5–9”, …, and “100+”. Any rows with missing <code>AgeGroup</code> values are filtered out. The data is then grouped by both <code>AgeGroup</code> and <code>Sex</code>, and the total population (<code>Pop</code>) within each group is calculated using <code>summarise()</code>. Finally, to enable the mirrored bar chart structure of a population pyramid, male population values are converted to negative using <code>mutate()</code> with an <code>ifelse()</code> condition. This transformation allows males to be displayed on the left and females on the right of the central axis in the plot.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Explaination</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pyramid_data <span class="ot">&lt;-</span> population_data <span class="sc">%&gt;%</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
@@ -321,7 +333,16 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Pop =</span> <span class="fu">sum</span>(Pop), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Pop =</span> <span class="fu">ifelse</span>(Sex <span class="sc">==</span> <span class="st">"Males"</span>, <span class="sc">-</span>Pop, Pop))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>The code below prepares the dataset <code>population_data</code> for visualising population distribution by broad age groups. It first converts the <code>Age</code> column to numeric format and then uses the <code>case_when()</code> function to classify individuals into six custom age groups: “Children” (≤12), “Teenager” (13–18), “Young Adult” (19–25), “Adult” (26–44), “Middle-age” (45–65), and “Elderly” (&gt;65). Any rows with undefined <code>AgeGroup</code> values are excluded using <code>filter()</code>. The dataset is then grouped by both <code>AgeGroup</code> and <code>Sex</code>, and the total population within each group is calculated using <code>summarise()</code>. Finally, the <code>AgeGroup</code> variable is converted into an ordered factor to ensure consistent and logical plotting on the x-axis.</p>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<p>The code below prepares the dataset <code>population_data</code> for visualising a population pyramid by first converting the <code>Age</code> column to numeric format. It then categorises individual ages into 5-year intervals using the <code>cut()</code> function, creating a new variable <code>AgeGroup</code> with labels such as “0–4”, “5–9”, …, and “100+”. Any rows with missing <code>AgeGroup</code> values are filtered out. The data is then grouped by both <code>AgeGroup</code> and <code>Sex</code>, and the total population (<code>Pop</code>) within each group is calculated using <code>summarise()</code>. Finally, to enable the mirrored bar chart structure of a population pyramid, male population values are converted to negative using <code>mutate()</code> with an <code>ifelse()</code> condition. This transformation allows males to be displayed on the left and females on the right of the central axis in the plot.</p>
+</div>
+</div>
+</div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Explaination</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pyramid_data_grouped <span class="ot">&lt;-</span> population_data <span class="sc">%&gt;%</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
@@ -342,6 +363,12 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    AgeGroup,</span>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Children"</span>, <span class="st">"Teenager"</span>, <span class="st">"Young Adult"</span>, <span class="st">"Adult"</span>, <span class="st">"Middle-age"</span>, <span class="st">"Elderly"</span>)</span>
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  ))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<p>The code below prepares the dataset <code>population_data</code> for visualising population distribution by broad age groups. It first converts the <code>Age</code> column to numeric format and then uses the <code>case_when()</code> function to classify individuals into six custom age groups: “Children” (≤12), “Teenager” (13–18), “Young Adult” (19–25), “Adult” (26–44), “Middle-age” (45–65), and “Elderly” (&gt;65). Any rows with undefined <code>AgeGroup</code> values are excluded using <code>filter()</code>. The dataset is then grouped by both <code>AgeGroup</code> and <code>Sex</code>, and the total population within each group is calculated using <code>summarise()</code>. Finally, the <code>AgeGroup</code> variable is converted into an ordered factor to ensure consistent and logical plotting on the x-axis.</p>
+</div>
+</div>
 </div>
 </section>
 <section id="dataset-for-visuallisation-2" class="level2">
@@ -369,9 +396,9 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <section id="visuallisation-1---demographic-structure-of-singapore-residents-by-age-and-sex" class="level2">
 <h2 class="anchored" data-anchor-id="visuallisation-1---demographic-structure-of-singapore-residents-by-age-and-sex">3.1 Visuallisation 1 - Demographic Structure of Singapore Residents by Age and Sex</h2>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">The plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">The code</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">The plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">The code</a></li></ul>
 <div class="tab-content">
-<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -382,7 +409,7 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 </div>
 </div>
 </div>
-<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
 <div style="font-size: 0.8em">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Plot 1: Population Pyramid ---</span></span>

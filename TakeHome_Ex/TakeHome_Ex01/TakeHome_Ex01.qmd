@@ -26,23 +26,27 @@ pacman::p_load(ggrepel, patchwork,
 
 ## 2.2 Importing dataset
 
-The code chunk below imports the dataset `respopagesex2024.csv` and load the CSV file into a dataframe named `population_data`.
-
-After import, the `mutate()` function is applied to convert the `Age` column from character to numeric format.
-
-Lastly, the `glimpse()` function provides a concise overview of the dataset’s structure, displaying column names, data types, and sample values.
-
+:::: panel-tabset
+## The code
 ```{r}
 population_data <- read_csv("respopagesex2024.csv") %>%
   mutate(Age = as.numeric(Age))
 
 glimpse(population_data)
 ```
+## Explaination
+
+The code chunk below imports the dataset `respopagesex2024.csv` and load the CSV file into a dataframe named `population_data`.
+
+After import, the `mutate()` function is applied to convert the `Age` column from character to numeric format.
+
+Lastly, the `glimpse()` function provides a concise overview of the dataset’s structure, displaying column names, data types, and sample values.
+
+::::
 
 ## 2.3 Dataset for visuallisation 1
-
-The code below prepares the dataset `population_data` for visualising a population pyramid by first converting the `Age` column to numeric format. It then categorises individual ages into 5-year intervals using the `cut()` function, creating a new variable `AgeGroup` with labels such as "0–4", "5–9", ..., and "100+". Any rows with missing `AgeGroup` values are filtered out. The data is then grouped by both `AgeGroup` and `Sex`, and the total population (`Pop`) within each group is calculated using `summarise()`. Finally, to enable the mirrored bar chart structure of a population pyramid, male population values are converted to negative using `mutate()` with an `ifelse()` condition. This transformation allows males to be displayed on the left and females on the right of the central axis in the plot.
-
+:::: panel-tabset
+## The code
 ```{r}
 pyramid_data <- population_data %>%
   mutate(
@@ -60,8 +64,13 @@ pyramid_data <- population_data %>%
   mutate(Pop = ifelse(Sex == "Males", -Pop, Pop))
 ```
 
-The code below prepares the dataset `population_data` for visualising population distribution by broad age groups. It first converts the `Age` column to numeric format and then uses the `case_when()` function to classify individuals into six custom age groups: "Children" (≤12), "Teenager" (13–18), "Young Adult" (19–25), "Adult" (26–44), "Middle-age" (45–65), and "Elderly" (\>65). Any rows with undefined `AgeGroup` values are excluded using `filter()`. The dataset is then grouped by both `AgeGroup` and `Sex`, and the total population within each group is calculated using `summarise()`. Finally, the `AgeGroup` variable is converted into an ordered factor to ensure consistent and logical plotting on the x-axis.
+## Explaination
 
+The code below prepares the dataset `population_data` for visualising a population pyramid by first converting the `Age` column to numeric format. It then categorises individual ages into 5-year intervals using the `cut()` function, creating a new variable `AgeGroup` with labels such as "0–4", "5–9", ..., and "100+". Any rows with missing `AgeGroup` values are filtered out. The data is then grouped by both `AgeGroup` and `Sex`, and the total population (`Pop`) within each group is calculated using `summarise()`. Finally, to enable the mirrored bar chart structure of a population pyramid, male population values are converted to negative using `mutate()` with an `ifelse()` condition. This transformation allows males to be displayed on the left and females on the right of the central axis in the plot.
+::::
+
+:::: panel-tabset
+## The code
 ```{r}
 pyramid_data_grouped <- population_data %>%
   mutate(
@@ -83,6 +92,11 @@ pyramid_data_grouped <- population_data %>%
     levels = c("Children", "Teenager", "Young Adult", "Adult", "Middle-age", "Elderly")
   ))
 ```
+
+## Explaination
+
+The code below prepares the dataset `population_data` for visualising population distribution by broad age groups. It first converts the `Age` column to numeric format and then uses the `case_when()` function to classify individuals into six custom age groups: "Children" (≤12), "Teenager" (13–18), "Young Adult" (19–25), "Adult" (26–44), "Middle-age" (45–65), and "Elderly" (\>65). Any rows with undefined `AgeGroup` values are excluded using `filter()`. The dataset is then grouped by both `AgeGroup` and `Sex`, and the total population within each group is calculated using `summarise()`. Finally, the `AgeGroup` variable is converted into an ordered factor to ensure consistent and logical plotting on the x-axis.
+::::
 
 ## 2.4 Dataset for visuallisation 2
 
