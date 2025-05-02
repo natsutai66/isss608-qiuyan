@@ -26,6 +26,12 @@ pacman::p_load(ggrepel, patchwork,
 
 ## 2.2 Importing dataset
 
+The code chunk below imports the dataset `respopagesex2024.csv` and load the CSV file into a dataframe named `population_data`.
+
+After import, the `mutate()` function is applied to convert the `Age` column from character to numeric format.
+
+Lastly, the `glimpse()` function provides a concise overview of the dataset’s structure, displaying column names, data types, and sample values.
+
 ```{r}
 population_data <- read_csv("respopagesex2024.csv") %>%
   mutate(Age = as.numeric(Age))
@@ -35,41 +41,12 @@ glimpse(population_data)
 
 ## 2.3 Dataset for visuallisation 1
 
-```{r}
-# Aggregate population by Age and Sex
-pyramid_data <- population_data %>%
-  group_by(Age, Sex) %>%
-  summarise(Pop = sum(Pop), .groups = "drop") %>%
-  mutate(Pop = ifelse(Sex == "Males", -Pop, Pop))  # Make male population negative for mirroring
-```
-
-
-## 2.4 Dataset for visuallisation 2
+The code below prepares the dataset `population_data` for visualising a population pyramid by first converting the `Age` column to numeric format. It then categorises individual ages into 5-year intervals using the `cut()` function, creating a new variable `AgeGroup` with labels such as "0–4", "5–9", ..., and "100+". Any rows with missing `AgeGroup` values are filtered out. The data is then grouped by both `AgeGroup` and `Sex`, and the total population (`Pop`) within each group is calculated using `summarise()`. Finally, to enable the mirrored bar chart structure of a population pyramid, male population values are converted to negative using `mutate()` with an `ifelse()` condition. This transformation allows males to be displayed on the left and females on the right of the central axis in the plot.
 
 ```{r}
-planning_area_population <- population_data %>%
-  group_by(PA) %>%
-  summarise(Total_Pop = sum(Pop), .groups = "drop") %>%
-  filter(Total_Pop > 0) %>%   
-  arrange(desc(Total_Pop))
-```
-
-## 2.5 Dataset for visuallisation 3
-```{r}
-age_distribution <- population_data %>%
-  mutate(Age = as.numeric(Age)) %>%
-  filter(Pop > 0) %>%
-  uncount(weights = Pop)
-```
-
-# 3 Data visuallisation
-
-## 3.1 Visuallisation 1 - Population Pyramid
-
-```{r fig.width=14, fig.height=8}
-# --- Plot 1: Population Pyramid ---
 pyramid_data <- population_data %>%
   mutate(
+    Age = as.numeric(Age),
     AgeGroup = cut(
       Age,
       breaks = c(seq(0, 100, by = 5), Inf),
@@ -81,33 +58,14 @@ pyramid_data <- population_data %>%
   group_by(AgeGroup, Sex) %>%
   summarise(Pop = sum(Pop), .groups = "drop") %>%
   mutate(Pop = ifelse(Sex == "Males", -Pop, Pop))
+```
 
-p1 <- ggplot(pyramid_data, aes(x = AgeGroup, y = Pop, fill = Sex)) +
-  geom_bar(stat = "identity", width = 0.9, color = "white") +
-  coord_flip() +
-  scale_y_continuous(
-    labels = function(x) scales::comma(abs(x)),
-    breaks = scales::pretty_breaks(n = 8)
-  ) +
-  scale_fill_manual(values = c("Males" = "#3182bd", "Females" = "#f768a1")) +
-  labs(
-    title = "Population Pyramid of Singapore (June 2024)",
-    x = "Age Group (5-year bins)",
-    y = "Population",
-    fill = "Sex"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 14),
-    axis.text = element_text(size = 9),
-    axis.title.x = element_text(margin = margin(t = 10)),
-    legend.position = "none"  # hide this legend, we'll collect one at the end
-  )
+The code below prepares the dataset `population_data` for visualising population distribution by broad age groups. It first converts the `Age` column to numeric format and then uses the `case_when()` function to classify individuals into six custom age groups: "Children" (≤12), "Teenager" (13–18), "Young Adult" (19–25), "Adult" (26–44), "Middle-age" (45–65), and "Elderly" (\>65). Any rows with undefined `AgeGroup` values are excluded using `filter()`. The dataset is then grouped by both `AgeGroup` and `Sex`, and the total population within each group is calculated using `summarise()`. Finally, the `AgeGroup` variable is converted into an ordered factor to ensure consistent and logical plotting on the x-axis.
 
-# --- Plot 2: Custom Age Group Bar Chart ---
-# Use simple labels for Age Groups
+```{r}
 pyramid_data_grouped <- population_data %>%
   mutate(
+    Age = as.numeric(Age),
     AgeGroup = case_when(
       Age <= 12 ~ "Children",
       Age >= 13 & Age <= 18 ~ "Teenager",
@@ -124,7 +82,59 @@ pyramid_data_grouped <- population_data %>%
     AgeGroup,
     levels = c("Children", "Teenager", "Young Adult", "Adult", "Middle-age", "Elderly")
   ))
+```
 
+## 2.4 Dataset for visuallisation 2
+
+```{r}
+planning_area_population <- population_data %>%
+  group_by(PA) %>%
+  summarise(Total_Pop = sum(Pop), .groups = "drop") %>%
+  filter(Total_Pop > 0) %>%   
+  arrange(desc(Total_Pop))
+```
+
+## 2.5 Dataset for visuallisation 3
+
+```{r}
+age_distribution <- population_data %>%
+  mutate(Age = as.numeric(Age)) %>%
+  filter(Pop > 0) %>%
+  uncount(weights = Pop)
+```
+
+# 3 Data visuallisation
+
+## 3.1 Visuallisation 1 - Demographic Structure of Singapore Residents by Age and Sex
+
+:::: panel-tabset
+## The plot
+
+```{r fig.width=14, fig.height=10}
+#| echo: false
+# --- Plot 1: Population Pyramid ---
+p1 <- ggplot(pyramid_data, aes(x = AgeGroup, y = Pop, fill = Sex)) +
+  geom_bar(stat = "identity", width = 0.9, color = "white") +
+  coord_flip() +
+  scale_y_continuous(
+    labels = function(x) scales::comma(abs(x)),
+    breaks = scales::pretty_breaks(n = 8)
+  ) +
+  scale_fill_manual(values = c("Males" = "#3182bd", "Females" = "#f768a1")) +
+  labs(
+    title = "Population Pyramid of Singapore",
+    x = "Age Group (5-year bins)",
+    y = "Population"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.text = element_text(size = 9),
+    axis.title.x = element_text(margin = margin(t = 10)),
+    legend.position = "none"  # hide this legend
+  )
+
+# --- Plot 2: Age Group Bar Chart ---
 p2 <- ggplot(pyramid_data_grouped, aes(x = AgeGroup, y = Total_Pop, fill = Sex)) +
   geom_bar(stat = "identity", position = "dodge") +
   scale_y_continuous(labels = scales::comma_format()) +
@@ -132,19 +142,90 @@ p2 <- ggplot(pyramid_data_grouped, aes(x = AgeGroup, y = Total_Pop, fill = Sex))
   labs(
     title = "Population by Age Groups",
     x = "Age Group",
-    y = "Total Population",
-    fill = "Sex"
+    y = "Total Population"
   ) +
   theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     plot.title = element_text(size = 14, face = "bold"),
-    legend.position = "bottom"
+    legend.position = "none"  # hide legend here too
   )
 
-# --- Combine with shared legend ---
-(p1 + p2) + plot_layout(guides = "collect") & theme(legend.position = "bottom")
+# --- Combine and add unified legend + age group note ---
+combined <- (p1 + p2) + plot_layout(guides = "collect") & theme(legend.position = "bottom")
+
+# Add age group definitions as caption text
+combined +
+  plot_annotation(
+    caption = "Age Group Ranges: Children: ≤12 | Teenager: 13–18 | Young Adult: 19–25 | Adult: 26–44 | Middle-age: 45–65 | Elderly: ≥65",
+    theme = theme(plot.caption = element_text(hjust = 0.5, size = 12, margin = margin(t = 10)))
+  )
 ```
+
+## The code
+
+::: {style="font-size: 0.8em"}
+```{r fig.width=14, fig.height=10}
+#| eval: false
+# --- Plot 1: Population Pyramid ---
+p1 <- ggplot(pyramid_data, aes(x = AgeGroup, y = Pop, fill = Sex)) +
+  geom_bar(stat = "identity", width = 0.9, color = "white") +
+  coord_flip() +
+  scale_y_continuous(
+    labels = function(x) scales::comma(abs(x)),
+    breaks = scales::pretty_breaks(n = 8)
+  ) +
+  scale_fill_manual(values = c("Males" = "#3182bd", "Females" = "#f768a1")) +
+  labs(
+    title = "Population Pyramid of Singapore",
+    x = "Age Group (5-year bins)",
+    y = "Population"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.text = element_text(size = 9),
+    axis.title.x = element_text(margin = margin(t = 10)),
+    legend.position = "none"  # hide this legend
+  )
+
+# --- Plot 2: Age Group Bar Chart ---
+p2 <- ggplot(pyramid_data_grouped, aes(x = AgeGroup, y = Total_Pop, fill = Sex)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(labels = scales::comma_format()) +
+  scale_fill_manual(values = c("Males" = "#3182bd", "Females" = "#f768a1")) +
+  labs(
+    title = "Population by Age Groups",
+    x = "Age Group",
+    y = "Total Population"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_text(size = 10),
+    plot.title = element_text(size = 14, face = "bold"),
+    legend.position = "none"  # hide legend here too
+  )
+
+# --- Combine and add unified legend + age group note ---
+combined <- (p1 + p2) + plot_layout(guides = "collect") & theme(legend.position = "bottom")
+
+# Add age group definitions as caption text
+combined +
+  plot_annotation(
+    caption = "Age Group Ranges: Children: ≤12 | Teenager: 13–18 | Young Adult: 19–25 | Adult: 26–44 | Middle-age: 45–65 | Elderly: ≥65",
+    theme = theme(plot.caption = element_text(hjust = 0.5, size = 12, margin = margin(t = 10)))
+  )
+```
+:::
+::::
+
+Insight:
+
+The population pyramid reveals a mature demographic structure with a bulge in the 40–59 age bands, reflecting Singapore’s aging population. The narrower base in the younger cohorts (ages 0–14) suggests declining birth rates, while the balanced width across genders indicates no significant sex disparity at each age group.
+
+The grouped bar chart further aggregates the population into broader life stages. The highest population lies in the “Middle-age” (45–65) and “Adult” (26–44) categories, which together form the majority of the working-age population. In contrast, the “Children” and “Teenager” groups are notably smaller, reinforcing concerns about future population replacement and dependency ratios. The elderly (65+) also form a substantial group, highlighting the importance of eldercare and retirement policy planning.
+
+Together, the visualizations underscore critical demographic challenges: a shrinking youth base, a growing senior population, and the need for sustainable workforce and social support strategies.
 
 ## 3.2 Visuallisation 2 - Horizontal Bar Plot of Population Density
 
