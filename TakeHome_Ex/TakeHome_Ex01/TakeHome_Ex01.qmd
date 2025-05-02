@@ -21,7 +21,7 @@ execute:
 ```{r}
 pacman::p_load(ggrepel, patchwork, 
                ggthemes, hrbrthemes,
-               tidyverse) 
+               tidyverse, tidytext) 
 ```
 
 ## 2.2 Importing dataset
@@ -101,11 +101,25 @@ The code below prepares the dataset `population_data` for visualising population
 ## 2.4 Dataset for visuallisation 2
 
 ```{r}
-planning_area_population <- population_data %>%
-  group_by(PA) %>%
+population_age_group_top20 <- population_data %>%
+  mutate(
+    Age = as.numeric(Age),
+    AgeGroup = case_when(
+      Age <= 12 ~ "Children",
+      Age >= 13 & Age <= 18 ~ "Teenager",
+      Age > 18 & Age <= 25 ~ "Young Adult",
+      Age >= 26 & Age <= 44 ~ "Adult",
+      Age >= 45 & Age <= 65 ~ "Middle-age",
+      Age > 65 ~ "Elderly"
+    )
+  ) %>%
+  filter(!is.na(AgeGroup)) %>%
+  group_by(PA, AgeGroup) %>%
   summarise(Total_Pop = sum(Pop), .groups = "drop") %>%
-  filter(Total_Pop > 0) %>%   
-  arrange(desc(Total_Pop))
+  filter(Total_Pop > 0) %>%
+  group_by(AgeGroup) %>%
+  slice_max(order_by = Total_Pop, n = 20) %>%
+  ungroup()
 ```
 
 ## 2.5 Dataset for visuallisation 3
@@ -243,19 +257,22 @@ Together, the visualizations underscore critical demographic challenges: a shrin
 
 ## 3.2 Visuallisation 2 - Horizontal Bar Plot of Population Density
 
-```{r fig.height=12, fig.width=8}
-ggplot(planning_area_population, aes(x = reorder(PA, Total_Pop), y = Total_Pop)) +
-  geom_col(fill = "steelblue") +
+```{r fig.width=16, fig.height=12}
+ggplot(population_age_group_top20, aes(x = reorder_within(PA, Total_Pop, AgeGroup), y = Total_Pop, fill = AgeGroup)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ AgeGroup, scales = "free") +
+  scale_x_reordered() +
   coord_flip() +
   labs(
-    title = "Population Density by Planning Area (June 2024)",
+    title = "Top 20 Planning Areas by Age Group Population",
     x = "Planning Area",
     y = "Total Population"
   ) +
   theme_minimal() +
   theme(
-    axis.text.y = element_text(size = 10),
-    plot.title = element_text(size = 14, face = "bold")
+    strip.text = element_text(face = "bold", size = 14),
+    axis.text.y = element_text(size = 12),
+    plot.title = element_text(face = "bold", size = 16)
   )
 ```
 

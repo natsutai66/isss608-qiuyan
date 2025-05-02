@@ -1,108 +1,59 @@
 [
   {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html",
-    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html",
-    "title": "Hands-on Exercise 3 part 1",
-    "section": "",
-    "text": "This hands-on exercise shows how to create interactive data visualisation by using functions provided by ggiraph and plotlyr packages."
+    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#installing-and-loading-the-required-libraries",
+    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#installing-and-loading-the-required-libraries",
+    "title": "Take Home Exercise 1",
+    "section": "2.1 Installing and loading the required libraries",
+    "text": "2.1 Installing and loading the required libraries\n\npacman::p_load(ggrepel, patchwork, \n               ggthemes, hrbrthemes,\n               tidyverse, tidytext)"
   },
   {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#tooltip-effect-with-tooltip-aesthetic",
-    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#tooltip-effect-with-tooltip-aesthetic",
-    "title": "Hands-on Exercise 3 part 1",
-    "section": "Tooltip effect with tooltip aesthetic",
-    "text": "Tooltip effect with tooltip aesthetic\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(\n    aes(tooltip = ID),\n    stackgroups = TRUE, \n    binwidth = 1, \n    method = \"histodot\") +\n  scale_y_continuous(NULL, \n                     breaks = NULL)\ngirafe(\n  ggobj = p,\n  width_svg = 6,\n  height_svg = 6*0.618\n)\n\n\n\n\n\nBy hovering the mouse pointer on an data point of interest, the student’s ID will be displayed.\n\nImproved plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\np &lt;- ggplot(data = exam_data, aes(x = MATHS)) +\n  geom_dotplot_interactive(\n    aes(tooltip = ID),\n    binwidth = 1,\n    stackgroups = TRUE,\n    dotsize = 0.8,          # Make dots bigger\n    color = \"darkblue\",     # Dot border color\n    fill = \"skyblue\",       # Dot fill color\n    method = \"histodot\",\n    binaxis = \"x\"           # Stack along x-axis\n  ) +\n  scale_y_continuous(NULL, breaks = NULL) +  # Hide y-axis\n  labs(\n    title = \"Distribution of Maths Scores\",\n    x = \"Maths Score\",\n    y = NULL\n  ) +\n  theme_minimal() +          # Cleaner background\n  theme(\n    plot.title = element_text(hjust = 0.5, size = 16, face = \"bold\"),\n    axis.text.x = element_text(size = 12),\n    axis.title.x = element_text(size = 14)\n  )\n\ngirafe(\n  ggobj = p,\n  width_svg = 8,            # Slightly bigger\n  height_svg = 8 * 0.618    \n)"
+    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#importing-dataset",
+    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#importing-dataset",
+    "title": "Take Home Exercise 1",
+    "section": "2.2 Importing dataset",
+    "text": "2.2 Importing dataset\n\nThe codeExplaination\n\n\n\npopulation_data &lt;- read_csv(\"respopagesex2024.csv\") %&gt;%\n  mutate(Age = as.numeric(Age))\n\nglimpse(population_data)\n\nRows: 60,424\nColumns: 6\n$ PA   &lt;chr&gt; \"Ang Mo Kio\", \"Ang Mo Kio\", \"Ang Mo Kio\", \"Ang Mo Kio\", \"Ang Mo K…\n$ SZ   &lt;chr&gt; \"Ang Mo Kio Town Centre\", \"Ang Mo Kio Town Centre\", \"Ang Mo Kio T…\n$ Age  &lt;dbl&gt; 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 1…\n$ Sex  &lt;chr&gt; \"Males\", \"Females\", \"Males\", \"Females\", \"Males\", \"Females\", \"Male…\n$ Pop  &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 30, 10, 20, 10, 20, 30, 30, 10, 3…\n$ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024,…\n\n\n\n\nThe code chunk below imports the dataset respopagesex2024.csv and load the CSV file into a dataframe named population_data.\nAfter import, the mutate() function is applied to convert the Age column from character to numeric format.\nLastly, the glimpse() function provides a concise overview of the dataset’s structure, displaying column names, data types, and sample values."
   },
   {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#customising-tooltip-style",
-    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#customising-tooltip-style",
-    "title": "Hands-on Exercise 3 part 1",
-    "section": "6.1 Customising Tooltip style",
-    "text": "6.1 Customising Tooltip style\nCode chunk below uses opts_tooltip() of ggiraph to customize tooltip rendering by add css declarations.\n\ntooltip_css &lt;- \"background-color:white; #&lt;&lt;\nfont-style:bold; color:black;\" #&lt;&lt;\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(tooltip = ID),                   \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618,\n  options = list(    #&lt;&lt;\n    opts_tooltip(    #&lt;&lt;\n      css = tooltip_css)) #&lt;&lt;\n)   \n\n\n\n\n\nNotice that the background colour of the tooltip is black and the font colour is white and bold."
+    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#dataset-for-visuallisation-1",
+    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#dataset-for-visuallisation-1",
+    "title": "Take Home Exercise 1",
+    "section": "2.3 Dataset for visuallisation 1",
+    "text": "2.3 Dataset for visuallisation 1\n\nThe codeExplaination\n\n\n\npyramid_data &lt;- population_data %&gt;%\n  mutate(\n    Age = as.numeric(Age),\n    AgeGroup = cut(\n      Age,\n      breaks = c(seq(0, 100, by = 5), Inf),\n      right = FALSE,\n      labels = c(paste(seq(0, 95, 5), seq(4, 99, 5), sep = \"–\"), \"100+\")\n    )\n  ) %&gt;%\n  filter(!is.na(AgeGroup)) %&gt;%\n  group_by(AgeGroup, Sex) %&gt;%\n  summarise(Pop = sum(Pop), .groups = \"drop\") %&gt;%\n  mutate(Pop = ifelse(Sex == \"Males\", -Pop, Pop))\n\n\n\nThe code below prepares the dataset population_data for visualising a population pyramid by first converting the Age column to numeric format. It then categorises individual ages into 5-year intervals using the cut() function, creating a new variable AgeGroup with labels such as “0–4”, “5–9”, …, and “100+”. Any rows with missing AgeGroup values are filtered out. The data is then grouped by both AgeGroup and Sex, and the total population (Pop) within each group is calculated using summarise(). Finally, to enable the mirrored bar chart structure of a population pyramid, male population values are converted to negative using mutate() with an ifelse() condition. This transformation allows males to be displayed on the left and females on the right of the central axis in the plot.\n\n\n\n\nThe codeExplaination\n\n\n\npyramid_data_grouped &lt;- population_data %&gt;%\n  mutate(\n    Age = as.numeric(Age),\n    AgeGroup = case_when(\n      Age &lt;= 12 ~ \"Children\",\n      Age &gt;= 13 & Age &lt;= 18 ~ \"Teenager\",\n      Age &gt; 18 & Age &lt;= 25 ~ \"Young Adult\",\n      Age &gt;= 26 & Age &lt;= 44 ~ \"Adult\",\n      Age &gt;= 45 & Age &lt;= 65 ~ \"Middle-age\",\n      Age &gt; 65 ~ \"Elderly\"\n    )\n  ) %&gt;%\n  filter(!is.na(AgeGroup)) %&gt;%\n  group_by(AgeGroup, Sex) %&gt;%\n  summarise(Total_Pop = sum(Pop), .groups = \"drop\") %&gt;%\n  mutate(AgeGroup = factor(\n    AgeGroup,\n    levels = c(\"Children\", \"Teenager\", \"Young Adult\", \"Adult\", \"Middle-age\", \"Elderly\")\n  ))\n\n\n\nThe code below prepares the dataset population_data for visualising population distribution by broad age groups. It first converts the Age column to numeric format and then uses the case_when() function to classify individuals into six custom age groups: “Children” (≤12), “Teenager” (13–18), “Young Adult” (19–25), “Adult” (26–44), “Middle-age” (45–65), and “Elderly” (&gt;65). Any rows with undefined AgeGroup values are excluded using filter(). The dataset is then grouped by both AgeGroup and Sex, and the total population within each group is calculated using summarise(). Finally, the AgeGroup variable is converted into an ordered factor to ensure consistent and logical plotting on the x-axis."
   },
   {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#displaying-statistics-on-tooltip",
-    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#displaying-statistics-on-tooltip",
-    "title": "Hands-on Exercise 3 part 1",
-    "section": "6.2 Displaying statistics on tooltip",
-    "text": "6.2 Displaying statistics on tooltip\nCode chunk below shows an advanced way to customise tooltip. In this example, a function is used to compute 90% confident interval of the mean. The derived statistics are then displayed in the tooltip.\n\ntooltip &lt;- function(y, ymax, accuracy = .01) {\n  mean &lt;- scales::number(y, accuracy = accuracy)\n  sem &lt;- scales::number(ymax - y, accuracy = accuracy)\n  paste(\"Mean maths scores:\", mean, \"+/-\", sem)\n}\n\ngg_point &lt;- ggplot(data=exam_data, \n                   aes(x = RACE),\n) +\n  stat_summary(aes(y = MATHS, \n                   tooltip = after_stat(  \n                     tooltip(y, ymax))),  \n    fun.data = \"mean_se\", \n    geom = GeomInteractiveCol,  \n    fill = \"light blue\"\n  ) +\n  stat_summary(aes(y = MATHS),\n    fun.data = mean_se,\n    geom = \"errorbar\", width = 0.2, size = 0.2\n  )\n\ngirafe(ggobj = gg_point,\n       width_svg = 8,\n       height_svg = 8*0.618)"
+    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#dataset-for-visuallisation-2",
+    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#dataset-for-visuallisation-2",
+    "title": "Take Home Exercise 1",
+    "section": "2.4 Dataset for visuallisation 2",
+    "text": "2.4 Dataset for visuallisation 2\n\npopulation_age_group_top20 &lt;- population_data %&gt;%\n  mutate(\n    Age = as.numeric(Age),\n    AgeGroup = case_when(\n      Age &lt;= 12 ~ \"Children\",\n      Age &gt;= 13 & Age &lt;= 18 ~ \"Teenager\",\n      Age &gt; 18 & Age &lt;= 25 ~ \"Young Adult\",\n      Age &gt;= 26 & Age &lt;= 44 ~ \"Adult\",\n      Age &gt;= 45 & Age &lt;= 65 ~ \"Middle-age\",\n      Age &gt; 65 ~ \"Elderly\"\n    )\n  ) %&gt;%\n  filter(!is.na(AgeGroup)) %&gt;%\n  group_by(PA, AgeGroup) %&gt;%\n  summarise(Total_Pop = sum(Pop), .groups = \"drop\") %&gt;%\n  filter(Total_Pop &gt; 0) %&gt;%\n  group_by(AgeGroup) %&gt;%\n  slice_max(order_by = Total_Pop, n = 20) %&gt;%\n  ungroup()"
   },
   {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#hover-effect-with-data_id-aesthetic",
-    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#hover-effect-with-data_id-aesthetic",
-    "title": "Hands-on Exercise 3 part 1",
-    "section": "6.3 Hover effect with data_id aesthetic",
-    "text": "6.3 Hover effect with data_id aesthetic\nCode chunk below shows the second interactive feature of ggiraph, namely data_id.\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(           \n    aes(data_id = CLASS),             \n    stackgroups = TRUE,               \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618                      \n)  \n\n\n\n\n\nElements associated with a data_id (i.e CLASS) will be highlighted upon mouse over.\nNote that the default value of the hover css is hover_css = “fill:orange;”."
+    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#dataset-for-visuallisation-3",
+    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#dataset-for-visuallisation-3",
+    "title": "Take Home Exercise 1",
+    "section": "2.5 Dataset for visuallisation 3",
+    "text": "2.5 Dataset for visuallisation 3\n\nage_distribution &lt;- population_data %&gt;%\n  mutate(Age = as.numeric(Age)) %&gt;%\n  filter(Pop &gt; 0) %&gt;%\n  uncount(weights = Pop)"
   },
   {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#styling-hover-effect",
-    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#styling-hover-effect",
-    "title": "Hands-on Exercise 3 part 1",
-    "section": "6.4 Styling hover effect",
-    "text": "6.4 Styling hover effect\nIn the code chunk below, css codes are used to change the highlighting effect.\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(data_id = CLASS),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618,\n  options = list(                        \n    opts_hover(css = \"fill: #202020;\"),  \n    opts_hover_inv(css = \"opacity:0.2;\") \n  )                                        \n)   \n\n\n\n\n\nNote: Different from previous example, in this example the ccs customisation request are encoded directly."
+    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#visuallisation-1---demographic-structure-of-singapore-residents-by-age-and-sex",
+    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#visuallisation-1---demographic-structure-of-singapore-residents-by-age-and-sex",
+    "title": "Take Home Exercise 1",
+    "section": "3.1 Visuallisation 1 - Demographic Structure of Singapore Residents by Age and Sex",
+    "text": "3.1 Visuallisation 1 - Demographic Structure of Singapore Residents by Age and Sex\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n# --- Plot 1: Population Pyramid ---\np1 &lt;- ggplot(pyramid_data, aes(x = AgeGroup, y = Pop, fill = Sex)) +\n  geom_bar(stat = \"identity\", width = 0.9, color = \"white\") +\n  coord_flip() +\n  scale_y_continuous(\n    labels = function(x) scales::comma(abs(x)),\n    breaks = scales::pretty_breaks(n = 8)\n  ) +\n  scale_fill_manual(values = c(\"Males\" = \"#3182bd\", \"Females\" = \"#f768a1\")) +\n  labs(\n    title = \"Population Pyramid of Singapore\",\n    x = \"Age Group (5-year bins)\",\n    y = \"Population\"\n  ) +\n  theme_minimal() +\n  theme(\n    plot.title = element_text(face = \"bold\", size = 14),\n    axis.text = element_text(size = 9),\n    axis.title.x = element_text(margin = margin(t = 10)),\n    legend.position = \"none\"  # hide this legend\n  )\n\n# --- Plot 2: Age Group Bar Chart ---\np2 &lt;- ggplot(pyramid_data_grouped, aes(x = AgeGroup, y = Total_Pop, fill = Sex)) +\n  geom_bar(stat = \"identity\", position = \"dodge\") +\n  scale_y_continuous(labels = scales::comma_format()) +\n  scale_fill_manual(values = c(\"Males\" = \"#3182bd\", \"Females\" = \"#f768a1\")) +\n  labs(\n    title = \"Population by Age Groups\",\n    x = \"Age Group\",\n    y = \"Total Population\"\n  ) +\n  theme_minimal() +\n  theme(\n    axis.text = element_text(size = 10),\n    plot.title = element_text(size = 14, face = \"bold\"),\n    legend.position = \"none\"  # hide legend here too\n  )\n\n# --- Combine and add unified legend + age group note ---\ncombined &lt;- (p1 + p2) + plot_layout(guides = \"collect\") & theme(legend.position = \"bottom\")\n\n# Add age group definitions as caption text\ncombined +\n  plot_annotation(\n    caption = \"Age Group Ranges: Children: ≤12 | Teenager: 13–18 | Young Adult: 19–25 | Adult: 26–44 | Middle-age: 45–65 | Elderly: ≥65\",\n    theme = theme(plot.caption = element_text(hjust = 0.5, size = 12, margin = margin(t = 10)))\n  )\n\n\n\n\n\nInsight:\nThe population pyramid reveals a mature demographic structure with a bulge in the 40–59 age bands, reflecting Singapore’s aging population. The narrower base in the younger cohorts (ages 0–14) suggests declining birth rates, while the balanced width across genders indicates no significant sex disparity at each age group.\nThe grouped bar chart further aggregates the population into broader life stages. The highest population lies in the “Middle-age” (45–65) and “Adult” (26–44) categories, which together form the majority of the working-age population. In contrast, the “Children” and “Teenager” groups are notably smaller, reinforcing concerns about future population replacement and dependency ratios. The elderly (65+) also form a substantial group, highlighting the importance of eldercare and retirement policy planning.\nTogether, the visualizations underscore critical demographic challenges: a shrinking youth base, a growing senior population, and the need for sustainable workforce and social support strategies."
   },
   {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#combining-tooltip-and-hover-effect",
-    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#combining-tooltip-and-hover-effect",
-    "title": "Hands-on Exercise 3 part 1",
-    "section": "6.5 Combining tooltip and hover effect",
-    "text": "6.5 Combining tooltip and hover effect\nThere are time that we want to combine tooltip and hover effect on the interactive statistical graph as shown in the code chunk below.\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(tooltip = CLASS, \n        data_id = CLASS),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618,\n  options = list(                        \n    opts_hover(css = \"fill: #202020;\"),  \n    opts_hover_inv(css = \"opacity:0.2;\") \n  )                                        \n) \n\n\n\n\n\nElements associated with a data_id (i.e CLASS) will be highlighted upon mouse over. At the same time, the tooltip will show the CLASS."
+    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#visuallisation-2---horizontal-bar-plot-of-population-density",
+    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#visuallisation-2---horizontal-bar-plot-of-population-density",
+    "title": "Take Home Exercise 1",
+    "section": "3.2 Visuallisation 2 - Horizontal Bar Plot of Population Density",
+    "text": "3.2 Visuallisation 2 - Horizontal Bar Plot of Population Density\n\nggplot(population_age_group_top20, aes(x = reorder_within(PA, Total_Pop, AgeGroup), y = Total_Pop, fill = AgeGroup)) +\n  geom_col(show.legend = FALSE) +\n  facet_wrap(~ AgeGroup, scales = \"free\") +\n  scale_x_reordered() +\n  coord_flip() +\n  labs(\n    title = \"Top 20 Planning Areas by Age Group Population\",\n    x = \"Planning Area\",\n    y = \"Total Population\"\n  ) +\n  theme_minimal() +\n  theme(\n    strip.text = element_text(face = \"bold\", size = 14),\n    axis.text.y = element_text(size = 12),\n    plot.title = element_text(face = \"bold\", size = 16)\n  )"
   },
   {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#click-effect-with-onclick",
-    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#click-effect-with-onclick",
-    "title": "Hands-on Exercise 3 part 1",
-    "section": "6.6 Click effect with onclick",
-    "text": "6.6 Click effect with onclick\nonclick argument of ggiraph provides hotlink interactivity on the web.\n\nexam_data$onclick &lt;- sprintf(\"window.open(\\\"%s%s\\\")\",\n\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20school\",\nas.character(exam_data$ID))\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(onclick = onclick),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618) \n\n\n\n\n\nWeb document link with a data object will be displayed on the web browser upon mouse click."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#coordinated-multiple-views-with-ggiraph",
-    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#coordinated-multiple-views-with-ggiraph",
-    "title": "Hands-on Exercise 3 part 1",
-    "section": "6.7 Coordinated Multiple Views with ggiraph",
-    "text": "6.7 Coordinated Multiple Views with ggiraph\nCoordinated multiple views methods has been implemented in the data visualisation below.\nWhen a data point of one of the dotplot is selected, the corresponding data point ID on the second data visualisation will be highlighted too.\nThe following programming strategy will be used:\n\nAppropriate interactive functions of ggiraph will be used to create the multiple views.\npatchwork function of patchwork package will be used inside girafe function to create the interactive coordinated multiple views.\n\n\np1 &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(data_id = ID),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +  \n  coord_cartesian(xlim=c(0,100)) + \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\n\np2 &lt;- ggplot(data=exam_data, \n       aes(x = ENGLISH)) +\n  geom_dotplot_interactive(              \n    aes(data_id = ID),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") + \n  coord_cartesian(xlim=c(0,100)) + \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\n\ngirafe(code = print(p1 + p2), \n       width_svg = 6,\n       height_svg = 3,\n       options = list(\n         opts_hover(css = \"fill: #202020;\"),\n         opts_hover_inv(css = \"opacity:0.2;\")\n         )\n       ) \n\n\n\n\n\nThe data_id aesthetic is critical to link observations between plots and the tooltip aesthetic is optional but nice to have when mouse over a point."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#creating-an-interactive-scatter-plot-plot_ly-method",
-    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#creating-an-interactive-scatter-plot-plot_ly-method",
-    "title": "Hands-on Exercise 3 part 1",
-    "section": "7.1 Creating an interactive scatter plot: plot_ly() method",
-    "text": "7.1 Creating an interactive scatter plot: plot_ly() method\nThe tabset below shows an example a basic interactive plot created by using plot_ly().\n\nplot_ly(data = exam_data, \n             x = ~MATHS, \n             y = ~ENGLISH)"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#working-with-visual-variable-plot_ly-method",
-    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#working-with-visual-variable-plot_ly-method",
-    "title": "Hands-on Exercise 3 part 1",
-    "section": "7.2 Working with visual variable: plot_ly() method",
-    "text": "7.2 Working with visual variable: plot_ly() method\nIn the code chunk below, color argument is mapped to a qualitative visual variable (i.e. RACE).\nClick on the colour symbol at the legend.\n\nplot_ly(data = exam_data, \n        x = ~ENGLISH, \n        y = ~MATHS, \n        color = ~RACE)"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#creating-an-interactive-scatter-plot-ggplotly-method",
-    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#creating-an-interactive-scatter-plot-ggplotly-method",
-    "title": "Hands-on Exercise 3 part 1",
-    "section": "7.3 Creating an interactive scatter plot: ggplotly() method",
-    "text": "7.3 Creating an interactive scatter plot: ggplotly() method\nThe code chunk below plots an interactive scatter plot by using ggplotly().\n\np &lt;- ggplot(data=exam_data, \n            aes(x = MATHS,\n                y = ENGLISH)) +\n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\nggplotly(p)\n\n\n\n\n\nNotice that the only extra line you need to include in the code chunk is ggplotly()."
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#coordinated-multiple-views-with-plotly",
-    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#coordinated-multiple-views-with-plotly",
-    "title": "Hands-on Exercise 3 part 1",
-    "section": "7.4 Coordinated Multiple Views with plotly",
-    "text": "7.4 Coordinated Multiple Views with plotly\nThe creation of a coordinated linked plot by using plotly involves three steps:\n\nhighlight_key() of plotly package is used as shared data.\ntwo scatterplots will be created by using ggplot2 functions.\nlastly, subplot() of plotly package is used to place them next to each other side-by-side.\nhighlight_key() simply creates an object of class crosstalk::SharedData.\n\n\nd &lt;- highlight_key(exam_data)\np1 &lt;- ggplot(data=d, \n            aes(x = MATHS,\n                y = ENGLISH)) +\n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\n\np2 &lt;- ggplot(data=d, \n            aes(x = MATHS,\n                y = SCIENCE)) +\n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\nsubplot(ggplotly(p1),\n        ggplotly(p2))"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#interactive-data-table-dt-package",
-    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#interactive-data-table-dt-package",
-    "title": "Hands-on Exercise 3 part 1",
-    "section": "8.1 Interactive Data Table: DT package",
-    "text": "8.1 Interactive Data Table: DT package\n\nA wrapper of the JavaScript Library DataTables\nData objects in R can be rendered as HTML tables using the JavaScript library ‘DataTables’ (typically via R Markdown or Shiny).\n\n\nDT::datatable(exam_data, class= \"compact\")"
-  },
-  {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#linked-brushing-crosstalk-method",
-    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#linked-brushing-crosstalk-method",
-    "title": "Hands-on Exercise 3 part 1",
-    "section": "8.2 Linked brushing: crosstalk method",
-    "text": "8.2 Linked brushing: crosstalk method\nCode chunk below is used to implement the coordinated brushing shown above.\n\nd &lt;- highlight_key(exam_data) \np &lt;- ggplot(d, \n            aes(ENGLISH, \n                MATHS)) + \n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\n\ngg &lt;- highlight(ggplotly(p),        \n                \"plotly_selected\")  \n\ncrosstalk::bscols(gg,               \n                  DT::datatable(d), \n                  widths = 5)"
+    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#visuallisation-3---boxplot-of-age-distribution-by-planning-area",
+    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#visuallisation-3---boxplot-of-age-distribution-by-planning-area",
+    "title": "Take Home Exercise 1",
+    "section": "3.3 Visuallisation 3 - Boxplot of Age Distribution by Planning Area",
+    "text": "3.3 Visuallisation 3 - Boxplot of Age Distribution by Planning Area\n\n# Order planning areas by median age for better readability\nordered_area &lt;- age_distribution %&gt;%\n  group_by(PA) %&gt;%\n  summarise(median_age = median(Age)) %&gt;%\n  arrange(median_age) %&gt;%\n  pull(PA)\n\n# Convert PA into factor with specified order\nage_distribution &lt;- age_distribution %&gt;%\n  mutate(PA = factor(PA, levels = ordered_area))\n\n# Boxplot\nggplot(age_distribution, aes(x = Age, y = PA)) +\n  geom_boxplot(fill = \"skyblue\", color = \"grey30\", outlier.size = 0.5) +\n  labs(\n    title = \"Age Distribution by Planning Area (June 2024)\",\n    x = \"Age\",\n    y = \"Planning Area\"\n  ) +\n  theme_minimal() +\n  theme(\n    axis.text.y = element_text(size = 9),\n    plot.title = element_text(face = \"bold\", size = 14)\n  )"
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex03_part2/Hands-on_Ex03_part2.html",
@@ -252,87 +203,115 @@
     "text": "5.6 Creating a composite figure by using patchwork and ggtheme\n\npatchwork &lt;- (p1 / p2) | p3\npatchwork & theme_economist()"
   },
   {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html",
+    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html",
+    "title": "Hands-on Exercise 3 part 1",
+    "section": "",
+    "text": "This hands-on exercise shows how to create interactive data visualisation by using functions provided by ggiraph and plotlyr packages."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#tooltip-effect-with-tooltip-aesthetic",
+    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#tooltip-effect-with-tooltip-aesthetic",
+    "title": "Hands-on Exercise 3 part 1",
+    "section": "Tooltip effect with tooltip aesthetic",
+    "text": "Tooltip effect with tooltip aesthetic\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(\n    aes(tooltip = ID),\n    stackgroups = TRUE, \n    binwidth = 1, \n    method = \"histodot\") +\n  scale_y_continuous(NULL, \n                     breaks = NULL)\ngirafe(\n  ggobj = p,\n  width_svg = 6,\n  height_svg = 6*0.618\n)\n\n\n\n\n\nBy hovering the mouse pointer on an data point of interest, the student’s ID will be displayed.\n\nImproved plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\np &lt;- ggplot(data = exam_data, aes(x = MATHS)) +\n  geom_dotplot_interactive(\n    aes(tooltip = ID),\n    binwidth = 1,\n    stackgroups = TRUE,\n    dotsize = 0.8,          # Make dots bigger\n    color = \"darkblue\",     # Dot border color\n    fill = \"skyblue\",       # Dot fill color\n    method = \"histodot\",\n    binaxis = \"x\"           # Stack along x-axis\n  ) +\n  scale_y_continuous(NULL, breaks = NULL) +  # Hide y-axis\n  labs(\n    title = \"Distribution of Maths Scores\",\n    x = \"Maths Score\",\n    y = NULL\n  ) +\n  theme_minimal() +          # Cleaner background\n  theme(\n    plot.title = element_text(hjust = 0.5, size = 16, face = \"bold\"),\n    axis.text.x = element_text(size = 12),\n    axis.title.x = element_text(size = 14)\n  )\n\ngirafe(\n  ggobj = p,\n  width_svg = 8,            # Slightly bigger\n  height_svg = 8 * 0.618    \n)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#customising-tooltip-style",
+    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#customising-tooltip-style",
+    "title": "Hands-on Exercise 3 part 1",
+    "section": "6.1 Customising Tooltip style",
+    "text": "6.1 Customising Tooltip style\nCode chunk below uses opts_tooltip() of ggiraph to customize tooltip rendering by add css declarations.\n\ntooltip_css &lt;- \"background-color:white; #&lt;&lt;\nfont-style:bold; color:black;\" #&lt;&lt;\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(tooltip = ID),                   \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618,\n  options = list(    #&lt;&lt;\n    opts_tooltip(    #&lt;&lt;\n      css = tooltip_css)) #&lt;&lt;\n)   \n\n\n\n\n\nNotice that the background colour of the tooltip is black and the font colour is white and bold."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#displaying-statistics-on-tooltip",
+    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#displaying-statistics-on-tooltip",
+    "title": "Hands-on Exercise 3 part 1",
+    "section": "6.2 Displaying statistics on tooltip",
+    "text": "6.2 Displaying statistics on tooltip\nCode chunk below shows an advanced way to customise tooltip. In this example, a function is used to compute 90% confident interval of the mean. The derived statistics are then displayed in the tooltip.\n\ntooltip &lt;- function(y, ymax, accuracy = .01) {\n  mean &lt;- scales::number(y, accuracy = accuracy)\n  sem &lt;- scales::number(ymax - y, accuracy = accuracy)\n  paste(\"Mean maths scores:\", mean, \"+/-\", sem)\n}\n\ngg_point &lt;- ggplot(data=exam_data, \n                   aes(x = RACE),\n) +\n  stat_summary(aes(y = MATHS, \n                   tooltip = after_stat(  \n                     tooltip(y, ymax))),  \n    fun.data = \"mean_se\", \n    geom = GeomInteractiveCol,  \n    fill = \"light blue\"\n  ) +\n  stat_summary(aes(y = MATHS),\n    fun.data = mean_se,\n    geom = \"errorbar\", width = 0.2, size = 0.2\n  )\n\ngirafe(ggobj = gg_point,\n       width_svg = 8,\n       height_svg = 8*0.618)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#hover-effect-with-data_id-aesthetic",
+    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#hover-effect-with-data_id-aesthetic",
+    "title": "Hands-on Exercise 3 part 1",
+    "section": "6.3 Hover effect with data_id aesthetic",
+    "text": "6.3 Hover effect with data_id aesthetic\nCode chunk below shows the second interactive feature of ggiraph, namely data_id.\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(           \n    aes(data_id = CLASS),             \n    stackgroups = TRUE,               \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618                      \n)  \n\n\n\n\n\nElements associated with a data_id (i.e CLASS) will be highlighted upon mouse over.\nNote that the default value of the hover css is hover_css = “fill:orange;”."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#styling-hover-effect",
+    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#styling-hover-effect",
+    "title": "Hands-on Exercise 3 part 1",
+    "section": "6.4 Styling hover effect",
+    "text": "6.4 Styling hover effect\nIn the code chunk below, css codes are used to change the highlighting effect.\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(data_id = CLASS),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618,\n  options = list(                        \n    opts_hover(css = \"fill: #202020;\"),  \n    opts_hover_inv(css = \"opacity:0.2;\") \n  )                                        \n)   \n\n\n\n\n\nNote: Different from previous example, in this example the ccs customisation request are encoded directly."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#combining-tooltip-and-hover-effect",
+    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#combining-tooltip-and-hover-effect",
+    "title": "Hands-on Exercise 3 part 1",
+    "section": "6.5 Combining tooltip and hover effect",
+    "text": "6.5 Combining tooltip and hover effect\nThere are time that we want to combine tooltip and hover effect on the interactive statistical graph as shown in the code chunk below.\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(tooltip = CLASS, \n        data_id = CLASS),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618,\n  options = list(                        \n    opts_hover(css = \"fill: #202020;\"),  \n    opts_hover_inv(css = \"opacity:0.2;\") \n  )                                        \n) \n\n\n\n\n\nElements associated with a data_id (i.e CLASS) will be highlighted upon mouse over. At the same time, the tooltip will show the CLASS."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#click-effect-with-onclick",
+    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#click-effect-with-onclick",
+    "title": "Hands-on Exercise 3 part 1",
+    "section": "6.6 Click effect with onclick",
+    "text": "6.6 Click effect with onclick\nonclick argument of ggiraph provides hotlink interactivity on the web.\n\nexam_data$onclick &lt;- sprintf(\"window.open(\\\"%s%s\\\")\",\n\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20school\",\nas.character(exam_data$ID))\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(onclick = onclick),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618) \n\n\n\n\n\nWeb document link with a data object will be displayed on the web browser upon mouse click."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#coordinated-multiple-views-with-ggiraph",
+    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#coordinated-multiple-views-with-ggiraph",
+    "title": "Hands-on Exercise 3 part 1",
+    "section": "6.7 Coordinated Multiple Views with ggiraph",
+    "text": "6.7 Coordinated Multiple Views with ggiraph\nCoordinated multiple views methods has been implemented in the data visualisation below.\nWhen a data point of one of the dotplot is selected, the corresponding data point ID on the second data visualisation will be highlighted too.\nThe following programming strategy will be used:\n\nAppropriate interactive functions of ggiraph will be used to create the multiple views.\npatchwork function of patchwork package will be used inside girafe function to create the interactive coordinated multiple views.\n\n\np1 &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(data_id = ID),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +  \n  coord_cartesian(xlim=c(0,100)) + \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\n\np2 &lt;- ggplot(data=exam_data, \n       aes(x = ENGLISH)) +\n  geom_dotplot_interactive(              \n    aes(data_id = ID),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") + \n  coord_cartesian(xlim=c(0,100)) + \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\n\ngirafe(code = print(p1 + p2), \n       width_svg = 6,\n       height_svg = 3,\n       options = list(\n         opts_hover(css = \"fill: #202020;\"),\n         opts_hover_inv(css = \"opacity:0.2;\")\n         )\n       ) \n\n\n\n\n\nThe data_id aesthetic is critical to link observations between plots and the tooltip aesthetic is optional but nice to have when mouse over a point."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#creating-an-interactive-scatter-plot-plot_ly-method",
+    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#creating-an-interactive-scatter-plot-plot_ly-method",
+    "title": "Hands-on Exercise 3 part 1",
+    "section": "7.1 Creating an interactive scatter plot: plot_ly() method",
+    "text": "7.1 Creating an interactive scatter plot: plot_ly() method\nThe tabset below shows an example a basic interactive plot created by using plot_ly().\n\nplot_ly(data = exam_data, \n             x = ~MATHS, \n             y = ~ENGLISH)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#working-with-visual-variable-plot_ly-method",
+    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#working-with-visual-variable-plot_ly-method",
+    "title": "Hands-on Exercise 3 part 1",
+    "section": "7.2 Working with visual variable: plot_ly() method",
+    "text": "7.2 Working with visual variable: plot_ly() method\nIn the code chunk below, color argument is mapped to a qualitative visual variable (i.e. RACE).\nClick on the colour symbol at the legend.\n\nplot_ly(data = exam_data, \n        x = ~ENGLISH, \n        y = ~MATHS, \n        color = ~RACE)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#creating-an-interactive-scatter-plot-ggplotly-method",
+    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#creating-an-interactive-scatter-plot-ggplotly-method",
+    "title": "Hands-on Exercise 3 part 1",
+    "section": "7.3 Creating an interactive scatter plot: ggplotly() method",
+    "text": "7.3 Creating an interactive scatter plot: ggplotly() method\nThe code chunk below plots an interactive scatter plot by using ggplotly().\n\np &lt;- ggplot(data=exam_data, \n            aes(x = MATHS,\n                y = ENGLISH)) +\n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\nggplotly(p)\n\n\n\n\n\nNotice that the only extra line you need to include in the code chunk is ggplotly()."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#coordinated-multiple-views-with-plotly",
+    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#coordinated-multiple-views-with-plotly",
+    "title": "Hands-on Exercise 3 part 1",
+    "section": "7.4 Coordinated Multiple Views with plotly",
+    "text": "7.4 Coordinated Multiple Views with plotly\nThe creation of a coordinated linked plot by using plotly involves three steps:\n\nhighlight_key() of plotly package is used as shared data.\ntwo scatterplots will be created by using ggplot2 functions.\nlastly, subplot() of plotly package is used to place them next to each other side-by-side.\nhighlight_key() simply creates an object of class crosstalk::SharedData.\n\n\nd &lt;- highlight_key(exam_data)\np1 &lt;- ggplot(data=d, \n            aes(x = MATHS,\n                y = ENGLISH)) +\n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\n\np2 &lt;- ggplot(data=d, \n            aes(x = MATHS,\n                y = SCIENCE)) +\n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\nsubplot(ggplotly(p1),\n        ggplotly(p2))"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#interactive-data-table-dt-package",
+    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#interactive-data-table-dt-package",
+    "title": "Hands-on Exercise 3 part 1",
+    "section": "8.1 Interactive Data Table: DT package",
+    "text": "8.1 Interactive Data Table: DT package\n\nA wrapper of the JavaScript Library DataTables\nData objects in R can be rendered as HTML tables using the JavaScript library ‘DataTables’ (typically via R Markdown or Shiny).\n\n\nDT::datatable(exam_data, class= \"compact\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#linked-brushing-crosstalk-method",
+    "href": "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html#linked-brushing-crosstalk-method",
+    "title": "Hands-on Exercise 3 part 1",
+    "section": "8.2 Linked brushing: crosstalk method",
+    "text": "8.2 Linked brushing: crosstalk method\nCode chunk below is used to implement the coordinated brushing shown above.\n\nd &lt;- highlight_key(exam_data) \np &lt;- ggplot(d, \n            aes(ENGLISH, \n                MATHS)) + \n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\n\ngg &lt;- highlight(ggplotly(p),        \n                \"plotly_selected\")  \n\ncrosstalk::bscols(gg,               \n                  DT::datatable(d), \n                  widths = 5)"
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Visual Analytics & Applications",
     "section": "",
     "text": "◔.̮◔✧ Hi, I am Qiu Yan. Welcome to ISSS608 Visual Analytics and Applications. In this website, you will find my coursework prepared for this course. Thank you for visiting ~"
-  },
-  {
-    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#installing-and-loading-the-required-libraries",
-    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#installing-and-loading-the-required-libraries",
-    "title": "Take Home Exercise 1",
-    "section": "2.1 Installing and loading the required libraries",
-    "text": "2.1 Installing and loading the required libraries\n\npacman::p_load(ggrepel, patchwork, \n               ggthemes, hrbrthemes,\n               tidyverse)"
-  },
-  {
-    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#importing-dataset",
-    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#importing-dataset",
-    "title": "Take Home Exercise 1",
-    "section": "2.2 Importing dataset",
-    "text": "2.2 Importing dataset\n\nThe codeExplaination\n\n\n\npopulation_data &lt;- read_csv(\"respopagesex2024.csv\") %&gt;%\n  mutate(Age = as.numeric(Age))\n\nglimpse(population_data)\n\nRows: 60,424\nColumns: 6\n$ PA   &lt;chr&gt; \"Ang Mo Kio\", \"Ang Mo Kio\", \"Ang Mo Kio\", \"Ang Mo Kio\", \"Ang Mo K…\n$ SZ   &lt;chr&gt; \"Ang Mo Kio Town Centre\", \"Ang Mo Kio Town Centre\", \"Ang Mo Kio T…\n$ Age  &lt;dbl&gt; 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 1…\n$ Sex  &lt;chr&gt; \"Males\", \"Females\", \"Males\", \"Females\", \"Males\", \"Females\", \"Male…\n$ Pop  &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 30, 10, 20, 10, 20, 30, 30, 10, 3…\n$ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024,…\n\n\n\n\nThe code chunk below imports the dataset respopagesex2024.csv and load the CSV file into a dataframe named population_data.\nAfter import, the mutate() function is applied to convert the Age column from character to numeric format.\nLastly, the glimpse() function provides a concise overview of the dataset’s structure, displaying column names, data types, and sample values."
-  },
-  {
-    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#dataset-for-visuallisation-1",
-    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#dataset-for-visuallisation-1",
-    "title": "Take Home Exercise 1",
-    "section": "2.3 Dataset for visuallisation 1",
-    "text": "2.3 Dataset for visuallisation 1\n\nThe codeExplaination\n\n\n\npyramid_data &lt;- population_data %&gt;%\n  mutate(\n    Age = as.numeric(Age),\n    AgeGroup = cut(\n      Age,\n      breaks = c(seq(0, 100, by = 5), Inf),\n      right = FALSE,\n      labels = c(paste(seq(0, 95, 5), seq(4, 99, 5), sep = \"–\"), \"100+\")\n    )\n  ) %&gt;%\n  filter(!is.na(AgeGroup)) %&gt;%\n  group_by(AgeGroup, Sex) %&gt;%\n  summarise(Pop = sum(Pop), .groups = \"drop\") %&gt;%\n  mutate(Pop = ifelse(Sex == \"Males\", -Pop, Pop))\n\n\n\nThe code below prepares the dataset population_data for visualising a population pyramid by first converting the Age column to numeric format. It then categorises individual ages into 5-year intervals using the cut() function, creating a new variable AgeGroup with labels such as “0–4”, “5–9”, …, and “100+”. Any rows with missing AgeGroup values are filtered out. The data is then grouped by both AgeGroup and Sex, and the total population (Pop) within each group is calculated using summarise(). Finally, to enable the mirrored bar chart structure of a population pyramid, male population values are converted to negative using mutate() with an ifelse() condition. This transformation allows males to be displayed on the left and females on the right of the central axis in the plot.\n\n\n\n\nThe codeExplaination\n\n\n\npyramid_data_grouped &lt;- population_data %&gt;%\n  mutate(\n    Age = as.numeric(Age),\n    AgeGroup = case_when(\n      Age &lt;= 12 ~ \"Children\",\n      Age &gt;= 13 & Age &lt;= 18 ~ \"Teenager\",\n      Age &gt; 18 & Age &lt;= 25 ~ \"Young Adult\",\n      Age &gt;= 26 & Age &lt;= 44 ~ \"Adult\",\n      Age &gt;= 45 & Age &lt;= 65 ~ \"Middle-age\",\n      Age &gt; 65 ~ \"Elderly\"\n    )\n  ) %&gt;%\n  filter(!is.na(AgeGroup)) %&gt;%\n  group_by(AgeGroup, Sex) %&gt;%\n  summarise(Total_Pop = sum(Pop), .groups = \"drop\") %&gt;%\n  mutate(AgeGroup = factor(\n    AgeGroup,\n    levels = c(\"Children\", \"Teenager\", \"Young Adult\", \"Adult\", \"Middle-age\", \"Elderly\")\n  ))\n\n\n\nThe code below prepares the dataset population_data for visualising population distribution by broad age groups. It first converts the Age column to numeric format and then uses the case_when() function to classify individuals into six custom age groups: “Children” (≤12), “Teenager” (13–18), “Young Adult” (19–25), “Adult” (26–44), “Middle-age” (45–65), and “Elderly” (&gt;65). Any rows with undefined AgeGroup values are excluded using filter(). The dataset is then grouped by both AgeGroup and Sex, and the total population within each group is calculated using summarise(). Finally, the AgeGroup variable is converted into an ordered factor to ensure consistent and logical plotting on the x-axis."
-  },
-  {
-    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#dataset-for-visuallisation-2",
-    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#dataset-for-visuallisation-2",
-    "title": "Take Home Exercise 1",
-    "section": "2.4 Dataset for visuallisation 2",
-    "text": "2.4 Dataset for visuallisation 2\n\nplanning_area_population &lt;- population_data %&gt;%\n  group_by(PA) %&gt;%\n  summarise(Total_Pop = sum(Pop), .groups = \"drop\") %&gt;%\n  filter(Total_Pop &gt; 0) %&gt;%   \n  arrange(desc(Total_Pop))"
-  },
-  {
-    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#population-pyramid",
-    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#population-pyramid",
-    "title": "Take Home Exercise 1",
-    "section": "3.1 Population Pyramid",
-    "text": "3.1 Population Pyramid\n\nggplot(pyramid_data, aes(x = Age, y = Pop, fill = Sex)) +\n  geom_bar(stat = \"identity\", width = 1, color = \"white\") +\n  coord_flip() +\n  scale_y_continuous(\n    labels = abs,\n    breaks = scales::pretty_breaks(n = 10)\n  ) +\n  scale_fill_manual(values = c(\"Males\" = \"steelblue\", \"Females\" = \"lightcoral\")) +\n  labs(\n    title = \"Population Pyramid of Singapore (June 2024)\",\n    x = \"Age\",\n    y = \"Population\",\n    fill = \"Sex\"\n  ) +\n  theme_minimal()"
-  },
-  {
-    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#horizontal-bar-plot-of-population-density",
-    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#horizontal-bar-plot-of-population-density",
-    "title": "Take Home Exercise 1",
-    "section": "3.2 Horizontal Bar Plot of Population Density",
-    "text": "3.2 Horizontal Bar Plot of Population Density\n\nggplot(planning_area_population, aes(x = reorder(PA, Total_Pop), y = Total_Pop)) +\n  geom_col(fill = \"steelblue\") +\n  coord_flip() +\n  labs(\n    title = \"Population Density by Planning Area (June 2024)\",\n    x = \"Planning Area\",\n    y = \"Total Population\"\n  ) +\n  theme_minimal() +\n  theme(\n    axis.text.y = element_text(size = 10),\n    plot.title = element_text(size = 14, face = \"bold\")\n  )"
-  },
-  {
-    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#dataset-for-visuallisation-3",
-    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#dataset-for-visuallisation-3",
-    "title": "Take Home Exercise 1",
-    "section": "2.5 Dataset for visuallisation 3",
-    "text": "2.5 Dataset for visuallisation 3\n\nage_distribution &lt;- population_data %&gt;%\n  mutate(Age = as.numeric(Age)) %&gt;%\n  filter(Pop &gt; 0) %&gt;%\n  uncount(weights = Pop)"
-  },
-  {
-    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#visuallisation-1---population-pyramid",
-    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#visuallisation-1---population-pyramid",
-    "title": "Take Home Exercise 1",
-    "section": "3.1 Visuallisation 1 - Population Pyramid",
-    "text": "3.1 Visuallisation 1 - Population Pyramid\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n# --- Plot 1: Population Pyramid ---\npyramid_data &lt;- population_data %&gt;%\n  mutate(\n    Age = as.numeric(Age),\n    AgeGroup = cut(\n      Age,\n      breaks = c(seq(0, 100, by = 5), Inf),\n      right = FALSE,\n      labels = c(paste(seq(0, 95, 5), seq(4, 99, 5), sep = \"–\"), \"100+\")\n    )\n  ) %&gt;%\n  filter(!is.na(AgeGroup)) %&gt;%\n  group_by(AgeGroup, Sex) %&gt;%\n  summarise(Pop = sum(Pop), .groups = \"drop\") %&gt;%\n  mutate(Pop = ifelse(Sex == \"Males\", -Pop, Pop))\n\np1 &lt;- ggplot(pyramid_data, aes(x = AgeGroup, y = Pop, fill = Sex)) +\n  geom_bar(stat = \"identity\", width = 0.9, color = \"white\") +\n  coord_flip() +\n  scale_y_continuous(\n    labels = function(x) scales::comma(abs(x)),\n    breaks = scales::pretty_breaks(n = 8)\n  ) +\n  scale_fill_manual(values = c(\"Males\" = \"#3182bd\", \"Females\" = \"#f768a1\")) +\n  labs(\n    title = \"Population Pyramid of Singapore\",\n    x = \"Age Group (5-year bins)\",\n    y = \"Population\"\n  ) +\n  theme_minimal() +\n  theme(\n    plot.title = element_text(face = \"bold\", size = 14),\n    axis.text = element_text(size = 9),\n    axis.title.x = element_text(margin = margin(t = 10)),\n    legend.position = \"none\"  # hide this legend\n  )\n\n# --- Plot 2: Age Group Bar Chart ---\npyramid_data_grouped &lt;- population_data %&gt;%\n  mutate(\n    Age = as.numeric(Age),\n    AgeGroup = case_when(\n      Age &lt;= 12 ~ \"Children\",\n      Age &gt;= 13 & Age &lt;= 18 ~ \"Teenager\",\n      Age &gt; 18 & Age &lt;= 25 ~ \"Young Adult\",\n      Age &gt;= 26 & Age &lt;= 44 ~ \"Adult\",\n      Age &gt;= 45 & Age &lt;= 65 ~ \"Middle-age\",\n      Age &gt; 65 ~ \"Elderly\"\n    )\n  ) %&gt;%\n  filter(!is.na(AgeGroup)) %&gt;%\n  group_by(AgeGroup, Sex) %&gt;%\n  summarise(Total_Pop = sum(Pop), .groups = \"drop\") %&gt;%\n  mutate(AgeGroup = factor(\n    AgeGroup,\n    levels = c(\"Children\", \"Teenager\", \"Young Adult\", \"Adult\", \"Middle-age\", \"Elderly\")\n  ))\n\np2 &lt;- ggplot(pyramid_data_grouped, aes(x = AgeGroup, y = Total_Pop, fill = Sex)) +\n  geom_bar(stat = \"identity\", position = \"dodge\") +\n  scale_y_continuous(labels = scales::comma_format()) +\n  scale_fill_manual(values = c(\"Males\" = \"#3182bd\", \"Females\" = \"#f768a1\")) +\n  labs(\n    title = \"Population by Age Groups\",\n    x = \"Age Group\",\n    y = \"Total Population\"\n  ) +\n  theme_minimal() +\n  theme(\n    axis.text = element_text(size = 10),\n    plot.title = element_text(size = 14, face = \"bold\"),\n    legend.position = \"none\"  # hide legend here too\n  )\n\n# --- Combine and add unified legend + age group note ---\ncombined &lt;- (p1 + p2) + plot_layout(guides = \"collect\") & theme(legend.position = \"bottom\")\n\n# Add age group definitions as caption text\ncombined +\n  plot_annotation(\n    caption = \"Age Group Ranges: Children: ≤12 | Teenager: 13–18 | Young Adult: 19–25 | Adult: 26–44 | Middle-age: 45–65 | Elderly: ≥65\",\n    theme = theme(plot.caption = element_text(hjust = 0.5, size = 12, margin = margin(t = 10)))\n  )"
-  },
-  {
-    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#visuallisation-2---horizontal-bar-plot-of-population-density",
-    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#visuallisation-2---horizontal-bar-plot-of-population-density",
-    "title": "Take Home Exercise 1",
-    "section": "3.2 Visuallisation 2 - Horizontal Bar Plot of Population Density",
-    "text": "3.2 Visuallisation 2 - Horizontal Bar Plot of Population Density\n\nggplot(planning_area_population, aes(x = reorder(PA, Total_Pop), y = Total_Pop)) +\n  geom_col(fill = \"steelblue\") +\n  coord_flip() +\n  labs(\n    title = \"Population Density by Planning Area (June 2024)\",\n    x = \"Planning Area\",\n    y = \"Total Population\"\n  ) +\n  theme_minimal() +\n  theme(\n    axis.text.y = element_text(size = 10),\n    plot.title = element_text(size = 14, face = \"bold\")\n  )"
-  },
-  {
-    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#visuallisation-3---boxplot-of-age-distribution-by-planning-area",
-    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#visuallisation-3---boxplot-of-age-distribution-by-planning-area",
-    "title": "Take Home Exercise 1",
-    "section": "3.3 Visuallisation 3 - Boxplot of Age Distribution by Planning Area",
-    "text": "3.3 Visuallisation 3 - Boxplot of Age Distribution by Planning Area\n\n# Order planning areas by median age for better readability\nordered_area &lt;- age_distribution %&gt;%\n  group_by(PA) %&gt;%\n  summarise(median_age = median(Age)) %&gt;%\n  arrange(median_age) %&gt;%\n  pull(PA)\n\n# Convert PA into factor with specified order\nage_distribution &lt;- age_distribution %&gt;%\n  mutate(PA = factor(PA, levels = ordered_area))\n\n# Boxplot\nggplot(age_distribution, aes(x = Age, y = PA)) +\n  geom_boxplot(fill = \"skyblue\", color = \"grey30\", outlier.size = 0.5) +\n  labs(\n    title = \"Age Distribution by Planning Area (June 2024)\",\n    x = \"Age\",\n    y = \"Planning Area\"\n  ) +\n  theme_minimal() +\n  theme(\n    axis.text.y = element_text(size = 9),\n    plot.title = element_text(face = \"bold\", size = 14)\n  )"
-  },
-  {
-    "objectID": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#visuallisation-1---demographic-structure-of-singapore-residents-by-age-and-sex",
-    "href": "TakeHome_Ex/TakeHome_Ex01/TakeHome_Ex01.html#visuallisation-1---demographic-structure-of-singapore-residents-by-age-and-sex",
-    "title": "Take Home Exercise 1",
-    "section": "3.1 Visuallisation 1 - Demographic Structure of Singapore Residents by Age and Sex",
-    "text": "3.1 Visuallisation 1 - Demographic Structure of Singapore Residents by Age and Sex\n\nThe plotThe code\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n# --- Plot 1: Population Pyramid ---\np1 &lt;- ggplot(pyramid_data, aes(x = AgeGroup, y = Pop, fill = Sex)) +\n  geom_bar(stat = \"identity\", width = 0.9, color = \"white\") +\n  coord_flip() +\n  scale_y_continuous(\n    labels = function(x) scales::comma(abs(x)),\n    breaks = scales::pretty_breaks(n = 8)\n  ) +\n  scale_fill_manual(values = c(\"Males\" = \"#3182bd\", \"Females\" = \"#f768a1\")) +\n  labs(\n    title = \"Population Pyramid of Singapore\",\n    x = \"Age Group (5-year bins)\",\n    y = \"Population\"\n  ) +\n  theme_minimal() +\n  theme(\n    plot.title = element_text(face = \"bold\", size = 14),\n    axis.text = element_text(size = 9),\n    axis.title.x = element_text(margin = margin(t = 10)),\n    legend.position = \"none\"  # hide this legend\n  )\n\n# --- Plot 2: Age Group Bar Chart ---\np2 &lt;- ggplot(pyramid_data_grouped, aes(x = AgeGroup, y = Total_Pop, fill = Sex)) +\n  geom_bar(stat = \"identity\", position = \"dodge\") +\n  scale_y_continuous(labels = scales::comma_format()) +\n  scale_fill_manual(values = c(\"Males\" = \"#3182bd\", \"Females\" = \"#f768a1\")) +\n  labs(\n    title = \"Population by Age Groups\",\n    x = \"Age Group\",\n    y = \"Total Population\"\n  ) +\n  theme_minimal() +\n  theme(\n    axis.text = element_text(size = 10),\n    plot.title = element_text(size = 14, face = \"bold\"),\n    legend.position = \"none\"  # hide legend here too\n  )\n\n# --- Combine and add unified legend + age group note ---\ncombined &lt;- (p1 + p2) + plot_layout(guides = \"collect\") & theme(legend.position = \"bottom\")\n\n# Add age group definitions as caption text\ncombined +\n  plot_annotation(\n    caption = \"Age Group Ranges: Children: ≤12 | Teenager: 13–18 | Young Adult: 19–25 | Adult: 26–44 | Middle-age: 45–65 | Elderly: ≥65\",\n    theme = theme(plot.caption = element_text(hjust = 0.5, size = 12, margin = margin(t = 10)))\n  )\n\n\n\n\n\nInsight:\nThe population pyramid reveals a mature demographic structure with a bulge in the 40–59 age bands, reflecting Singapore’s aging population. The narrower base in the younger cohorts (ages 0–14) suggests declining birth rates, while the balanced width across genders indicates no significant sex disparity at each age group.\nThe grouped bar chart further aggregates the population into broader life stages. The highest population lies in the “Middle-age” (45–65) and “Adult” (26–44) categories, which together form the majority of the working-age population. In contrast, the “Children” and “Teenager” groups are notably smaller, reinforcing concerns about future population replacement and dependency ratios. The elderly (65+) also form a substantial group, highlighting the importance of eldercare and retirement policy planning.\nTogether, the visualizations underscore critical demographic challenges: a shrinking youth base, a growing senior population, and the need for sustainable workforce and social support strategies."
   }
 ]
