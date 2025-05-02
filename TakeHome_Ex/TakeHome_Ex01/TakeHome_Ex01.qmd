@@ -28,10 +28,7 @@ pacman::p_load(ggrepel, patchwork,
 
 ```{r}
 population_data <- read_csv("respopagesex2024.csv") %>%
-  mutate(
-    Age = if_else(Age == "90_and_Over", "90", Age),
-    Age = as.numeric(Age)
-  )
+  mutate(Age = as.numeric(Age))
 
 glimpse(population_data)
 ```
@@ -69,22 +66,84 @@ age_distribution <- population_data %>%
 
 ## 3.1 Visuallisation 1 - Population Pyramid
 
-```{r}
-ggplot(pyramid_data, aes(x = Age, y = Pop, fill = Sex)) +
-  geom_bar(stat = "identity", width = 1, color = "white") +
+```{r fig.width=14, fig.height=8}
+# --- Plot 1: Population Pyramid ---
+pyramid_data <- population_data %>%
+  mutate(
+    AgeGroup = cut(
+      Age,
+      breaks = c(seq(0, 100, by = 5), Inf),
+      right = FALSE,
+      labels = c(paste(seq(0, 95, 5), seq(4, 99, 5), sep = "–"), "100+")
+    )
+  ) %>%
+  filter(!is.na(AgeGroup)) %>%
+  group_by(AgeGroup, Sex) %>%
+  summarise(Pop = sum(Pop), .groups = "drop") %>%
+  mutate(Pop = ifelse(Sex == "Males", -Pop, Pop))
+
+p1 <- ggplot(pyramid_data, aes(x = AgeGroup, y = Pop, fill = Sex)) +
+  geom_bar(stat = "identity", width = 0.9, color = "white") +
   coord_flip() +
   scale_y_continuous(
-    labels = abs,
-    breaks = scales::pretty_breaks(n = 10)
+    labels = function(x) scales::comma(abs(x)),
+    breaks = scales::pretty_breaks(n = 8)
   ) +
-  scale_fill_manual(values = c("Males" = "steelblue", "Females" = "lightcoral")) +
+  scale_fill_manual(values = c("Males" = "#3182bd", "Females" = "#f768a1")) +
   labs(
     title = "Population Pyramid of Singapore (June 2024)",
-    x = "Age",
+    x = "Age Group (5-year bins)",
     y = "Population",
     fill = "Sex"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.text = element_text(size = 9),
+    axis.title.x = element_text(margin = margin(t = 10)),
+    legend.position = "none"  # hide this legend, we'll collect one at the end
+  )
+
+# --- Plot 2: Custom Age Group Bar Chart ---
+# Use simple labels for Age Groups
+pyramid_data_grouped <- population_data %>%
+  mutate(
+    AgeGroup = case_when(
+      Age <= 12 ~ "Children",
+      Age >= 13 & Age <= 18 ~ "Teenager",
+      Age > 18 & Age <= 25 ~ "Young Adult",
+      Age >= 26 & Age <= 44 ~ "Adult",
+      Age >= 45 & Age <= 65 ~ "Middle-age",
+      Age > 65 ~ "Elderly"
+    )
+  ) %>%
+  filter(!is.na(AgeGroup)) %>%
+  group_by(AgeGroup, Sex) %>%
+  summarise(Total_Pop = sum(Pop), .groups = "drop") %>%
+  mutate(AgeGroup = factor(
+    AgeGroup,
+    levels = c("Children", "Teenager", "Young Adult", "Adult", "Middle-age", "Elderly")
+  ))
+
+p2 <- ggplot(pyramid_data_grouped, aes(x = AgeGroup, y = Total_Pop, fill = Sex)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(labels = scales::comma_format()) +
+  scale_fill_manual(values = c("Males" = "#3182bd", "Females" = "#f768a1")) +
+  labs(
+    title = "Population by Age Groups",
+    x = "Age Group",
+    y = "Total Population",
+    fill = "Sex"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_text(size = 10),
+    plot.title = element_text(size = 14, face = "bold"),
+    legend.position = "bottom"
+  )
+
+# --- Combine with shared legend ---
+(p1 + p2) + plot_layout(guides = "collect") & theme(legend.position = "bottom")
 ```
 
 ## 3.2 Visuallisation 2 - Horizontal Bar Plot of Population Density
