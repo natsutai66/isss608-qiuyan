@@ -19,21 +19,22 @@ execute:
 ## 2.1 Installing and loading the required libraries
 
 ```{r}
-pacman::p_load(ggrepel, patchwork, 
-               ggthemes, hrbrthemes,
-               tidyverse, tidytext) 
+pacman::p_load(ggrepel, patchwork, ggthemes, hrbrthemes,
+               tidyverse, tidytext,treemapify) 
 ```
 
 ## 2.2 Importing dataset
 
-:::: panel-tabset
+::: panel-tabset
 ## The code
+
 ```{r}
 population_data <- read_csv("respopagesex2024.csv") %>%
   mutate(Age = as.numeric(Age))
 
 glimpse(population_data)
 ```
+
 ## Explaination
 
 The code chunk below imports the dataset `respopagesex2024.csv` and load the CSV file into a dataframe named `population_data`.
@@ -41,12 +42,13 @@ The code chunk below imports the dataset `respopagesex2024.csv` and load the CSV
 After import, the `mutate()` function is applied to convert the `Age` column from character to numeric format.
 
 Lastly, the `glimpse()` function provides a concise overview of the dataset’s structure, displaying column names, data types, and sample values.
-
-::::
+:::
 
 ## 2.3 Dataset for visuallisation 1
-:::: panel-tabset
+
+::: panel-tabset
 ## The code
+
 ```{r}
 pyramid_data <- population_data %>%
   mutate(
@@ -67,10 +69,11 @@ pyramid_data <- population_data %>%
 ## Explaination
 
 The code below prepares the dataset `population_data` for visualising a population pyramid by first converting the `Age` column to numeric format. It then categorises individual ages into 5-year intervals using the `cut()` function, creating a new variable `AgeGroup` with labels such as "0–4", "5–9", ..., and "100+". Any rows with missing `AgeGroup` values are filtered out. The data is then grouped by both `AgeGroup` and `Sex`, and the total population (`Pop`) within each group is calculated using `summarise()`. Finally, to enable the mirrored bar chart structure of a population pyramid, male population values are converted to negative using `mutate()` with an `ifelse()` condition. This transformation allows males to be displayed on the left and females on the right of the central axis in the plot.
-::::
+:::
 
-:::: panel-tabset
+::: panel-tabset
 ## The code
+
 ```{r}
 pyramid_data_grouped <- population_data %>%
   mutate(
@@ -96,9 +99,28 @@ pyramid_data_grouped <- population_data %>%
 ## Explaination
 
 The code below prepares the dataset `population_data` for visualising population distribution by broad age groups. It first converts the `Age` column to numeric format and then uses the `case_when()` function to classify individuals into six custom age groups: "Children" (≤12), "Teenager" (13–18), "Young Adult" (19–25), "Adult" (26–44), "Middle-age" (45–65), and "Elderly" (\>65). Any rows with undefined `AgeGroup` values are excluded using `filter()`. The dataset is then grouped by both `AgeGroup` and `Sex`, and the total population within each group is calculated using `summarise()`. Finally, the `AgeGroup` variable is converted into an ordered factor to ensure consistent and logical plotting on the x-axis.
-::::
+:::
 
 ## 2.4 Dataset for visuallisation 2
+
+::: panel-tabset
+## The code
+
+```{r}
+planning_area_population <- population_data %>%
+  group_by(PA) %>%
+  summarise(Total_Pop = sum(Pop), .groups = "drop") %>%
+  filter(Total_Pop > 0) %>%
+  mutate(Pop_thousands = Total_Pop / 1000)
+```
+
+## Explaination
+
+The code groups the `population_data` by `PA` (Planning Area) and then uses `summarise()` to calculate the total population (`Total_Pop`) within each area by summing the `Pop` values. The `.groups = "drop"` argument ensures the resulting data frame is ungrouped for further processing. Next, it filters out any planning areas with a total population of zero to maintain clarity in the visualization. Finally, the code introduces a new variable, `Pop_thousands`, by dividing the total population by 1,000 to express values in thousands.
+:::
+
+::: panel-tabset
+## The code
 
 ```{r}
 population_age_group_top20 <- population_data %>%
@@ -121,6 +143,11 @@ population_age_group_top20 <- population_data %>%
   slice_max(order_by = Total_Pop, n = 20) %>%
   ungroup()
 ```
+
+## Explaination
+
+The provided code prepares a dataset to visualize the top 20 planning areas in Singapore by population across different age groups. It begins by converting the `Age` variable to a numeric format and classifying individuals into custom age groups such as “Children,” “Teenager,” “Young Adult,” “Adult,” “Middle-age,” and “Elderly” using the `case_when()` function. Rows with undefined age groups are removed using `filter()`. The data is then grouped by `PA` (Planning Area) and `AgeGroup`, and the total population for each group is calculated using `summarise()`. After filtering out planning areas with zero population, the code selects the top 20 planning areas per age group based on total population using `slice_max()`. Finally, `ungroup()` is applied to prepare the data for plotting.
+:::
 
 ## 2.5 Dataset for visuallisation 3
 
@@ -255,10 +282,35 @@ The grouped bar chart further aggregates the population into broader life stages
 
 Together, the visualizations underscore critical demographic challenges: a shrinking youth base, a growing senior population, and the need for sustainable workforce and social support strategies.
 
-## 3.2 Visuallisation 2 - Horizontal Bar Plot of Population Density
+## 3.2 Visuallisation 2 - Overview of Population Distribution by Planning Area and Age Group
 
-```{r fig.width=16, fig.height=12}
-ggplot(population_age_group_top20, aes(x = reorder_within(PA, Total_Pop, AgeGroup), y = Total_Pop, fill = AgeGroup)) +
+:::: panel-tabset
+## The plot
+
+```{r fig.width=16, fig.height=18}
+#| echo: false
+# Treemap plot
+p1 <- ggplot(planning_area_population, aes(area = Pop_thousands, label = PA, fill = Pop_thousands)) +
+  geom_treemap() +
+  geom_treemap_text(
+    colour = "black",
+    place = "centre",
+    reflow = TRUE,
+    size = 12
+  ) +
+  scale_fill_viridis_c(option = "D", labels = scales::comma_format(suffix = "k")) +
+  labs(
+    title = "Treemap of Total Population by Planning Area (in Thousands)",
+    fill = "Population (thousands)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 18),
+    legend.position = "bottom"
+  )
+
+# Bar plot
+p2 <- ggplot(population_age_group_top20, aes(x = reorder_within(PA, Total_Pop, AgeGroup), y = Total_Pop, fill = AgeGroup)) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~ AgeGroup, scales = "free") +
   scale_x_reordered() +
@@ -270,11 +322,71 @@ ggplot(population_age_group_top20, aes(x = reorder_within(PA, Total_Pop, AgeGrou
   ) +
   theme_minimal() +
   theme(
-    strip.text = element_text(face = "bold", size = 14),
-    axis.text.y = element_text(size = 12),
-    plot.title = element_text(face = "bold", size = 16)
+    strip.text = element_text(face = "bold", size = 16),
+    axis.text.y = element_text(size = 10),
+    plot.title = element_text(face = "bold", size = 18)
   )
+
+# combine both plots
+p1 / p2 + plot_layout(heights = c(1, 2))
 ```
+
+## The code
+
+::: {style="font-size: 0.8em"}
+```{r fig.width=16, fig.height=18}
+#| eval: false
+# Treemap plot
+p1 <- ggplot(planning_area_population, aes(area = Pop_thousands, label = PA, fill = Pop_thousands)) +
+  geom_treemap() +
+  geom_treemap_text(
+    colour = "black",
+    place = "centre",
+    reflow = TRUE,
+    size = 12
+  ) +
+  scale_fill_viridis_c(option = "D", labels = scales::comma_format(suffix = "k")) +
+  labs(
+    title = "Treemap of Total Population by Planning Area (in Thousands)",
+    fill = "Population (thousands)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 18),
+    legend.position = "bottom"
+  )
+
+# Bar plot
+p2 <- ggplot(population_age_group_top20, aes(x = reorder_within(PA, Total_Pop, AgeGroup), y = Total_Pop, fill = AgeGroup)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ AgeGroup, scales = "free") +
+  scale_x_reordered() +
+  coord_flip() +
+  labs(
+    title = "Top 20 Planning Areas by Age Group Population",
+    x = "Planning Area",
+    y = "Total Population"
+  ) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(face = "bold", size = 16),
+    axis.text.y = element_text(size = 10),
+    plot.title = element_text(face = "bold", size = 18)
+  )
+
+# combine both plots
+p1 / p2 + plot_layout(heights = c(1, 2))
+```
+:::
+::::
+
+Insight:
+
+The treemap provides a high-level view of the total population across planning areas, showing that Tampines, Bedok, Sengkang, and Jurong West are the most densely populated regions in Singapore. These areas dominate in population size, occupying larger blocks and warmer color tones.
+
+The bar charts below offer a breakdown by age group, revealing nuanced patterns: Tampines and Sengkang consistently rank high across most age groups, especially for adults and children, suggesting a family-oriented residential profile. In contrast, areas like Bedok have a significantly larger elderly population, while Woodlands stands out in the young adult category.
+
+The variation across age groups highlights the differing demographic compositions of planning areas, which can inform planning for schools, eldercare, housing, and transportation needs.
 
 ## 3.3 Visuallisation 3 - Boxplot of Age Distribution by Planning Area
 
