@@ -12,11 +12,15 @@ execute:
   warning: false
 ---
 
+
+
 # 1 **Overview**
 
 # 2 Data Pre-processing and Exploration
 
 ## 2.1 Installing and loading the required libraries
+
+
 
 ```{r}
 pacman::p_load(dplyr, scales, ggrepel, 
@@ -24,10 +28,14 @@ pacman::p_load(dplyr, scales, ggrepel,
                tidytext,treemapify) 
 ```
 
+
+
 ## 2.2 Importing dataset
 
 ::: panel-tabset
 ## The code
+
+
 
 ```{r}
 population_data <- read_csv("respopagesex2024.csv") %>%
@@ -35,6 +43,8 @@ population_data <- read_csv("respopagesex2024.csv") %>%
 
 glimpse(population_data)
 ```
+
+
 
 ## Explaination
 
@@ -49,6 +59,8 @@ Lastly, the `glimpse()` function provides a concise overview of the dataset’s 
 
 ::: panel-tabset
 ## The code
+
+
 
 ```{r}
 pyramid_data <- population_data %>%
@@ -67,6 +79,8 @@ pyramid_data <- population_data %>%
   mutate(Pop = ifelse(Sex == "Males", -Pop, Pop))
 ```
 
+
+
 ## Explaination
 
 The code prepares the dataset `population_data` for visualising a population pyramid by first converting the `Age` column to numeric format. It then categorises individual ages into 5-year intervals using the `cut()` function, creating a new variable `AgeGroup` with labels such as "0–4", "5–9", ..., and "100+". Any rows with missing `AgeGroup` values are filtered out. The data is then grouped by both `AgeGroup` and `Sex`, and the total population (`Pop`) within each group is calculated using `summarise()`. Finally, to enable the mirrored bar chart structure of a population pyramid, male population values are converted to negative using `mutate()` with an `ifelse()` condition. This transformation allows males to be displayed on the left and females on the right of the central axis in the plot.
@@ -74,6 +88,8 @@ The code prepares the dataset `population_data` for visualising a population pyr
 
 ::: panel-tabset
 ## The code
+
+
 
 ```{r}
 pyramid_data_grouped <- population_data %>%
@@ -96,6 +112,8 @@ pyramid_data_grouped <- population_data %>%
   )
 ```
 
+
+
 ## Explaination
 
 The code involves transforming population data into a summarized form suitable for visualizing population distribution by broad age categories and sex. First, the `Age` variable is classified into six age groups—Children, Teenager, Young Adult, Adult, Middle-age, and Elderly—using logical conditions via the `case_when()` function. Any records with missing or undefined age groups are removed using `filter()`. The data is then grouped by both `AgeGroup` and `Sex`, and the total population for each group is calculated using `summarise()`. To ensure a consistent order in plots, the `AgeGroup` variable is converted to a factor with a specified level sequence. Finally, a new column `Total_Pop_k` is created to represent the total population in thousands, formatted with a “k” suffix for more concise labeling in visualizations.
@@ -106,6 +124,8 @@ The code involves transforming population data into a summarized form suitable f
 ::: panel-tabset
 ## The code
 
+
+
 ```{r}
 planning_area_population <- population_data %>%
   group_by(PA) %>%
@@ -114,6 +134,8 @@ planning_area_population <- population_data %>%
   mutate(Pop_thousands = Total_Pop / 1000)
 ```
 
+
+
 ## Explaination
 
 The code groups the `population_data` by `PA` (Planning Area) and then uses `summarise()` to calculate the total population (`Total_Pop`) within each area by summing the `Pop` values. The `.groups = "drop"` argument ensures the resulting data frame is ungrouped for further processing. Next, it filters out any planning areas with a total population of zero to maintain clarity in the visualization. Finally, the code introduces a new variable, `Pop_thousands`, by dividing the total population by 1,000 to express values in thousands.
@@ -121,6 +143,8 @@ The code groups the `population_data` by `PA` (Planning Area) and then uses `sum
 
 ::: panel-tabset
 ## The code
+
+
 
 ```{r}
 population_age_group_top20 <- population_data %>%
@@ -144,12 +168,16 @@ population_age_group_top20 <- population_data %>%
   ungroup()
 ```
 
+
+
 ## Explaination
 
 The provided code prepares a dataset to visualize the top 20 planning areas in Singapore by population across different age groups. It begins by converting the `Age` variable to a numeric format and classifying individuals into custom age groups such as “Children,” “Teenager,” “Young Adult,” “Adult,” “Middle-age,” and “Elderly” using the `case_when()` function. Rows with undefined age groups are removed using `filter()`. The data is then grouped by `PA` (Planning Area) and `AgeGroup`, and the total population for each group is calculated using `summarise()`. After filtering out planning areas with zero population, the code selects the top 20 planning areas per age group based on total population using `slice_max()`. Finally, `ungroup()` is applied to prepare the data for plotting.
 :::
 
 ## 2.5 Dataset for visuallisation 3
+
+
 
 ```{r}
 age_distribution <- population_data %>%
@@ -158,12 +186,16 @@ age_distribution <- population_data %>%
   uncount(weights = Pop)
 ```
 
+
+
 # 3 Data visuallisation
 
 ## 3.1 Visuallisation 1 - Demographic Structure of Singapore Residents by Age and Sex
 
 :::: panel-tabset
 ## The plot
+
+
 
 ```{r fig.width=14, fig.height=10}
 #| echo: false
@@ -226,9 +258,13 @@ p2 <- ggplot(pyramid_data_grouped, aes(x = AgeGroup, y = Total_Pop, fill = Sex))
   )
 ```
 
+
+
 ## The code
 
 ::: {style="font-size: 0.8em"}
+
+
 ```{r fig.width=14, fig.height=10}
 #| eval: false
 # Population Pyramid
@@ -289,6 +325,8 @@ p2 <- ggplot(pyramid_data_grouped, aes(x = AgeGroup, y = Total_Pop, fill = Sex))
     theme = theme(plot.caption = element_text(hjust = 0.5, size = 12, margin = margin(t = 10)))
   )
 ```
+
+
 :::
 ::::
 
@@ -305,6 +343,8 @@ Together, the visualizations underscore critical demographic challenges: a shrin
 :::: panel-tabset
 ## The plot
 
+
+
 ```{r fig.width=16, fig.height=18}
 #| echo: false
 # Treemap plot
@@ -349,9 +389,13 @@ p2 <- ggplot(population_age_group_top20, aes(x = reorder_within(PA, Total_Pop, A
 p1 / p2 + plot_layout(heights = c(1, 2))
 ```
 
+
+
 ## The code
 
 ::: {style="font-size: 0.8em"}
+
+
 ```{r fig.width=16, fig.height=18}
 #| eval: false
 # Treemap plot
@@ -395,6 +439,8 @@ p2 <- ggplot(population_age_group_top20, aes(x = reorder_within(PA, Total_Pop, A
 # combine both plots
 p1 / p2 + plot_layout(heights = c(1, 2))
 ```
+
+
 :::
 ::::
 
@@ -407,6 +453,8 @@ The bar charts below offer a breakdown by age group, revealing nuanced patterns:
 The variation across age groups highlights the differing demographic compositions of planning areas, which can inform planning for schools, eldercare, housing, and transportation needs.
 
 ## 3.3 Visuallisation 3 - Boxplot of Age Distribution by Planning Area
+
+
 
 ```{r fig.height=12, fig.width=8}
 # Order planning areas by median age for better readability
@@ -434,3 +482,4 @@ ggplot(age_distribution, aes(x = Age, y = PA)) +
     plot.title = element_text(face = "bold", size = 14)
   )
 ```
+
