@@ -586,3 +586,9 @@ p2 <- ggplot(pa_summary20, aes(
 ```
 :::
 ::::
+
+Insight:
+
+On the scatterplot, total population per PA ranges from approximately 90,000 in Sembawang to about 275,000 in Bedok and Tampines. Average ages vary between 36 years in Punggol and 46 years in Ang Mo Kio, with intermediate mean ages (≈38–45) in other PAs. Bubble sizes indicate elderly proportion: Ang Mo Kio (\~20 %) and Bukit Merah (\~18 %) have the largest shares, while Sembawang and Punggol register the smallest (\~12 %).
+
+In the violin plots for the top ten PAs, median ages are clustered between roughly 35 and 45 years; the interquartile ranges span about 20–30 years. Bedok and Hougang violins have wide upper distributions—indicating substantial populations over 60—while Punggol’s shape is narrowly concentrated between 20 and 40. Medians appear highest in Bukit Batok and Sengkang and lowest in Punggol and Choa Chu Kang.
