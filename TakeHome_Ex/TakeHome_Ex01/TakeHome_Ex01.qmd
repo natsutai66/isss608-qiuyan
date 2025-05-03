@@ -155,7 +155,6 @@ The provided code prepares a dataset to visualize the top 20 planning areas in S
 ## The code
 
 ```{r}
-# --- top 10 for violin ---
 violin_data <- population_data %>%
   mutate(Age = as.numeric(Age)) %>%
   filter(!is.na(Age), !is.na(PA)) %>%
@@ -184,7 +183,6 @@ The code first converts the `Age` column to numeric and drops any rows where eit
 ## The code
 
 ```{r}
-# --- top 20 for scatter ---
 top20_PAs <- population_data %>%
   group_by(PA) %>%
   summarise(Total_Pop = sum(Pop), .groups = "drop") %>%
@@ -457,7 +455,7 @@ The bar charts below offer a breakdown by age group, revealing nuanced patterns:
 
 The variation across age groups highlights the differing demographic compositions of planning areas, which can inform planning for schools, eldercare, housing, and transportation needs.
 
-## 3.3 Visuallisation 3 - Boxplot of Age Distribution by Planning Area
+## 3.3 Visuallisation 3 - Demographic Structure and Aging Patterns in Singapore’s Top Residential Planning Areas
 
 :::: panel-tabset
 ## The plot
