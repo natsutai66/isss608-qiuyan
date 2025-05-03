@@ -151,12 +151,63 @@ The provided code prepares a dataset to visualize the top 20 planning areas in S
 
 ## 2.5 Dataset for visuallisation 3
 
+::: panel-tabset
+## The code
+
 ```{r}
-age_distribution <- population_data %>%
+# --- top 10 for violin ---
+violin_data <- population_data %>%
   mutate(Age = as.numeric(Age)) %>%
-  filter(Pop > 0) %>%
+  filter(!is.na(Age), !is.na(PA)) %>%
+  group_by(PA, Age) %>%
+  summarise(Pop = sum(Pop), .groups = "drop") %>%
   uncount(weights = Pop)
+
+top10_PAs <- population_data %>%
+  group_by(PA) %>%
+  summarise(Total_Pop = sum(Pop), .groups = "drop") %>%
+  arrange(desc(Total_Pop)) %>%
+  slice_head(n = 10) %>%
+  pull(PA)
+
+violin_filtered <- violin_data %>%
+  filter(PA %in% top10_PAs) %>%
+  mutate(PA = factor(PA, levels = top10_PAs))
 ```
+
+## Explaination
+
+The code first converts the `Age` column to numeric and drops any rows where either age or planning‐area (`PA`) is missing. It then groups by each unique combination of `PA` and `Age` and sums the population counts (`Pop`) to get an aggregated tally for each age cohort within each area. The `uncount()` step “explodes” these tallies back into individual rows—so each row now represents one person’s age and planning area—producing a long‐form dataset ideal for violin‐plotting. Separately, it identifies the ten most populous planning areas by summing `Pop` in the original data, sorting descending, and pulling out the top ten area names into `top10_PAs`. Finally, it filters the expanded `violin_data` to only those ten areas and redefines `PA` as a factor ordered according to population rank.
+:::
+
+::: panel-tabset
+## The code
+
+```{r}
+# --- top 20 for scatter ---
+top20_PAs <- population_data %>%
+  group_by(PA) %>%
+  summarise(Total_Pop = sum(Pop), .groups = "drop") %>%
+  arrange(desc(Total_Pop)) %>%
+  slice_head(n = 20) %>%
+  pull(PA)
+
+pa_summary20 <- violin_data %>%
+  filter(PA %in% top20_PAs) %>%
+  mutate(AgeGroup = if_else(Age > 65, "Elderly", "Other")) %>%
+  group_by(PA) %>%
+  summarise(
+    Avg_Age      = mean(Age),
+    Total_Pop    = n(),
+    Elderly_Prop = mean(AgeGroup == "Elderly"),
+    .groups      = "drop"
+  )
+```
+
+## Explaination
+
+The code identifies the twenty planning areas with the largest populations by grouping the original `population_data` by `PA`, summing the `Pop` counts to compute each area’s total population, sorting those totals in descending order, and then taking the first twenty `PA` values into a vector called `top20_PAs`. Next, it builds `pa_summary20` by filtering the expanded `violin_data` to only those twenty areas and creating a new categorical variable `AgeGroup` which labels individuals older than 65 as “Elderly” and everyone else as “Other.” Finally, it groups this subset by `PA` and computes three key summary statistics for each area: the mean age (`Avg_Age`), the total number of observations (`Total_Pop`, effectively the population count in the sample), and the proportion of residents classified as elderly (`Elderly_Prop`).
+:::
 
 # 3 Data visuallisation
 
@@ -408,29 +459,130 @@ The variation across age groups highlights the differing demographic composition
 
 ## 3.3 Visuallisation 3 - Boxplot of Age Distribution by Planning Area
 
-```{r fig.height=12, fig.width=8}
-# Order planning areas by median age for better readability
-ordered_area <- age_distribution %>%
-  group_by(PA) %>%
-  summarise(median_age = median(Age)) %>%
-  arrange(median_age) %>%
-  pull(PA)
+:::: panel-tabset
+## The plot
 
-# Convert PA into factor with specified order
-age_distribution <- age_distribution %>%
-  mutate(PA = factor(PA, levels = ordered_area))
+```{r fig.height=16, fig.width=14}
+#| echo: false
+# palette for all 20 PAs
+area_colors_all <- colorRampPalette(
+  RColorBrewer::brewer.pal(10, "Set3")
+)(20)
+names(area_colors_all) <- top20_PAs
 
-# Boxplot
-ggplot(age_distribution, aes(x = Age, y = PA)) +
-  geom_boxplot(fill = "skyblue", color = "grey30", outlier.size = 0.5) +
+# Violin plot
+p1 <- ggplot(violin_filtered, aes(x = PA, y = Age, fill = PA)) +
+  geom_violin(trim = FALSE, scale = "area", width = 0.8, alpha = 0.7) +
+  geom_boxplot(width = 0.1, outlier.shape = NA, color = "black") +
+  scale_fill_manual(values = area_colors_all[top10_PAs]) +
   labs(
-    title = "Age Distribution by Planning Area (June 2024)",
-    x = "Age",
-    y = "Planning Area"
+    title = "Age Distribution by Planning Area (Top 10 Residential Areas)",
+    x     = "Planning Area",
+    y     = "Age"
   ) +
-  theme_minimal() +
+  theme_minimal(base_size = 14) +
   theme(
-    axis.text.y = element_text(size = 9),
-    plot.title = element_text(face = "bold", size = 14)
+    legend.position = "none",
+    axis.text.x     = element_text(angle = 45, hjust = 1),
+    axis.title      = element_text(size = 16),
+    plot.title      = element_text(face = "bold", size = 18)
   )
+
+# Scatter plot
+p2 <- ggplot(pa_summary20, aes(
+      x = Total_Pop,
+      y = Avg_Age,
+      size = Elderly_Prop,
+      fill = PA
+    )) +
+  geom_point(shape = 21, alpha = 0.8, color = "black") +
+  geom_text_repel(aes(label = PA), size = 4, max.overlaps = 30) +
+  
+  scale_fill_manual(values = area_colors_all, guide = FALSE) +
+  scale_size_continuous(
+    name  = "Elderly Proportion",
+    range = c(6, 20)
+  ) +
+  scale_x_continuous(labels = scales::comma) +
+  labs(
+    title = "Average Age vs. Total Population (Top 20 Planning Areas)",
+    x     = "Total Population",
+    y     = "Average Age"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "right",
+    legend.title    = element_text(size = 14),
+    legend.text     = element_text(size = 12),
+    axis.title      = element_text(size = 16),
+    plot.title      = element_text(face = "bold", size = 18)
+  )
+
+# combine
+(p2 / p1) + plot_layout(heights = c(1, 0.6))
 ```
+
+## The code
+
+::: {style="font-size: 0.8em"}
+```{r fig.height=16, fig.width=14}
+#| eval: false
+# palette for all 20 PAs
+area_colors_all <- colorRampPalette(
+  RColorBrewer::brewer.pal(10, "Set3")
+)(20)
+names(area_colors_all) <- top20_PAs
+
+# Violin plot
+p1 <- ggplot(violin_filtered, aes(x = PA, y = Age, fill = PA)) +
+  geom_violin(trim = FALSE, scale = "area", width = 0.8, alpha = 0.7) +
+  geom_boxplot(width = 0.1, outlier.shape = NA, color = "black") +
+  scale_fill_manual(values = area_colors_all[top10_PAs]) +
+  labs(
+    title = "Age Distribution by Planning Area (Top 10 Residential Areas)",
+    x     = "Planning Area",
+    y     = "Age"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "none",
+    axis.text.x     = element_text(angle = 45, hjust = 1),
+    axis.title      = element_text(size = 16),
+    plot.title      = element_text(face = "bold", size = 18)
+  )
+
+# Scatter plot
+p2 <- ggplot(pa_summary20, aes(
+      x = Total_Pop,
+      y = Avg_Age,
+      size = Elderly_Prop,
+      fill = PA
+    )) +
+  geom_point(shape = 21, alpha = 0.8, color = "black") +
+  geom_text_repel(aes(label = PA), size = 4, max.overlaps = 30) +
+  
+  scale_fill_manual(values = area_colors_all, guide = FALSE) +
+  scale_size_continuous(
+    name  = "Elderly Proportion",
+    range = c(6, 20)
+  ) +
+  scale_x_continuous(labels = scales::comma) +
+  labs(
+    title = "Average Age vs. Total Population (Top 20 Planning Areas)",
+    x     = "Total Population",
+    y     = "Average Age"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "right",
+    legend.title    = element_text(size = 14),
+    legend.text     = element_text(size = 12),
+    axis.title      = element_text(size = 16),
+    plot.title      = element_text(face = "bold", size = 18)
+  )
+
+# combine
+(p2 / p1) + plot_layout(heights = c(1, 0.6))
+```
+:::
+::::
