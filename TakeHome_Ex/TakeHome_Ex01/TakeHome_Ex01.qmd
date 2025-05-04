@@ -40,7 +40,7 @@ pacman::p_load(scales, ggrepel, patchwork,
 ## The libraries
 
 | name | purpose |
-|------------------------------------|------------------------------------|
+|-------------|-----------------------------------------------------------|
 | scales | Nicely formats axis ticks and legends. |
 | ggrepel | Adds non‑overlapping text labels to ggplots. |
 | patchwork | Combines multiple ggplots into a single figure. |
