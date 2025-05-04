@@ -118,8 +118,8 @@ pyramid_data_grouped <- population_data %>%
   group_by(AgeGroup, Sex) %>%
   summarise(Total_Pop = sum(Pop), .groups = "drop") %>%
   mutate(
-    AgeGroup = factor(AgeGroup, levels = c("Children", "Teenager", 
-                                           "Young Adult", "Adult", "Middle-age", "Elderly")),
+    AgeGroup = factor(AgeGroup, levels = c("Children", "Teenager", "Young Adult", 
+                                           "Adult", "Middle-age", "Elderly")),
     Total_Pop_k = paste0(round(Total_Pop / 1000), "k")
   )
 ```
