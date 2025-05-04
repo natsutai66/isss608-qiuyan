@@ -12,17 +12,44 @@ execute:
   warning: false
 ---
 
-# 1 **Overview**
+# 1 Overview
+
+This exercise delivers three static analytical visualisations and concise commentaries that explain the demographic structure and geographic distribution of Singapore residents in June 2024. Using the “Singapore Residents by Planning Area / Subzone, Single Year of Age and Sex” dataset from the Department of Statistics, the data were wrangled entirely with the ***tidyverse*** and visualised with **ggplot2** and its extensions, adhering to the exercise requirement for reproducible R code and non‑interactive graphics.
+
+1.  **Nation‑wide age profile** – a population pyramid and companion bar chart depict gender balance, cohort sizes, and the dominance of the 26‑65 workforce alongside a contracting youth base and expanding senior segment.
+
+2.  **Spatial distribution** – a treemap ranks planning areas by total residents, while six faceted bar charts rank them within each major age group, revealing contrasts such as Tampines’ family orientation versus Bedok’s larger elderly share.
+
+3.  **Age‑structure contrasts** – a bubble plot (average age vs population, bubble = senior share) and violin plots of the ten largest areas detail how mean age and intra‑area distributions vary, pinpointing estates like Ang Mo Kio (oldest) and Punggol (youngest).
+
+Together these visuals provide a foundation for evidence‑based recommendations on schooling capacity, eldercare facilities, housing typology, and transport planning across Singapore’s diverse neighbourhoods.
 
 # 2 Data Pre-processing and Exploration
 
 ## 2.1 Installing and loading the required libraries
 
+::: panel-tabset
+## The code
+
 ```{r}
-pacman::p_load(dplyr, scales, ggrepel, 
-               patchwork, ggthemes, hrbrthemes,tidyverse, 
+pacman::p_load(scales, ggrepel, patchwork, 
+               ggthemes, hrbrthemes,tidyverse, 
                tidytext,treemapify) 
 ```
+
+## The libraries
+
+| name | purpose |
+|----|----|
+| scales | Nicely formats axis ticks and legends. |
+| ggrepel | Adds non‑overlapping text labels to ggplots. |
+| patchwork | Combines multiple ggplots into a single figure. |
+| ggthemes | Supplies predefined aesthetic themes. |
+| hrbrthemes | Extends ggthemes with modern, typographically friendly themes and font support. |
+| tidyverse | Meta‑package that loads ggplot2, dplyr, tidyr, readr, stringr, forcats, etc.—the backbone for data import, transformation, and visualisation. |
+| tidytext | Tokenises and analyses text. |
+| treemapify | Creates ggplot‑compatible treemaps. |
+:::
 
 ## 2.2 Importing dataset
 
@@ -38,7 +65,7 @@ glimpse(population_data)
 
 ## Explaination
 
-The code chunk below imports the dataset `respopagesex2024.csv` and load the CSV file into a dataframe named `population_data`.
+The code chunk imports the dataset `respopagesex2024.csv` and load the CSV file into a dataframe named `population_data`.
 
 After import, the `mutate()` function is applied to convert the `Age` column from character to numeric format.
 
@@ -146,7 +173,7 @@ population_age_group_top20 <- population_data %>%
 
 ## Explaination
 
-The provided code prepares a dataset to visualize the top 20 planning areas in Singapore by population across different age groups. It begins by converting the `Age` variable to a numeric format and classifying individuals into custom age groups such as “Children,” “Teenager,” “Young Adult,” “Adult,” “Middle-age,” and “Elderly” using the `case_when()` function. Rows with undefined age groups are removed using `filter()`. The data is then grouped by `PA` (Planning Area) and `AgeGroup`, and the total population for each group is calculated using `summarise()`. After filtering out planning areas with zero population, the code selects the top 20 planning areas per age group based on total population using `slice_max()`. Finally, `ungroup()` is applied to prepare the data for plotting.
+The code prepares a dataset to visualize the top 20 planning areas in Singapore by population across different age groups. It begins by converting the `Age` variable to a numeric format and classifying individuals into custom age groups such as “Children,” “Teenager,” “Young Adult,” “Adult,” “Middle-age,” and “Elderly” using the `case_when()` function. Rows with undefined age groups are removed using `filter()`. The data is then grouped by `PA` (Planning Area) and `AgeGroup`, and the total population for each group is calculated using `summarise()`. After filtering out planning areas with zero population, the code selects the top 20 planning areas per age group based on total population using `slice_max()`. Finally, `ungroup()` is applied to prepare the data for plotting.
 :::
 
 ## 2.5 Dataset for visuallisation 3
@@ -590,3 +617,17 @@ Insight:
 On the scatterplot, total population per PA ranges from approximately 90,000 in Sembawang to about 275,000 in Bedok and Tampines. Average ages vary between 36 years in Punggol and 46 years in Ang Mo Kio, with intermediate mean ages (≈38–45) in other PAs. Bubble sizes indicate elderly proportion: Ang Mo Kio (\~20 %) and Bukit Merah (\~18 %) have the largest shares, while Sembawang and Punggol register the smallest (\~12 %).
 
 In the violin plots for the top ten PAs, median ages are clustered between roughly 35 and 45 years; the interquartile ranges span about 20–30 years. Bedok and Hougang violins have wide upper distributions—indicating substantial populations over 60—while Punggol’s shape is narrowly concentrated between 20 and 40. Medians appear highest in Bukit Batok and Sengkang and lowest in Punggol and Choa Chu Kang.
+
+# 4 Conclusion
+
+Singapore’s demographic map is far from uniform and calls for neighbourhood‑specific policies.
+
+Bedok and Ang Mo Kio top the charts for average age and elderly share (≈45 years, ≥18 % seniors). These estates should be prioritised for geriatric clinics, barrier‑free retrofits, and daytime activity centres, while re‑skilling programmes can keep older residents economically active.
+
+Conversely, Tampines and Sengkang combine large absolute populations with the highest counts of children and adults. Here, capacity expansion in preschools, primary schools and family‑oriented recreation will relieve crowding, and peak‑hour transit frequency should rise to meet the commuter load.
+
+Jurong West and Woodlands host sizeable young‑adult cohorts; affordable starter housing, co‑working hubs, and evening bus services would match their mobility and employment needs.
+
+Finally, Punggol and Sembawang, although populous, remain the youngest (mean age ≤ 38 years, \< 13 % seniors); forward planning should secure space for future eldercare even as current investment focuses on childcare and playground networks.
+
+In short, aligning healthcare, education, transport and housing investments with each estate’s demographic profile will maximise social return and future‑proof Singapore’s urban fabric.

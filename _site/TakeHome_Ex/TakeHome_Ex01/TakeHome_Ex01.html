@@ -204,7 +204,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">1 <strong>Overview</strong></a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">1 Overview</a></li>
   <li><a href="#data-pre-processing-and-exploration" id="toc-data-pre-processing-and-exploration" class="nav-link" data-scroll-target="#data-pre-processing-and-exploration">2 Data Pre-processing and Exploration</a>
   <ul class="collapse">
   <li><a href="#installing-and-loading-the-required-libraries" id="toc-installing-and-loading-the-required-libraries" class="nav-link" data-scroll-target="#installing-and-loading-the-required-libraries">2.1 Installing and loading the required libraries</a></li>
@@ -219,6 +219,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#visuallisation-2---overview-of-population-distribution-by-planning-area-and-age-group" id="toc-visuallisation-2---overview-of-population-distribution-by-planning-area-and-age-group" class="nav-link" data-scroll-target="#visuallisation-2---overview-of-population-distribution-by-planning-area-and-age-group">3.2 Visuallisation 2 - Overview of Population Distribution by Planning Area and Age Group</a></li>
   <li><a href="#visuallisation-3---demographic-structure-and-aging-patterns-in-singapores-top-residential-planning-areas" id="toc-visuallisation-3---demographic-structure-and-aging-patterns-in-singapores-top-residential-planning-areas" class="nav-link" data-scroll-target="#visuallisation-3---demographic-structure-and-aging-patterns-in-singapores-top-residential-planning-areas">3.3 Visuallisation 3 - Demographic Structure and Aging Patterns in Singapore’s Top Residential Planning Areas</a></li>
   </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">4 Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -256,7 +257,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">May 3, 2025</p>
+      <p class="date-modified">May 4, 2025</p>
     </div>
   </div>
     
@@ -268,24 +269,86 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <section id="overview" class="level1">
-<h1>1 <strong>Overview</strong></h1>
+<h1>1 Overview</h1>
+<p>This exercise delivers three static analytical visualisations and concise commentaries that explain the demographic structure and geographic distribution of Singapore residents in June 2024. Using the “Singapore Residents by Planning Area / Subzone, Single Year of Age and Sex” dataset from the Department of Statistics, the data were wrangled entirely with the <strong><em>tidyverse</em></strong> and visualised with <strong>ggplot2</strong> and its extensions, adhering to the exercise requirement for reproducible R code and non‑interactive graphics.</p>
+<ol type="1">
+<li><p><strong>Nation‑wide age profile</strong> – a population pyramid and companion bar chart depict gender balance, cohort sizes, and the dominance of the 26‑65 workforce alongside a contracting youth base and expanding senior segment.</p></li>
+<li><p><strong>Spatial distribution</strong> – a treemap ranks planning areas by total residents, while six faceted bar charts rank them within each major age group, revealing contrasts such as Tampines’ family orientation versus Bedok’s larger elderly share.</p></li>
+<li><p><strong>Age‑structure contrasts</strong> – a bubble plot (average age vs population, bubble = senior share) and violin plots of the ten largest areas detail how mean age and intra‑area distributions vary, pinpointing estates like Ang Mo Kio (oldest) and Punggol (youngest).</p></li>
+</ol>
+<p>Together these visuals provide a foundation for evidence‑based recommendations on schooling capacity, eldercare facilities, housing typology, and transport planning across Singapore’s diverse neighbourhoods.</p>
 </section>
 <section id="data-pre-processing-and-exploration" class="level1">
 <h1>2 Data Pre-processing and Exploration</h1>
 <section id="installing-and-loading-the-required-libraries" class="level2">
 <h2 class="anchored" data-anchor-id="installing-and-loading-the-required-libraries">2.1 Installing and loading the required libraries</h2>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">The libraries</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(dplyr, scales, ggrepel, </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>               patchwork, ggthemes, hrbrthemes,tidyverse, </span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(scales, ggrepel, patchwork, </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>               ggthemes, hrbrthemes,tidyverse, </span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>               tidytext,treemapify) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>name</th>
+<th>purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>scales</td>
+<td>Nicely formats axis ticks and legends.</td>
+</tr>
+<tr class="even">
+<td>ggrepel</td>
+<td>Adds non‑overlapping text labels to ggplots.</td>
+</tr>
+<tr class="odd">
+<td>patchwork</td>
+<td>Combines multiple ggplots into a single figure.</td>
+</tr>
+<tr class="even">
+<td>ggthemes</td>
+<td>Supplies predefined aesthetic themes.</td>
+</tr>
+<tr class="odd">
+<td>hrbrthemes</td>
+<td>Extends ggthemes with modern, typographically friendly themes and font support.</td>
+</tr>
+<tr class="even">
+<td>tidyverse</td>
+<td>Meta‑package that loads ggplot2, dplyr, tidyr, readr, stringr, forcats, etc.—the backbone for data import, transformation, and visualisation.</td>
+</tr>
+<tr class="odd">
+<td>tidytext</td>
+<td>Tokenises and analyses text.</td>
+</tr>
+<tr class="even">
+<td>treemapify</td>
+<td>Creates ggplot‑compatible treemaps.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 </section>
 <section id="importing-dataset" class="level2">
 <h2 class="anchored" data-anchor-id="importing-dataset">2.2 Importing dataset</h2>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Explaination</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Explaination</a></li></ul>
 <div class="tab-content">
-<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>population_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"respopagesex2024.csv"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Age =</span> <span class="fu">as.numeric</span>(Age))</span>
@@ -303,8 +366,8 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 </div>
 </div>
 </div>
-<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
-<p>The code chunk below imports the dataset <code>respopagesex2024.csv</code> and load the CSV file into a dataframe named <code>population_data</code>.</p>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<p>The code chunk imports the dataset <code>respopagesex2024.csv</code> and load the CSV file into a dataframe named <code>population_data</code>.</p>
 <p>After import, the <code>mutate()</code> function is applied to convert the <code>Age</code> column from character to numeric format.</p>
 <p>Lastly, the <code>glimpse()</code> function provides a concise overview of the dataset’s structure, displaying column names, data types, and sample values.</p>
 </div>
@@ -314,9 +377,9 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <section id="dataset-for-visuallisation-1" class="level2">
 <h2 class="anchored" data-anchor-id="dataset-for-visuallisation-1">2.3 Dataset for visuallisation 1</h2>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Explaination</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Explaination</a></li></ul>
 <div class="tab-content">
-<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pyramid_data <span class="ot">&lt;-</span> population_data <span class="sc">%&gt;%</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
@@ -334,15 +397,15 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Pop =</span> <span class="fu">ifelse</span>(Sex <span class="sc">==</span> <span class="st">"Males"</span>, <span class="sc">-</span>Pop, Pop))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
-<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
 <p>The code prepares the dataset <code>population_data</code> for visualising a population pyramid by first converting the <code>Age</code> column to numeric format. It then categorises individual ages into 5-year intervals using the <code>cut()</code> function, creating a new variable <code>AgeGroup</code> with labels such as “0–4”, “5–9”, …, and “100+”. Any rows with missing <code>AgeGroup</code> values are filtered out. The data is then grouped by both <code>AgeGroup</code> and <code>Sex</code>, and the total population (<code>Pop</code>) within each group is calculated using <code>summarise()</code>. Finally, to enable the mirrored bar chart structure of a population pyramid, male population values are converted to negative using <code>mutate()</code> with an <code>ifelse()</code> condition. This transformation allows males to be displayed on the left and females on the right of the central axis in the plot.</p>
 </div>
 </div>
 </div>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Explaination</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">Explaination</a></li></ul>
 <div class="tab-content">
-<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pyramid_data_grouped <span class="ot">&lt;-</span> population_data <span class="sc">%&gt;%</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
@@ -364,7 +427,7 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
-<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
 <p>The code involves transforming population data into a summarized form suitable for visualizing population distribution by broad age categories and sex. First, the <code>Age</code> variable is classified into six age groups—Children, Teenager, Young Adult, Adult, Middle-age, and Elderly—using logical conditions via the <code>case_when()</code> function. Any records with missing or undefined age groups are removed using <code>filter()</code>. The data is then grouped by both <code>AgeGroup</code> and <code>Sex</code>, and the total population for each group is calculated using <code>summarise()</code>. To ensure a consistent order in plots, the <code>AgeGroup</code> variable is converted to a factor with a specified level sequence. Finally, a new column <code>Total_Pop_k</code> is created to represent the total population in thousands, formatted with a “k” suffix for more concise labeling in visualizations.</p>
 </div>
 </div>
@@ -373,9 +436,9 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <section id="dataset-for-visuallisation-2" class="level2">
 <h2 class="anchored" data-anchor-id="dataset-for-visuallisation-2">2.4 Dataset for visuallisation 2</h2>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">Explaination</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">Explaination</a></li></ul>
 <div class="tab-content">
-<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
+<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>planning_area_population <span class="ot">&lt;-</span> population_data <span class="sc">%&gt;%</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(PA) <span class="sc">%&gt;%</span></span>
@@ -384,15 +447,15 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Pop_thousands =</span> Total_Pop <span class="sc">/</span> <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
-<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
+<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
 <p>The code groups the <code>population_data</code> by <code>PA</code> (Planning Area) and then uses <code>summarise()</code> to calculate the total population (<code>Total_Pop</code>) within each area by summing the <code>Pop</code> values. The <code>.groups = "drop"</code> argument ensures the resulting data frame is ungrouped for further processing. Next, it filters out any planning areas with a total population of zero to maintain clarity in the visualization. Finally, the code introduces a new variable, <code>Pop_thousands</code>, by dividing the total population by 1,000 to express values in thousands.</p>
 </div>
 </div>
 </div>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">Explaination</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false">Explaination</a></li></ul>
 <div class="tab-content">
-<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
+<div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>population_age_group_top20 <span class="ot">&lt;-</span> population_data <span class="sc">%&gt;%</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
@@ -415,8 +478,8 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
-<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
-<p>The provided code prepares a dataset to visualize the top 20 planning areas in Singapore by population across different age groups. It begins by converting the <code>Age</code> variable to a numeric format and classifying individuals into custom age groups such as “Children,” “Teenager,” “Young Adult,” “Adult,” “Middle-age,” and “Elderly” using the <code>case_when()</code> function. Rows with undefined age groups are removed using <code>filter()</code>. The data is then grouped by <code>PA</code> (Planning Area) and <code>AgeGroup</code>, and the total population for each group is calculated using <code>summarise()</code>. After filtering out planning areas with zero population, the code selects the top 20 planning areas per age group based on total population using <code>slice_max()</code>. Finally, <code>ungroup()</code> is applied to prepare the data for plotting.</p>
+<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
+<p>The code prepares a dataset to visualize the top 20 planning areas in Singapore by population across different age groups. It begins by converting the <code>Age</code> variable to a numeric format and classifying individuals into custom age groups such as “Children,” “Teenager,” “Young Adult,” “Adult,” “Middle-age,” and “Elderly” using the <code>case_when()</code> function. Rows with undefined age groups are removed using <code>filter()</code>. The data is then grouped by <code>PA</code> (Planning Area) and <code>AgeGroup</code>, and the total population for each group is calculated using <code>summarise()</code>. After filtering out planning areas with zero population, the code selects the top 20 planning areas per age group based on total population using <code>slice_max()</code>. Finally, <code>ungroup()</code> is applied to prepare the data for plotting.</p>
 </div>
 </div>
 </div>
@@ -424,9 +487,9 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <section id="dataset-for-visuallisation-3" class="level2">
 <h2 class="anchored" data-anchor-id="dataset-for-visuallisation-3">2.5 Dataset for visuallisation 3</h2>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false">Explaination</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-7-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-1" role="tab" aria-controls="tabset-7-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-7-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-2" role="tab" aria-controls="tabset-7-2" aria-selected="false">Explaination</a></li></ul>
 <div class="tab-content">
-<div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
+<div id="tabset-7-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-7-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>violin_data <span class="ot">&lt;-</span> population_data <span class="sc">%&gt;%</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Age =</span> <span class="fu">as.numeric</span>(Age)) <span class="sc">%&gt;%</span></span>
@@ -447,15 +510,15 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PA =</span> <span class="fu">factor</span>(PA, <span class="at">levels =</span> top10_PAs))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
-<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
+<div id="tabset-7-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-7-2-tab">
 <p>The code first converts the <code>Age</code> column to numeric and drops any rows where either age or planning‐area (<code>PA</code>) is missing. It then groups by each unique combination of <code>PA</code> and <code>Age</code> and sums the population counts (<code>Pop</code>) to get an aggregated tally for each age cohort within each area. The <code>uncount()</code> step “explodes” these tallies back into individual rows—so each row now represents one person’s age and planning area—producing a long‐form dataset ideal for violin‐plotting. Separately, it identifies the ten most populous planning areas by summing <code>Pop</code> in the original data, sorting descending, and pulling out the top ten area names into <code>top10_PAs</code>. Finally, it filters the expanded <code>violin_data</code> to only those ten areas and redefines <code>PA</code> as a factor ordered according to population rank.</p>
 </div>
 </div>
 </div>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-7-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-1" role="tab" aria-controls="tabset-7-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-7-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-2" role="tab" aria-controls="tabset-7-2" aria-selected="false">Explaination</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-8-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-1" role="tab" aria-controls="tabset-8-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-8-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-2" role="tab" aria-controls="tabset-8-2" aria-selected="false">Explaination</a></li></ul>
 <div class="tab-content">
-<div id="tabset-7-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-7-1-tab">
+<div id="tabset-8-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-8-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>top20_PAs <span class="ot">&lt;-</span> population_data <span class="sc">%&gt;%</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(PA) <span class="sc">%&gt;%</span></span>
@@ -476,7 +539,7 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
-<div id="tabset-7-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-7-2-tab">
+<div id="tabset-8-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-2-tab">
 <p>The code identifies the twenty planning areas with the largest populations by grouping the original <code>population_data</code> by <code>PA</code>, summing the <code>Pop</code> counts to compute each area’s total population, sorting those totals in descending order, and then taking the first twenty <code>PA</code> values into a vector called <code>top20_PAs</code>. Next, it builds <code>pa_summary20</code> by filtering the expanded <code>violin_data</code> to only those twenty areas and creating a new categorical variable <code>AgeGroup</code> which labels individuals older than 65 as “Elderly” and everyone else as “Other.” Finally, it groups this subset by <code>PA</code> and computes three key summary statistics for each area: the mean age (<code>Avg_Age</code>), the total number of observations (<code>Total_Pop</code>, effectively the population count in the sample), and the proportion of residents classified as elderly (<code>Elderly_Prop</code>).</p>
 </div>
 </div>
@@ -488,9 +551,9 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <section id="visuallisation-1---demographic-structure-of-singapore-residents-by-age-and-sex" class="level2">
 <h2 class="anchored" data-anchor-id="visuallisation-1---demographic-structure-of-singapore-residents-by-age-and-sex">3.1 Visuallisation 1 - Demographic Structure of Singapore Residents by Age and Sex</h2>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-8-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-1" role="tab" aria-controls="tabset-8-1" aria-selected="true">The plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-8-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-2" role="tab" aria-controls="tabset-8-2" aria-selected="false">The code</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-9-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-1" role="tab" aria-controls="tabset-9-1" aria-selected="true">The plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-9-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-2" role="tab" aria-controls="tabset-9-2" aria-selected="false">The code</a></li></ul>
 <div class="tab-content">
-<div id="tabset-8-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-8-1-tab">
+<div id="tabset-9-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-9-1-tab">
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -501,7 +564,7 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 </div>
 </div>
 </div>
-<div id="tabset-8-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-2-tab">
+<div id="tabset-9-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-9-2-tab">
 <div style="font-size: 0.8em">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Population Pyramid</span></span>
@@ -574,9 +637,9 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <section id="visuallisation-2---overview-of-population-distribution-by-planning-area-and-age-group" class="level2">
 <h2 class="anchored" data-anchor-id="visuallisation-2---overview-of-population-distribution-by-planning-area-and-age-group">3.2 Visuallisation 2 - Overview of Population Distribution by Planning Area and Age Group</h2>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-9-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-1" role="tab" aria-controls="tabset-9-1" aria-selected="true">The plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-9-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-2" role="tab" aria-controls="tabset-9-2" aria-selected="false">The code</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-10-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-10-1" role="tab" aria-controls="tabset-10-1" aria-selected="true">The plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-10-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-10-2" role="tab" aria-controls="tabset-10-2" aria-selected="false">The code</a></li></ul>
 <div class="tab-content">
-<div id="tabset-9-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-9-1-tab">
+<div id="tabset-10-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-10-1-tab">
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -587,7 +650,7 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 </div>
 </div>
 </div>
-<div id="tabset-9-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-9-2-tab">
+<div id="tabset-10-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-10-2-tab">
 <div style="font-size: 0.8em">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Treemap plot</span></span>
@@ -643,9 +706,9 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <section id="visuallisation-3---demographic-structure-and-aging-patterns-in-singapores-top-residential-planning-areas" class="level2">
 <h2 class="anchored" data-anchor-id="visuallisation-3---demographic-structure-and-aging-patterns-in-singapores-top-residential-planning-areas">3.3 Visuallisation 3 - Demographic Structure and Aging Patterns in Singapore’s Top Residential Planning Areas</h2>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-10-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-10-1" role="tab" aria-controls="tabset-10-1" aria-selected="true">The plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-10-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-10-2" role="tab" aria-controls="tabset-10-2" aria-selected="false">The code</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-11-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-11-1" role="tab" aria-controls="tabset-11-1" aria-selected="true">The plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-11-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-11-2" role="tab" aria-controls="tabset-11-2" aria-selected="false">The code</a></li></ul>
 <div class="tab-content">
-<div id="tabset-10-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-10-1-tab">
+<div id="tabset-11-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-11-1-tab">
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -656,7 +719,7 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 </div>
 </div>
 </div>
-<div id="tabset-10-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-10-2-tab">
+<div id="tabset-11-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-11-2-tab">
 <div style="font-size: 0.8em">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># palette for all 20 PAs</span></span>
@@ -723,9 +786,18 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <p>Insight:</p>
 <p>On the scatterplot, total population per PA ranges from approximately 90,000 in Sembawang to about 275,000 in Bedok and Tampines. Average ages vary between 36 years in Punggol and 46 years in Ang Mo Kio, with intermediate mean ages (≈38–45) in other PAs. Bubble sizes indicate elderly proportion: Ang Mo Kio (~20 %) and Bukit Merah (~18 %) have the largest shares, while Sembawang and Punggol register the smallest (~12 %).</p>
 <p>In the violin plots for the top ten PAs, median ages are clustered between roughly 35 and 45 years; the interquartile ranges span about 20–30 years. Bedok and Hougang violins have wide upper distributions—indicating substantial populations over 60—while Punggol’s shape is narrowly concentrated between 20 and 40. Medians appear highest in Bukit Batok and Sengkang and lowest in Punggol and Choa Chu Kang.</p>
-
-
 </section>
+</section>
+<section id="conclusion" class="level1">
+<h1>4 Conclusion</h1>
+<p>Singapore’s demographic map is far from uniform and calls for neighbourhood‑specific policies.</p>
+<p>Bedok and Ang Mo Kio top the charts for average age and elderly share (≈45 years, ≥18 % seniors). These estates should be prioritised for geriatric clinics, barrier‑free retrofits, and daytime activity centres, while re‑skilling programmes can keep older residents economically active.</p>
+<p>Conversely, Tampines and Sengkang combine large absolute populations with the highest counts of children and adults. Here, capacity expansion in preschools, primary schools and family‑oriented recreation will relieve crowding, and peak‑hour transit frequency should rise to meet the commuter load.</p>
+<p>Jurong West and Woodlands host sizeable young‑adult cohorts; affordable starter housing, co‑working hubs, and evening bus services would match their mobility and employment needs.</p>
+<p>Finally, Punggol and Sembawang, although populous, remain the youngest (mean age ≤ 38 years, &lt; 13 % seniors); forward planning should secure space for future eldercare even as current investment focuses on childcare and playground networks.</p>
+<p>In short, aligning healthcare, education, transport and housing investments with each estate’s demographic profile will maximise social return and future‑proof Singapore’s urban fabric.</p>
+
+
 </section>
 
 </main> <!-- /main -->
