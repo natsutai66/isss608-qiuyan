@@ -40,13 +40,13 @@ pacman::p_load(scales, ggrepel, patchwork,
 ## The libraries
 
 | name | purpose |
-|-------------|-----------------------------------------------------------|
+|-----------|------------------------------------------------------------|
 | scales | Nicely formats axis ticks and legends. |
 | ggrepel | Adds non‑overlapping text labels to ggplots. |
 | patchwork | Combines multiple ggplots into a single figure. |
 | ggthemes | Supplies predefined aesthetic themes. |
 | hrbrthemes | Extends ggthemes with modern, typographically friendly themes and font support. |
-| tidyverse | Meta‑package that loads ggplot2, dplyr, tidyr, readr, stringr, forcats, etc.—the backbone for data import, transformation, and visualisation. |
+| tidyverse | Meta‑package that loads ggplot2, dplyr, tidyr, readr, stringr, forcats, etc. — the backbone for data import, transformation, and visualisation. |
 | tidytext | Tokenises and analyses text. |
 | treemapify | Creates ggplot‑compatible treemaps. |
 :::
