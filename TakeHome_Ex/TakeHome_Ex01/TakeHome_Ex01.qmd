@@ -2,7 +2,7 @@
 title: "Take Home Exercise 1"
 description: "Demographic structures and distribution of Singapore in 2024"
 author: "Tai Qiu Yan"
-date: "May 2, 2024"
+date: "May 4, 2024"
 date-modified: "last-modified"
 format: html
 editor: visual
@@ -14,13 +14,13 @@ execute:
 
 # 1 Overview
 
-This exercise delivers three static analytical visualisations and concise commentaries that explain the demographic structure and geographic distribution of Singapore residents in June 2024. Using the “Singapore Residents by Planning Area / Subzone, Single Year of Age and Sex” dataset from the Department of Statistics, the data were wrangled entirely with the ***tidyverse*** and visualised with **ggplot2** and its extensions, adhering to the exercise requirement for reproducible R code and non‑interactive graphics.
+This exercise delivers three static analytical visualisations and concise commentaries that explain the demographic structure and geographic distribution of Singapore residents in June 2024. Using the “Singapore Residents by Planning Area / Subzone, Single Year of Age and Sex” dataset from the Department of Statistics, the data were wrangled entirely with the **tidyverse** and visualised with **ggplot2** and its extensions, adhering to the exercise requirement for reproducible R code and non‑interactive graphics.
 
 1.  **Nation‑wide age profile** – a population pyramid and companion bar chart depict gender balance, cohort sizes, and the dominance of the 26‑65 workforce alongside a contracting youth base and expanding senior segment.
 
 2.  **Spatial distribution** – a treemap ranks planning areas by total residents, while six faceted bar charts rank them within each major age group, revealing contrasts such as Tampines’ family orientation versus Bedok’s larger elderly share.
 
-3.  **Age‑structure contrasts** – a bubble plot (average age vs population, bubble = senior share) and violin plots of the ten largest areas detail how mean age and intra‑area distributions vary, pinpointing estates like Ang Mo Kio (oldest) and Punggol (youngest).
+3.  **Age‑structure contrasts** – a bubble plot (average age vs population, bubble = senior share) and violin plots of the ten largest areas detail how mean age and intra‑area distributions vary, pinpointing estates like Ang Mo Kio (oldest) and Punggol (youngest).
 
 Together these visuals provide a foundation for evidence‑based recommendations on schooling capacity, eldercare facilities, housing typology, and transport planning across Singapore’s diverse neighbourhoods.
 
@@ -40,7 +40,7 @@ pacman::p_load(scales, ggrepel, patchwork,
 ## The libraries
 
 | name | purpose |
-|----|----|
+|------------------------------------|------------------------------------|
 | scales | Nicely formats axis ticks and legends. |
 | ggrepel | Adds non‑overlapping text labels to ggplots. |
 | patchwork | Combines multiple ggplots into a single figure. |
@@ -118,7 +118,8 @@ pyramid_data_grouped <- population_data %>%
   group_by(AgeGroup, Sex) %>%
   summarise(Total_Pop = sum(Pop), .groups = "drop") %>%
   mutate(
-    AgeGroup = factor(AgeGroup, levels = c("Children", "Teenager", "Young Adult", "Adult", "Middle-age", "Elderly")),
+    AgeGroup = factor(AgeGroup, levels = c("Children", "Teenager", 
+                                           "Young Adult", "Adult", "Middle-age", "Elderly")),
     Total_Pop_k = paste0(round(Total_Pop / 1000), "k")
   )
 ```
@@ -631,3 +632,7 @@ Jurong West and Woodlands host sizeable young‑adult cohorts; affordable starte
 Finally, Punggol and Sembawang, although populous, remain the youngest (mean age ≤ 38 years, \< 13 % seniors); forward planning should secure space for future eldercare even as current investment focuses on childcare and playground networks.
 
 In short, aligning healthcare, education, transport and housing investments with each estate’s demographic profile will maximise social return and future‑proof Singapore’s urban fabric.
+
+# 5 Reference
+
+Kam, Tin Seong. (2025). Beyond ggplot2 Fundamentals. R for Visual Analytics. https://r4va.netlify.app/chap02

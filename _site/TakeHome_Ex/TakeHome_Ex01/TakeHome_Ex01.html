@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Tai Qiu Yan">
-<meta name="dcterms.date" content="2024-05-02">
+<meta name="dcterms.date" content="2024-05-04">
 <meta name="description" content="Demographic structures and distribution of Singapore in 2024">
 
 <title>Take Home Exercise 1 – ISSS608-VAA</title>
@@ -220,6 +220,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#visuallisation-3---demographic-structure-and-aging-patterns-in-singapores-top-residential-planning-areas" id="toc-visuallisation-3---demographic-structure-and-aging-patterns-in-singapores-top-residential-planning-areas" class="nav-link" data-scroll-target="#visuallisation-3---demographic-structure-and-aging-patterns-in-singapores-top-residential-planning-areas">3.3 Visuallisation 3 - Demographic Structure and Aging Patterns in Singapore’s Top Residential Planning Areas</a></li>
   </ul></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">4 Conclusion</a></li>
+  <li><a href="#reference" id="toc-reference" class="nav-link" data-scroll-target="#reference">5 Reference</a></li>
   </ul>
 </nav>
     </div>
@@ -250,7 +251,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 2, 2024</p>
+      <p class="date">May 4, 2024</p>
     </div>
   </div>
   
@@ -270,11 +271,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="overview" class="level1">
 <h1>1 Overview</h1>
-<p>This exercise delivers three static analytical visualisations and concise commentaries that explain the demographic structure and geographic distribution of Singapore residents in June 2024. Using the “Singapore Residents by Planning Area / Subzone, Single Year of Age and Sex” dataset from the Department of Statistics, the data were wrangled entirely with the <strong><em>tidyverse</em></strong> and visualised with <strong>ggplot2</strong> and its extensions, adhering to the exercise requirement for reproducible R code and non‑interactive graphics.</p>
+<p>This exercise delivers three static analytical visualisations and concise commentaries that explain the demographic structure and geographic distribution of Singapore residents in June 2024. Using the “Singapore Residents by Planning Area / Subzone, Single Year of Age and Sex” dataset from the Department of Statistics, the data were wrangled entirely with the <strong>tidyverse</strong> and visualised with <strong>ggplot2</strong> and its extensions, adhering to the exercise requirement for reproducible R code and non‑interactive graphics.</p>
 <ol type="1">
 <li><p><strong>Nation‑wide age profile</strong> – a population pyramid and companion bar chart depict gender balance, cohort sizes, and the dominance of the 26‑65 workforce alongside a contracting youth base and expanding senior segment.</p></li>
 <li><p><strong>Spatial distribution</strong> – a treemap ranks planning areas by total residents, while six faceted bar charts rank them within each major age group, revealing contrasts such as Tampines’ family orientation versus Bedok’s larger elderly share.</p></li>
-<li><p><strong>Age‑structure contrasts</strong> – a bubble plot (average age vs population, bubble = senior share) and violin plots of the ten largest areas detail how mean age and intra‑area distributions vary, pinpointing estates like Ang Mo Kio (oldest) and Punggol (youngest).</p></li>
+<li><p><strong>Age‑structure contrasts</strong> – a bubble plot (average age vs population, bubble = senior share) and violin plots of the ten largest areas detail how mean age and intra‑area distributions vary, pinpointing estates like Ang Mo Kio (oldest) and Punggol (youngest).</p></li>
 </ol>
 <p>Together these visuals provide a foundation for evidence‑based recommendations on schooling capacity, eldercare facilities, housing typology, and transport planning across Singapore’s diverse neighbourhoods.</p>
 </section>
@@ -422,9 +423,10 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(AgeGroup, Sex) <span class="sc">%&gt;%</span></span>
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Total_Pop =</span> <span class="fu">sum</span>(Pop), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">AgeGroup =</span> <span class="fu">factor</span>(AgeGroup, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Children"</span>, <span class="st">"Teenager"</span>, <span class="st">"Young Adult"</span>, <span class="st">"Adult"</span>, <span class="st">"Middle-age"</span>, <span class="st">"Elderly"</span>)),</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">Total_Pop_k =</span> <span class="fu">paste0</span>(<span class="fu">round</span>(Total_Pop <span class="sc">/</span> <span class="dv">1000</span>), <span class="st">"k"</span>)</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">AgeGroup =</span> <span class="fu">factor</span>(AgeGroup, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Children"</span>, <span class="st">"Teenager"</span>, </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>                                           <span class="st">"Young Adult"</span>, <span class="st">"Adult"</span>, <span class="st">"Middle-age"</span>, <span class="st">"Elderly"</span>)),</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">Total_Pop_k =</span> <span class="fu">paste0</span>(<span class="fu">round</span>(Total_Pop <span class="sc">/</span> <span class="dv">1000</span>), <span class="st">"k"</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
@@ -796,6 +798,10 @@ $ Time &lt;dbl&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2
 <p>Jurong West and Woodlands host sizeable young‑adult cohorts; affordable starter housing, co‑working hubs, and evening bus services would match their mobility and employment needs.</p>
 <p>Finally, Punggol and Sembawang, although populous, remain the youngest (mean age ≤ 38 years, &lt; 13 % seniors); forward planning should secure space for future eldercare even as current investment focuses on childcare and playground networks.</p>
 <p>In short, aligning healthcare, education, transport and housing investments with each estate’s demographic profile will maximise social return and future‑proof Singapore’s urban fabric.</p>
+</section>
+<section id="reference" class="level1">
+<h1>5 Reference</h1>
+<p>Kam, Tin Seong. (2025). Beyond ggplot2 Fundamentals.&nbsp;R for Visual Analytics.&nbsp;https://r4va.netlify.app/chap02</p>
 
 
 </section>
