@@ -629,10 +629,10 @@ Conversely, Tampines and Sengkang combine large absolute populations with the hi
 
 Jurong West and Woodlands host sizeable young‑adult cohorts; affordable starter housing, co‑working hubs, and evening bus services would match their mobility and employment needs.
 
-Finally, Punggol and Sembawang, although populous, remain the youngest (mean age ≤ 38 years, < 13% seniors); forward planning should secure space for future eldercare even as current investment focuses on childcare and playground networks.
+Finally, Punggol and Sembawang, although populous, remain the youngest (mean age ≤ 38 years, \< 13% seniors); forward planning should secure space for future eldercare even as current investment focuses on childcare and playground networks.
 
 In short, aligning healthcare, education, transport and housing investments with each estate’s demographic profile will maximise social return and future‑proof Singapore’s urban fabric.
 
 # 5 Reference
 
-Kam, Tin Seong. (2025). Beyond ggplot2 Fundamentals. R for Visual Analytics. https://r4va.netlify.app/chap02
+Kam, Tin Seong. (January 27, 2025). Beyond ggplot2 Fundamentals. *R for Visual Analytics.* https://r4va.netlify.app/chap02
