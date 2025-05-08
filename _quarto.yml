@@ -15,8 +15,14 @@ website:
             href: "Hands-on_Ex/Hands-on_Ex03_part1/Hands-on_Ex03_part1.html"
           - text: "Hands-on Exercise 3 part 2"
             href: "Hands-on_Ex/Hands-on_Ex03_part2/Hands-on_Ex03_part2.html"
-          - text: "Hands-on Exercise 4"
-            href: "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html"
+          - text: "Hands-on Exercise 4 part 1"
+            href: "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html"
+          - text: "Hands-on Exercise 4 part 2"
+            href: "Hands-on_Ex/Hands-on_Ex04_part2/Hands-on_Ex04_part2.html"
+          - text: "Hands-on Exercise 4 part 3"
+            href: "Hands-on_Ex/Hands-on_Ex04_part3/Hands-on_Ex04_part3.html"
+          - text: "Hands-on Exercise 4 part 4"
+            href: "Hands-on_Ex/Hands-on_Ex04_part4/Hands-on_Ex04_part4.html"
             
 
       - text: "In-Class Exercise"

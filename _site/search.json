@@ -334,5 +334,103 @@
     "title": "Take Home Exercise 1",
     "section": "",
     "text": "This exercise delivers three static analytical visualisations and concise commentaries that explain the demographic structure and geographic distribution of Singapore residents in June 2024. Using the “Singapore Residents by Planning Area / Subzone, Single Year of Age and Sex” dataset from the Department of Statistics, the data were wrangled entirely with the tidyverse and visualised with ggplot2 and its extensions, adhering to the exercise requirement for reproducible R code and non‑interactive graphics.\n\nNation‑wide age profile – a population pyramid and companion bar chart depict gender balance, cohort sizes, and the dominance of the 26‑65 workforce alongside a contracting youth base and expanding senior segment.\nSpatial distribution – a treemap ranks planning areas by total residents, while six faceted bar charts rank them within each major age group, revealing contrasts such as Tampines’ family orientation versus Bedok’s larger elderly share.\nAge‑structure contrasts – a bubble plot (average age vs population, bubble = senior share) and violin plots of the ten largest areas detail how mean age and intra‑area distributions vary, pinpointing estates like Ang Mo Kio (oldest) and Punggol (youngest).\n\nTogether these visuals provide a foundation for evidence‑based recommendations on schooling capacity, eldercare facilities, housing typology, and transport planning across Singapore’s diverse neighbourhoods."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html",
+    "href": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html",
+    "title": "Hands-on Exercise 4 part 1",
+    "section": "",
+    "text": "This exercise demonstrates two statistical graphic methods for visualising distribution, namely ridgeline plot and raincloud plot by using ggplot2 and its extensions."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#loading-the-packages",
+    "href": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#loading-the-packages",
+    "title": "Hands-on Exercise 4 part 1",
+    "section": "2.1 Loading the packages",
+    "text": "2.1 Loading the packages\nThe following R packages will be used, they are:\n\nggridges, a ggplot2 extension specially designed for plotting ridgeline plots,\nggdist, a ggplot2 extension spacially desgin for visualising distribution and uncertainty,\ntidyverse, a family of R packages to meet the modern data science and visual communication needs,\nggthemes, a ggplot extension that provides the user additional themes, scales, and geoms for the ggplots package, and\ncolorspace, an R package provides a broad toolbox for selecting individual colors or color palettes, manipulating these colors, and employing them in various kinds of visualisations.\n\n\npacman::p_load(ggdist, ggridges, ggthemes,\n               colorspace, tidyverse)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#import-data",
+    "href": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#import-data",
+    "title": "Hands-on Exercise 4 part 1",
+    "section": "2.2 Import Data",
+    "text": "2.2 Import Data\nIn the code chunk below, read_csv() of readr package is used to import Exam_data.csv into R and saved it into a tibble data.frame.\n\nexam &lt;- read_csv(\"data/Exam_data.csv\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#data-overview",
+    "href": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#data-overview",
+    "title": "Hands-on Exercise 4 part 1",
+    "section": "2.3 Data Overview",
+    "text": "2.3 Data Overview\n\nsummary()\n\nsummary(exam)\n\n      ID               CLASS              GENDER              RACE          \n Length:322         Length:322         Length:322         Length:322        \n Class :character   Class :character   Class :character   Class :character  \n Mode  :character   Mode  :character   Mode  :character   Mode  :character  \n                                                                            \n                                                                            \n                                                                            \n    ENGLISH          MATHS          SCIENCE     \n Min.   :21.00   Min.   : 9.00   Min.   :15.00  \n 1st Qu.:59.00   1st Qu.:58.00   1st Qu.:49.25  \n Median :70.00   Median :74.00   Median :65.00  \n Mean   :67.18   Mean   :69.33   Mean   :61.16  \n 3rd Qu.:78.00   3rd Qu.:85.00   3rd Qu.:74.75  \n Max.   :96.00   Max.   :99.00   Max.   :96.00  \n\n\n\n\nglimpse()\n\nglimpse(exam)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…\n\n\n\n\nhead()\n\nhead(exam,100)\n\n# A tibble: 100 × 7\n   ID         CLASS GENDER RACE    ENGLISH MATHS SCIENCE\n   &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;\n 1 Student321 3I    Male   Malay        21     9      15\n 2 Student305 3I    Female Malay        24    22      16\n 3 Student289 3H    Male   Chinese      26    16      16\n 4 Student227 3F    Male   Chinese      27    77      31\n 5 Student318 3I    Male   Malay        27    11      25\n 6 Student306 3I    Female Malay        31    16      16\n 7 Student313 3I    Male   Chinese      31    21      25\n 8 Student316 3I    Male   Malay        31    18      27\n 9 Student312 3I    Male   Malay        33    19      15\n10 Student297 3H    Male   Indian       34    49      37\n# ℹ 90 more rows"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#plotting-ridgeline-graph-ggridges-method",
+    "href": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#plotting-ridgeline-graph-ggridges-method",
+    "title": "Hands-on Exercise 4 part 1",
+    "section": "3.1 Plotting ridgeline graph: ggridges method",
+    "text": "3.1 Plotting ridgeline graph: ggridges method\nThis section demonstrates how to plot ridgeline plot by using ggridges package.\nggridges package provides two main geom to plot gridgeline plots, they are: geom_ridgeline() and geom_density_ridges(). The former takes height values directly to draw the ridgelines, and the latter first estimates data densities and then draws those using ridgelines.\nThe ridgeline plot below is plotted by using geom_density_ridges().\n\nggplot(exam, \n       aes(x = ENGLISH, \n           y = CLASS)) +\n  geom_density_ridges(\n    scale = 3,\n    rel_min_height = 0.01,\n    bandwidth = 3.4,\n    fill = lighten(\"#7097BB\", .3),\n    color = \"white\"\n  ) +\n  scale_x_continuous(\n    name = \"English grades\",\n    expand = c(0, 0)\n    ) +\n  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +\n  theme_ridges()"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#varying-fill-colors-along-the-x-axis",
+    "href": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#varying-fill-colors-along-the-x-axis",
+    "title": "Hands-on Exercise 4 part 1",
+    "section": "3.2 Varying fill colors along the x axis",
+    "text": "3.2 Varying fill colors along the x axis\nSometimes we would like to have the area under a ridgeline not filled with a single solid color but rather with colors that vary in some form along the x axis. This effect can be achieved by using either geom_ridgeline_gradient() or geom_density_ridges_gradient(). Both geoms work just like geom_ridgeline() and geom_density_ridges(), except that they allow for varying fill colors. However, they do not allow for alpha transparency in the fill. For technical reasons, we can have changing fill colors or transparency but not both.\n\nggplot(exam, \n       aes(x = ENGLISH, \n           y = CLASS,\n           fill = after_stat(x))) +\n  geom_density_ridges_gradient(\n    scale = 3,\n    rel_min_height = 0.01) +\n  scale_fill_viridis_c(name = \"Temp. [F]\",\n                       option = \"C\") +\n  scale_x_continuous(\n    name = \"English grades\",\n    expand = c(0, 0)\n  ) +\n  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +\n  theme_ridges()"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#mapping-the-probabilities-directly-onto-colour",
+    "href": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#mapping-the-probabilities-directly-onto-colour",
+    "title": "Hands-on Exercise 4 part 1",
+    "section": "3.3 Mapping the probabilities directly onto colour",
+    "text": "3.3 Mapping the probabilities directly onto colour\nBeside providing additional geom objects to support the need to plot ridgeline plot, ggridges package also provides a stat function called stat_density_ridges() that replaces stat_density() of ggplot2.\nFigure below is plotted by mapping the probabilities calculated by using stat(ecdf) which represent the empirical cumulative density function for the distribution of English score.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nImportant\n\n\n\nIt is important include the argument calc_ecdf = TRUE in stat_density_ridges()."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#ridgeline-plots-with-quantile-lines",
+    "href": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#ridgeline-plots-with-quantile-lines",
+    "title": "Hands-on Exercise 4 part 1",
+    "section": "3.4 Ridgeline plots with quantile lines",
+    "text": "3.4 Ridgeline plots with quantile lines\nBy using geom_density_ridges_gradient(), we can colour the ridgeline plot by quantile, via the calculated stat(quantile) aesthetic as shown in the figure below.\n\n\n\n\n\n\n\n\n\nInstead of using number to define the quantiles, we can also specify quantiles by cut points such as 2.5% and 97.5% tails to colour the ridgeline plot as shown in the figure below."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#plotting-a-half-eye-graph",
+    "href": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#plotting-a-half-eye-graph",
+    "title": "Hands-on Exercise 4 part 1",
+    "section": "4.1 Plotting a Half Eye graph",
+    "text": "4.1 Plotting a Half Eye graph\nFirst, we will plot a Half-Eye graph by using stat_halfeye() of ggdist package.\nThis produces a Half Eye visualization, which is contains a half-density and a slab-interval.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ntips\n\n\n\nWe remove the slab interval by setting .width = 0 and point_colour = NA."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#adding-the-boxplot-with-geom_boxplot",
+    "href": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#adding-the-boxplot-with-geom_boxplot",
+    "title": "Hands-on Exercise 4 part 1",
+    "section": "4.2 Adding the boxplot with geom_boxplot()",
+    "text": "4.2 Adding the boxplot with geom_boxplot()\nNext, we will add the second geometry layer using geom_boxplot() of ggplot2. This produces a narrow boxplot. We reduce the width and adjust the opacity."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#adding-the-dot-plots-with-stat_dots",
+    "href": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#adding-the-dot-plots-with-stat_dots",
+    "title": "Hands-on Exercise 4 part 1",
+    "section": "4.3 Adding the Dot Plots with stat_dots()",
+    "text": "4.3 Adding the Dot Plots with stat_dots()\nNext, we will add the third geometry layer using stat_dots() of ggdist package. This produces a half-dotplot, which is similar to a histogram that indicates the number of samples (number of dots) in each bin. We select side = “left” to indicate we want it on the left-hand side."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#finishing-touch",
+    "href": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#finishing-touch",
+    "title": "Hands-on Exercise 4 part 1",
+    "section": "4.4 Finishing touch",
+    "text": "4.4 Finishing touch\nLastly, coord_flip() of ggplot2 package will be used to flip the raincloud chart horizontally to give it the raincloud appearance. At the same time, theme_economist() of ggthemes package is used to give the raincloud chart a professional publishing standard look."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#ridges-with-jittered-points",
+    "href": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#ridges-with-jittered-points",
+    "title": "Hands-on Exercise 4 part 1",
+    "section": "5.1 Ridges with jittered points",
+    "text": "5.1 Ridges with jittered points\n\nThe PlotThe Code\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(exam, \n       aes(x = ENGLISH, \n           y = RACE,\n       color= RACE,\n       fill= RACE)) +\n  theme_ridges()+\n  geom_density_ridges(jittered_points=TRUE,\n                      aes(point_color=RACE),\n                      alpha = 0.7,\n                      scale = 0.8,\n                      point_size = .5,\n                      ) +\n  scale_fill_discrete_qualitative('Set 3')+\n  scale_color_discrete_qualitative('Dark 3')+\n\n\n  labs(x = \"English Score\",\n       y = \"\",\n       title=\"Distribution of English Scores by Ethnic Group\") +  \n  theme(\n    legend.position = \"none\",\n    panel.grid.major.y = element_blank(),\n    panel.grid.minor = element_blank(),\n    axis.title.x = element_text(hjust = 1),\n    plot.title = element_text(face = \"bold\", size = 10),\n  )"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#shaped-jitters-with-geom_density_ridges",
+    "href": "Hands-on_Ex/Hands-on_Ex04_part1/Hands-on_Ex04_part1.html#shaped-jitters-with-geom_density_ridges",
+    "title": "Hands-on Exercise 4 part 1",
+    "section": "5.2 shaped jitters with geom_density_ridges()",
+    "text": "5.2 shaped jitters with geom_density_ridges()\n\nThe PlotThe Code\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(exam, \n       aes(x = ENGLISH, \n           y = RACE, \n           color=RACE, \n           fill=RACE\n           )) +\n  theme_ridges()+\n  geom_density_ridges(jittered_points=TRUE,\n                      position='raincloud',\n                      alpha = 0.7,\n                      scale=1,\n                      point_shape = '|',\n                      point_size = 2,\n                      ) +\n  geom_boxplot(width = .20,\n               outlier.shape = NA) +\n  scale_color_nord('victory_bonds')+\n  scale_fill_nord('victory_bonds')+\n  scale_color_brewer(palette = \"Set1\") +\nscale_fill_brewer(palette = \"Set1\") +\n  labs(x = \"English Score\",\n       y = \"\",\n       title=\"Distribution of English Scores by Ethnicity\") +\n  theme(\n    legend.position = \"none\",\n    panel.grid.major.y = element_blank(),\n    panel.grid.minor = element_blank(),\n    axis.title.x = element_text(hjust = 1),\n    plot.title = element_text(face = \"bold\", size = 10),\n  )"
   }
 ]
