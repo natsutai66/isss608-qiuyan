@@ -2,7 +2,7 @@
 title: "Hands-on Exercise 4 part 2"
 description: "Visualising Distribution"
 author: "Tai Qiu Yan"
-date: "May 4, 2025"
+date: "May 8, 2025"
 date-modified: "last-modified"
 format: html
 editor: visual
@@ -172,6 +172,6 @@ ggbarstats(exam1,
            x = MATHS_bins,
            y = GENDER)
 ```
-# 6 Reference
+# 4 Reference
 
-Kam, Tin Seong. (fEB 15, 2025). 10 Visual Statistical Analysis. R for Visual Analytics. r4va.netlify.app
+Kam Tin Seong. (February 15, 2025). 10 Visual Statistical Analysis. R for Visual Analytics. r4va.netlify.app
