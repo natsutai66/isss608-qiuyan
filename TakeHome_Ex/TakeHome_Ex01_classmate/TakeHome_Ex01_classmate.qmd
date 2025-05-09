@@ -1,0 +1,608 @@
+---
+title: "Take Home Exercise - classmate"
+description: "Phase 2: three good design principles and three areas for further improvement"
+author: "Tai Qiu Yan"
+date: "May 9, 2025"
+date-modified: "last-modified"
+format: docx
+editor: visual
+execute:
+  eval: true
+  echo: true
+  warning: false
+---
+
+# 1 Original submission
+
+The original visualization was created by our classmate Calvin Tan Song Hao. Please refer to [this link](https://isss608-ay2024-25t3.netlify.app/take-home_ex/take-home_ex01-1/take-home_ex01-1) for the original submission.
+
+# 2 Libraries and Data
+
+Originally, five R packages will be used for the preparation:
+
+```{r}
+pacman::p_load(tidyverse, patchwork, ggthemes, knitr, cowplot)
+```
+
+The data file - respopagesex2024 will be used:
+
+```{r}
+sg_data <- read_csv("data/respopagesex2024.csv")
+```
+
+Fixing Age Column Inconsistency:
+
+```{r}
+sg_data$Age <- as.character(sg_data$Age)
+
+sg_data$Age[sg_data$Age == "90_and_Over"] <- "90"
+
+sg_data$Age <- as.numeric(sg_data$Age)
+```
+
+Binning Age Column:
+
+-   **Young**: Singapore residents aged 0 to 24
+
+-   **Economically_Active**: Singapore residents aged 25 to 64
+
+-   **Aged**: Singapore residents aged 65 and above
+
+```{r}
+sg_data$Age_Group <- cut(
+  sg_data$Age,
+  breaks = c(-1, 24, 64, Inf),
+  labels = c("Young", "Economically_Active", "Aged"),
+  right = TRUE
+)
+```
+
+# 3 Visualisations
+
+## 3.1 Population Across Planning Areas by Sex
+
+```{r fig.width=14, fig.height=8}
+#| echo: false
+demography_sex <- sg_data %>%
+  group_by(PA, Sex) %>%
+  summarise(Pop = sum(Pop)) %>%
+  group_by(PA) %>%
+  mutate(Total = sum(Pop))
+
+demography_sex <- demography_sex %>%
+  filter(Total > 0)
+
+pa_order <- demography_sex %>%
+  distinct(PA, Total) %>%
+  arrange(Total) %>%
+  pull(PA)
+
+demography_sex <- demography_sex %>%
+  mutate(
+    PA = factor(PA, levels = pa_order)
+  )
+
+s1 <- ggplot(data = demography_sex, 
+       aes(x = PA, y = Pop, fill = Sex)) +
+  geom_bar(stat = "identity", position = "stack") +
+  coord_flip() +
+  theme_minimal() +
+  labs(
+    x = "Planing Area",
+    y = "Population",
+    fill = "Sex"
+  ) +
+  ggtitle("Population Across Planning Areas by Sex") +
+  scale_fill_manual(
+    values = c(
+      "Males" = "#88CCEE",
+      "Females" = "#CC6677"
+    ),
+    breaks = c("Males", "Females")
+  ) +
+  scale_y_continuous(labels = scales::comma) +
+  theme(
+    legend.position = "bottom"
+  )
+
+demography_sex_bottom10 <- demography_sex %>%
+  filter(PA %in% head(pa_order, 10))
+
+s2 <- ggplot(data = demography_sex_bottom10, 
+       aes(x = PA, y = Pop, fill = Sex)) +
+  geom_bar(stat = "identity", position = "stack") +
+  coord_flip() +
+  theme_test() +
+  labs(
+    x = NULL,
+    y = NULL
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Males" = "#88CCEE",
+      "Females" = "#CC6677"
+    ),
+    breaks = c("Males", "Females")
+  ) +
+  theme(
+    legend.position = "none",
+    plot.background = element_rect(fill = "transparent", colour = NA)
+  )
+
+zoom_rect <- ggplot() +
+  geom_rect(aes(xmin = 0, xmax = 1, ymin = 0, ymax = 1),
+            fill = NA, color = "black", linetype = "dashed") +
+  theme_void()
+
+ggdraw() +
+  draw_plot(s1, 0, 0, 1, 1) +
+  draw_plot(s2, 0.4, 0.185, 0.56, 0.25) +
+  draw_plot(zoom_rect, 0.005, 0.155, 0.3, 0.206) +
+  draw_plot(zoom_rect, 0.37, 0.18, 0.62, 0.27) # (left , btm, right, top)
+```
+
+## 3.1.1 Good design principles
+
+-   **Use of inset plot:** The use of an inset plot is particularly effective. It provides a magnified view of planning areas with relatively small populations that would otherwise appear almost invisible in the main chart. This ensures that no data is excluded from analysis, promoting inclusiveness and allowing for scale sensitivity without distorting the overall pattern of the chart.
+
+-   **Clear color coding:** Color coding by sex is implemented using familiar and easily distinguishable hues—blue for males and red for females. This choice allows viewers to quickly interpret the distribution of population by gender across different areas without needing to consult the legend repeatedly.
+
+-   **Horizontal bar chart with proper sorting:** The horizontal bar chart is well-structured, with planning areas sorted in descending order of total population. This arrangement supports effective comparative analysis and, importantly, accommodates long area names in a way that avoids label clutter, improving overall readability.
+
+## 3.1.2 Areas for further improvement
+
+-   **Stacked bars obscure comparison across genders:** The female bars are stacked on top of the male bars, making it difficult to compare female populations across planning areas since they do not share a common baseline. This limits interpretability and distorts direct comparisons. A better approach would be to use a population pyramid format, with males and females on opposite sides of a central axis. Additionally, labeling each bar with the exact population figure would provide immediate numerical clarity and make the chart more informative.
+
+-   **Redundant legend placement and layout inefficiency:** Although the legend is useful, it is somewhat redundant given the clear color-coding. It could be relocated near the inset chart to save space and reduce clutter. In the original layout, overlapping labels made it hard to read planning area names. Removing the legend from its current position would allow the chart to be taller and cleaner, improving overall readability.
+
+-   **Lack of summary indicators:** The chart would benefit from the addition of vertical median lines for both male and female populations. These lines would serve as reference benchmarks, allowing users to quickly identify which planning areas have populations above or below the median. This simple addition would enhance interpretability and provide a clearer statistical context to the viewer.
+
+## 3.1.3 Makeover
+
+:::: panel-tabset
+## The plot
+
+```{r fig.width=14, fig.height=10}
+#| echo: false
+library(ggplot2)
+library(dplyr)
+library(scales)
+
+# 1 Data prep
+demography_sex <- sg_data %>%
+  group_by(PA, Sex) %>%
+  summarise(Pop = sum(Pop), .groups = "drop") %>%
+  group_by(PA) %>%
+  mutate(Total = sum(Pop)) %>%
+  filter(Total > 0) %>%
+  mutate(Pop = ifelse(Sex == "Males", -Pop, Pop)) %>%
+  ungroup()
+
+stats <- demography_sex %>%
+  summarise(
+    total   = sum(abs(Pop)),
+    male    = sum(abs(Pop[Sex=="Males"])),
+    female  = sum(Pop[Sex=="Females"]),
+    ratio   = sum(abs(Pop[Sex=="Males"])) / sum(Pop[Sex=="Females"])
+  )
+stats_text <- paste0(
+  "Total Pop: ",   comma(stats$total),   "\n",
+  "Male Pop: ",    comma(stats$male),    "\n",
+  "Female Pop: ",  comma(stats$female),  "\n",
+  "M:F Ratio: ",   round(stats$ratio,2)
+)
+
+# 2 Ordering
+pa_order <- demography_sex %>%
+  distinct(PA, Total) %>%
+  arrange(desc(Total)) %>%
+  pull(PA)
+demography_sex$PA <- factor(demography_sex$PA, levels = rev(pa_order))
+
+# 3 Identify inset PAs (Newton → Seletar)
+pa_seq    <- pa_order
+start_idx <- which(pa_seq == "Newton")
+end_idx   <- which(pa_seq == "Seletar")
+inset_order <- pa_seq[start_idx:end_idx]
+inset_data  <- demography_sex %>%
+  filter(PA %in% inset_order) %>%
+  mutate(PA = factor(PA, levels = rev(inset_order)))
+
+# 4 Medians
+male_med   <- demography_sex %>% filter(Sex=="Males")   %>% pull(Pop) %>% abs() %>% median()
+female_med <- demography_sex %>% filter(Sex=="Females") %>% pull(Pop)          %>% median()
+
+# 5 Highlight region
+highlight_pos <- match(inset_order, levels(demography_sex$PA))
+ymin_hl <- min(highlight_pos) - 0.5
+ymax_hl <- max(highlight_pos) + 0.5
+
+box_pops <- demography_sex %>%
+  filter(PA %in% c("Newton","Tengah")) %>%
+  pull(Pop)
+
+xmin_box <- min(box_pops) 
+xmax_box <- max(box_pops) 
+
+pad <- (xmax_box - xmin_box) * 2
+xmin_box <- xmin_box - pad
+xmax_box <- xmax_box + pad
+
+# DEFINE INSIDE vs OUTSIDE for main plot
+inside_main  <- pa_order[1:which(pa_order=="Jurong East")]
+outside_main <- setdiff(pa_order, inside_main)
+
+# DEFINE INSIDE vs OUTSIDE for inset plot
+inside_inset  <- inset_order[1:which(inset_order=="Changi")]
+outside_inset <- setdiff(inset_order, inside_inset)
+
+# MAIN PYRAMID
+main_plot <- ggplot(demography_sex, aes(x = Pop, y = PA, fill = Sex)) +
+  
+  annotate("rect",
+         xmin = xmin_box, xmax = xmax_box,
+         ymin = ymin_hl,  ymax = ymax_hl,
+         colour = "black", linetype = "dotted",
+         size = 1, fill = NA) +
+  
+  geom_col(width = 0.8) +
+  
+  # summary text in left blank area
+  annotate("text",
+           x    = min(demography_sex$Pop) * 0.8,
+           y    = nlevels(demography_sex$PA) * 0.2,
+           label= stats_text,
+           hjust= 0, size = 3.5, colour = "grey20") +
+  
+  # inside labels (Tampines → Jurong East), shifted to bar ends but still inside
+  geom_text(
+    data = filter(demography_sex, PA %in% inside_main),
+    aes(label = comma(abs(Pop))),
+    position = position_identity(),
+    hjust = ifelse(
+      filter(demography_sex, PA %in% inside_main)$Sex == "Males",
+      0.02, 0.98
+    ),
+    vjust = 0.5,
+    size = 2.5, colour = "black"
+  ) +
+  
+  # outside labels (below Rochor → Seletar)
+  geom_text(
+    data = filter(demography_sex, PA %in% outside_main),
+    aes(label = comma(abs(Pop))),
+    position = position_identity(),
+    hjust = ifelse(
+      filter(demography_sex, PA %in% outside_main)$Sex == "Males",
+      1.1, -0.1
+    ),
+    size = 2.5, colour = "black"
+  ) +
+  
+  geom_vline(xintercept = -male_med,   linetype="longdash", size=1, colour="grey40") +
+  geom_vline(xintercept =  female_med, linetype="longdash", size=1, colour="grey40") +
+  
+  annotate("text",
+           x    = -male_med, y = Inf,
+           label= paste0("Median\n", comma(male_med)),
+           hjust= 1.1, vjust= -0.5,
+           size = 3, colour = "grey20") +
+  annotate("text",
+           x    =  female_med, y = Inf,
+           label= paste0("Median\n", comma(female_med)),
+           hjust= -0.1, vjust= -0.5,
+           size = 3, colour = "grey20") +
+  
+  scale_fill_manual(values = c("Males"="#ADD8E6","Females"="#FFB6C1")) +
+  scale_x_continuous(
+    labels = function(x) comma(abs(x))
+  ) +
+  scale_y_discrete(expand = expansion(add = c(0,2))) +
+  
+  labs(x="Population", y="Planning Area") +
+  theme_minimal() +
+  theme(
+    plot.title      = element_blank(),
+    axis.title      = element_text(size=12),
+    axis.text       = element_text(size=9),
+    legend.position = "none"
+  ) +
+  coord_cartesian(clip="off")
+
+# INSET PLOT
+inset_plot <- ggplot(inset_data, aes(x = Pop, y = PA, fill = Sex)) +
+  geom_col(width = 0.8) +
+  
+  # inside inset labels (Newton → Changi)
+  geom_text(
+    data = filter(inset_data, PA %in% inside_inset),
+    aes(label = comma(abs(Pop))),
+    position = position_stack(vjust = 0.5),
+    size = 2.5, colour = "black"
+  ) +
+  
+  # outside inset labels (Mandai → Seletar)
+  geom_text(
+    data = filter(inset_data, PA %in% outside_inset),
+    aes(label = comma(abs(Pop))),
+    position = position_identity(),
+    hjust = ifelse(
+      filter(inset_data, PA %in% outside_inset)$Sex == "Males",
+      1.1, -0.1
+    ),
+    size = 2.5, colour = "black"
+  ) +
+  
+  scale_fill_manual(values = c("Males"="#ADD8E6","Females"="#FFB6C1")) +
+  scale_x_continuous(
+    labels = function(x) comma(abs(x))
+  ) +
+  theme_minimal(base_size=9) +
+  theme(
+    axis.title       = element_blank(),
+    axis.text.y      = element_text(size=7),
+    axis.text.x      = element_text(size=7),
+    panel.background = element_rect(fill="white", colour=NA),
+    panel.grid.major = element_line(colour="grey90"),
+    legend.position  = "none"
+  )
+
+# DOTTED BOX FOR THE INSET
+zoom_box <- ggplot() +
+  theme_void() +
+  annotate("rect",
+           xmin = 0, xmax = 1,
+           ymin = 0, ymax = 1,
+           colour = "black", linetype = "dotted", size = 1, fill = NA)
+
+# ASSEMBLE EVERYTHING
+title_plot <- ggdraw() +
+  draw_label("Population Across Planning Areas by Sex",
+             fontface="bold", size=16, hjust=0.3)
+
+label_plot <- ggdraw() +
+  draw_label("Males",   x=0.3, y=0.5, fontface="bold", size=13, colour="#ADD8E6") +
+  draw_label("Females", x=0.8, y=0.5, fontface="bold", size=13, colour="#FFB6C1")
+
+final_plot <- plot_grid(
+  title_plot,
+  label_plot,
+  ggdraw(main_plot) +
+    draw_plot(inset_plot, x=0.665, y=0.06, width=0.33, height=0.40) +
+    draw_plot(zoom_box,      x=0.65, y=0.07, width=0.35, height=0.40),
+  ncol=1,
+  rel_heights=c(0.04,0.07,0.89)
+)
+
+print(final_plot)
+```
+
+## The code
+
+::: {style="font-size: 0.8em"}
+```{r fig.width=14, fig.height=10}
+#| eval: false
+library(ggplot2)
+library(dplyr)
+library(scales)
+
+# 1 Data prep
+demography_sex <- sg_data %>%
+  group_by(PA, Sex) %>%
+  summarise(Pop = sum(Pop), .groups = "drop") %>%
+  group_by(PA) %>%
+  mutate(Total = sum(Pop)) %>%
+  filter(Total > 0) %>%
+  mutate(Pop = ifelse(Sex == "Males", -Pop, Pop)) %>%
+  ungroup()
+
+stats <- demography_sex %>%
+  summarise(
+    total   = sum(abs(Pop)),
+    male    = sum(abs(Pop[Sex=="Males"])),
+    female  = sum(Pop[Sex=="Females"]),
+    ratio   = sum(abs(Pop[Sex=="Males"])) / sum(Pop[Sex=="Females"])
+  )
+stats_text <- paste0(
+  "Total Pop: ",   comma(stats$total),   "\n",
+  "Male Pop: ",    comma(stats$male),    "\n",
+  "Female Pop: ",  comma(stats$female),  "\n",
+  "M:F Ratio: ",   round(stats$ratio,2)
+)
+
+# 2 Ordering
+pa_order <- demography_sex %>%
+  distinct(PA, Total) %>%
+  arrange(desc(Total)) %>%
+  pull(PA)
+demography_sex$PA <- factor(demography_sex$PA, levels = rev(pa_order))
+
+# 3 Identify inset PAs (Newton → Seletar)
+pa_seq    <- pa_order
+start_idx <- which(pa_seq == "Newton")
+end_idx   <- which(pa_seq == "Seletar")
+inset_order <- pa_seq[start_idx:end_idx]
+inset_data  <- demography_sex %>%
+  filter(PA %in% inset_order) %>%
+  mutate(PA = factor(PA, levels = rev(inset_order)))
+
+# 4 Medians
+male_med   <- demography_sex %>% filter(Sex=="Males")   %>% pull(Pop) %>% abs() %>% median()
+female_med <- demography_sex %>% filter(Sex=="Females") %>% pull(Pop)          %>% median()
+
+# 5 Highlight region
+highlight_pos <- match(inset_order, levels(demography_sex$PA))
+ymin_hl <- min(highlight_pos) - 0.5
+ymax_hl <- max(highlight_pos) + 0.5
+
+box_pops <- demography_sex %>%
+  filter(PA %in% c("Newton","Tengah")) %>%
+  pull(Pop)
+
+xmin_box <- min(box_pops) 
+xmax_box <- max(box_pops) 
+
+pad <- (xmax_box - xmin_box) * 2
+xmin_box <- xmin_box - pad
+xmax_box <- xmax_box + pad
+
+# DEFINE INSIDE vs OUTSIDE for main plot
+inside_main  <- pa_order[1:which(pa_order=="Jurong East")]
+outside_main <- setdiff(pa_order, inside_main)
+
+# DEFINE INSIDE vs OUTSIDE for inset plot
+inside_inset  <- inset_order[1:which(inset_order=="Changi")]
+outside_inset <- setdiff(inset_order, inside_inset)
+
+# MAIN PYRAMID
+main_plot <- ggplot(demography_sex, aes(x = Pop, y = PA, fill = Sex)) +
+  
+  annotate("rect",
+         xmin = xmin_box, xmax = xmax_box,
+         ymin = ymin_hl,  ymax = ymax_hl,
+         colour = "black", linetype = "dotted",
+         size = 1, fill = NA) +
+  
+  geom_col(width = 0.8) +
+  
+  # summary text in left blank area
+  annotate("text",
+           x    = min(demography_sex$Pop) * 0.8,
+           y    = nlevels(demography_sex$PA) * 0.2,
+           label= stats_text,
+           hjust= 0, size = 3.5, colour = "grey20") +
+  
+  # inside labels (Tampines → Jurong East), shifted to bar ends but still inside
+  geom_text(
+    data = filter(demography_sex, PA %in% inside_main),
+    aes(label = comma(abs(Pop))),
+    position = position_identity(),
+    hjust = ifelse(
+      filter(demography_sex, PA %in% inside_main)$Sex == "Males",
+      0.02, 0.98
+    ),
+    vjust = 0.5,
+    size = 2.5, colour = "black"
+  ) +
+  
+  # outside labels (below Rochor → Seletar)
+  geom_text(
+    data = filter(demography_sex, PA %in% outside_main),
+    aes(label = comma(abs(Pop))),
+    position = position_identity(),
+    hjust = ifelse(
+      filter(demography_sex, PA %in% outside_main)$Sex == "Males",
+      1.1, -0.1
+    ),
+    size = 2.5, colour = "black"
+  ) +
+  
+  geom_vline(xintercept = -male_med,   linetype="longdash", size=1, colour="grey40") +
+  geom_vline(xintercept =  female_med, linetype="longdash", size=1, colour="grey40") +
+  
+  annotate("text",
+           x    = -male_med, y = Inf,
+           label= paste0("Median\n", comma(male_med)),
+           hjust= 1.1, vjust= -0.5,
+           size = 3, colour = "grey20") +
+  annotate("text",
+           x    =  female_med, y = Inf,
+           label= paste0("Median\n", comma(female_med)),
+           hjust= -0.1, vjust= -0.5,
+           size = 3, colour = "grey20") +
+  
+  scale_fill_manual(values = c("Males"="#ADD8E6","Females"="#FFB6C1")) +
+  scale_x_continuous(
+    labels = function(x) comma(abs(x))
+  ) +
+  scale_y_discrete(expand = expansion(add = c(0,2))) +
+  
+  labs(x="Population", y="Planning Area") +
+  theme_minimal() +
+  theme(
+    plot.title      = element_blank(),
+    axis.title      = element_text(size=12),
+    axis.text       = element_text(size=9),
+    legend.position = "none"
+  ) +
+  coord_cartesian(clip="off")
+
+# INSET PLOT
+inset_plot <- ggplot(inset_data, aes(x = Pop, y = PA, fill = Sex)) +
+  geom_col(width = 0.8) +
+  
+  # inside inset labels (Newton → Changi)
+  geom_text(
+    data = filter(inset_data, PA %in% inside_inset),
+    aes(label = comma(abs(Pop))),
+    position = position_stack(vjust = 0.5),
+    size = 2.5, colour = "black"
+  ) +
+  
+  # outside inset labels (Mandai → Seletar)
+  geom_text(
+    data = filter(inset_data, PA %in% outside_inset),
+    aes(label = comma(abs(Pop))),
+    position = position_identity(),
+    hjust = ifelse(
+      filter(inset_data, PA %in% outside_inset)$Sex == "Males",
+      1.1, -0.1
+    ),
+    size = 2.5, colour = "black"
+  ) +
+  
+  scale_fill_manual(values = c("Males"="#ADD8E6","Females"="#FFB6C1")) +
+  scale_x_continuous(
+    labels = function(x) comma(abs(x))
+  ) +
+  theme_minimal(base_size=9) +
+  theme(
+    axis.title       = element_blank(),
+    axis.text.y      = element_text(size=7),
+    axis.text.x      = element_text(size=7),
+    panel.background = element_rect(fill="white", colour=NA),
+    panel.grid.major = element_line(colour="grey90"),
+    legend.position  = "none"
+  )
+
+# DOTTED BOX FOR THE INSET
+zoom_box <- ggplot() +
+  theme_void() +
+  annotate("rect",
+           xmin = 0, xmax = 1,
+           ymin = 0, ymax = 1,
+           colour = "black", linetype = "dotted", size = 1, fill = NA)
+
+# ASSEMBLE EVERYTHING
+title_plot <- ggdraw() +
+  draw_label("Population Across Planning Areas by Sex",
+             fontface="bold", size=16, hjust=0.3)
+
+label_plot <- ggdraw() +
+  draw_label("Males",   x=0.3, y=0.5, fontface="bold", size=13, colour="#ADD8E6") +
+  draw_label("Females", x=0.8, y=0.5, fontface="bold", size=13, colour="#FFB6C1")
+
+final_plot <- plot_grid(
+  title_plot,
+  label_plot,
+  ggdraw(main_plot) +
+    draw_plot(inset_plot, x=0.665, y=0.06, width=0.33, height=0.40) +
+    draw_plot(zoom_box,      x=0.65, y=0.07, width=0.35, height=0.40),
+  ncol=1,
+  rel_heights=c(0.04,0.07,0.89)
+)
+
+print(final_plot)
+```
+:::
+::::
+
+
+
+
+
+
+
+
+
+
