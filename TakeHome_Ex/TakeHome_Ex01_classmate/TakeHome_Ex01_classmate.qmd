@@ -4,7 +4,7 @@ description: "Phase 2: three good design principles and three areas for further 
 author: "Tai Qiu Yan"
 date: "May 9, 2025"
 date-modified: "last-modified"
-format: docx
+format: html
 editor: visual
 execute:
   eval: true
