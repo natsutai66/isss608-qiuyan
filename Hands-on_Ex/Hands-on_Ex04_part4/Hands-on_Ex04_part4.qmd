@@ -243,4 +243,5 @@ fp_ggplotly
 ```
 
 # 6 Reference
+
 Kam Tin Seong. (February 14, 2025). 8 Funnel Plots for Fair Comparisons. R for Visual Analytics. r4va.netlify.app

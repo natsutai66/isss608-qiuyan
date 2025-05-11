@@ -118,6 +118,16 @@ ggbetweenstats(data = exam,
 
 Default information: - statistical details - Bayes Factor - sample sizes - distribution summary
 
+```{r}
+ggbetweenstats(data = exam,
+               x = GENDER,
+               y = MATHS,
+               type = "r",
+               messages = FALSE)
+```
+
+
+
 ## 3.7 Oneway ANOVA Test: ggbetweenstats() method
 
 In the code chunk below, `ggbetweenstats()` is used to build a visual for One-way ANOVA test on English score by race.
@@ -151,6 +161,13 @@ ggscatterstats(data = exam,
                x = MATHS,
                y = ENGLISH,
                marginal = FALSE,
+               )
+```
+```{r}
+ggscatterstats(data = exam,
+               x = MATHS,
+               y = ENGLISH,
+               marginal = TRUE,
                )
 ```
 
