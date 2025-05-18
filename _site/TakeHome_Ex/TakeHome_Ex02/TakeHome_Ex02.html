@@ -228,11 +228,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#data-pre-processing-and-exploration" id="toc-data-pre-processing-and-exploration" class="nav-link active" data-scroll-target="#data-pre-processing-and-exploration">2 Data Pre-processing and Exploration</a>
+  <li><a href="#data-pre-processing-and-exploration" id="toc-data-pre-processing-and-exploration" class="nav-link active" data-scroll-target="#data-pre-processing-and-exploration">Data Pre-processing and Exploration</a>
   <ul class="collapse">
-  <li><a href="#installing-and-loading-the-required-libraries" id="toc-installing-and-loading-the-required-libraries" class="nav-link" data-scroll-target="#installing-and-loading-the-required-libraries">2.1 Installing and loading the required libraries</a>
+  <li><a href="#installing-and-loading-the-required-libraries" id="toc-installing-and-loading-the-required-libraries" class="nav-link" data-scroll-target="#installing-and-loading-the-required-libraries">Installing and loading the required libraries</a>
   <ul class="collapse">
+  <li><a href="#inspect-structure" id="toc-inspect-structure" class="nav-link" data-scroll-target="#inspect-structure">Inspect structure</a></li>
   <li><a href="#extrack-and-inspect" id="toc-extrack-and-inspect" class="nav-link" data-scroll-target="#extrack-and-inspect">Extrack and inspect</a></li>
+  <li><a href="#initial-eda" id="toc-initial-eda" class="nav-link" data-scroll-target="#initial-eda">Initial EDA</a></li>
+  </ul></li>
+  <li><a href="#creating-knowledge-graph" id="toc-creating-knowledge-graph" class="nav-link" data-scroll-target="#creating-knowledge-graph">Creating Knowledge Graph</a>
+  <ul class="collapse">
   <li><a href="#step-1-mapping-from-node-id-to-row-index" id="toc-step-1-mapping-from-node-id-to-row-index" class="nav-link" data-scroll-target="#step-1-mapping-from-node-id-to-row-index">step 1 mapping from node id to row index</a></li>
   <li><a href="#step-2-map-source-and-target-ids-to-row-indices" id="toc-step-2-map-source-and-target-ids-to-row-indices" class="nav-link" data-scroll-target="#step-2-map-source-and-target-ids-to-row-indices">step 2 map source and target IDs to row indices</a></li>
   <li><a href="#step-3-filter-out-any-unmatched" id="toc-step-3-filter-out-any-unmatched" class="nav-link" data-scroll-target="#step-3-filter-out-any-unmatched">step 3 filter out any unmatched</a></li>
@@ -291,19 +296,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <section id="data-pre-processing-and-exploration" class="level1">
-<h1>2 Data Pre-processing and Exploration</h1>
+<h1>Data Pre-processing and Exploration</h1>
 <section id="installing-and-loading-the-required-libraries" class="level2">
-<h2 class="anchored" data-anchor-id="installing-and-loading-the-required-libraries">2.1 Installing and loading the required libraries</h2>
+<h2 class="anchored" data-anchor-id="installing-and-loading-the-required-libraries">Installing and loading the required libraries</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse, jsonlite,</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>               SmartEDA, tidygraph,</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>               ggraph) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>In the code chunk below, ‘fromJSON()’ of jaosnlite package is used to import</p>
+<p>In the code chunk below, ‘fromJSON()’ of jaosnlite package is used to import MC1_graph.json file into R and save the output object:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>kg <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="st">"data/MC1_graph.json"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>###Inspect structure</p>
+<section id="inspect-structure" class="level3">
+<h3 class="anchored" data-anchor-id="inspect-structure">Inspect structure</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(kg, <span class="at">max.level =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -315,13 +321,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  $ links     :'data.frame': 37857 obs. of  4 variables:</code></pre>
 </div>
 </div>
+</section>
 <section id="extrack-and-inspect" class="level3">
 <h3 class="anchored" data-anchor-id="extrack-and-inspect">Extrack and inspect</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>nodes_tbl <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(kg<span class="sc">$</span>nodes)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>edges_tbl <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(kg<span class="sc">$</span>links)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>###Initial EDA</p>
+</section>
+<section id="initial-eda" class="level3">
+<h3 class="anchored" data-anchor-id="initial-eda">Initial EDA</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> edges_tbl,</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">y =</span> <span class="st">`</span><span class="at">Edge Type</span><span class="st">`</span>))<span class="sc">+</span></span>
@@ -347,6 +356,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
+</section>
+<section id="creating-knowledge-graph" class="level2">
+<h2 class="anchored" data-anchor-id="creating-knowledge-graph">Creating Knowledge Graph</h2>
 <section id="step-1-mapping-from-node-id-to-row-index" class="level3">
 <h3 class="anchored" data-anchor-id="step-1-mapping-from-node-id-to-row-index">step 1 mapping from node id to row index</h3>
 <div class="cell">
