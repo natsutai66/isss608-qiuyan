@@ -35,6 +35,9 @@ website:
             href: "https://public.tableau.com/shared/F9XXPM8TG?:display_count=n&:origin=viz_share_link"     
           - text: "In-Class Exercise 4"
             href: "In-class_Ex/In-class_Ex_04/In-class_Ex_04.html"
+          - text: "In-Class Exercise 6"
+            href: "https://public.tableau.com/views/Inclassexercise6_17480707380260/Dashboard1?:language=en-US&publish=yes&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link"
+      
             
       - text: "Take Home Exercise"
         menu:
