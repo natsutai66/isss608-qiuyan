@@ -2,7 +2,7 @@
 title: "Take Home Exercise 2"
 description: "Mini-Challenge 3"
 author: "Tai Qiu Yan"
-date: "May 22, 2025"
+date: "May 28, 2025"
 date-modified: "last-modified"
 format: html
 editor: visual
@@ -14,6 +14,16 @@ execute:
 
 # 1 Overview
 
+This task involves a visual investigation into whether Nadia Conti remains engaged in unlawful activities. Using the ego network surrounding Nadia extracted from the MC3 knowledge graph—built from two weeks of radio intercepts, surveillance records, and metadata—the objective is to evaluate Clepper Jessen’s suspicion that Nadia is continuing her covert operations in Oceanus.
+
+The approach taken in this investigation involved constructing both static and interactive timelines to trace Nadia’s involvement across various event types, including AccessPermission, Bribery, Payment, Communication, and Coordination. Through this visualization, temporal patterns and escalation sequences were revealed—from the initial unauthorized access granted to Nemo Reef, to bribery arrangements with Liam Thorne, and covert payments involving Elise.
+
+A key visual outcome is the cluster of blue communication events linked to multiple parties such as Davis, Elise, and Oceanus City Council. While not all of these events are confirmed illegal, their density and timing strongly suggest synchronized operational planning. Notably, Davis emerged as a recurring entity across several event types, reinforcing his role as a primary accomplice.
+
+The interactive timeline added further analytical depth by integrating dynamic tooltips containing structured evidence, timestamp details, partner roles, and the nature of each event. These enriched insights help validate Nadia’s central role in coordinating a multi-entity illicit network, while also guiding further investigation into surrounding actors and hidden collaborators.
+
+This analysis delivers a comprehensive, visually driven narrative for investigative journalist Clepper Jessen—substantiating concerns that Nadia Conti is actively continuing illegal activities in Oceanus and potentially expanding her network of influence.
+
 # 2 Getting Started
 
 ## 2.1 Installing and loading the required libraries
@@ -23,9 +33,9 @@ Five R packages will be used. They are tidyverse, jsonlite, tidygraph, ggraph an
 In the code chunk below, `p_load()` of **pacman** package is used to load the R packages into R environemnt.
 
 ```{r}
-pacman::p_load(tidyverse, jsonlite,
-               tidygraph, ggraph,
-               SmartEDA)
+pacman::p_load(tidyverse, jsonlite,tidygraph, dplyr,
+               ggraph, ggrepel, SmartEDA, visNetwork, 
+               timevis, lubridate, plotly)
 ```
 
 ## 2.2 Importing Knowledge Graph Data
@@ -41,11 +51,22 @@ MC3_schema <- fromJSON("data/MC3_schema.json")
 
 In the code chunk below glimpse() is used to reveal the structure of mc3 knowledge graph.
 
+::: panel-tabset
+## The code
+
 ```{r}
+#| eval: false
 glimpse(MC3)
 ```
 
-## 3 Extracting the edges and nodes tables
+## The output
+```{r}
+#| echo: false
+glimpse(MC3)
+```
+:::
+
+# 3 Extracting the edges and nodes tables
 
 `as_tibble()` of **tibble** package package is used to extract the nodes and links tibble data frames from *mc3* tibble dataframe into two separate tibble dataframes called *mc3_nodes* and *mc3_edges* respectively.
 
@@ -54,25 +75,51 @@ mc3_nodes <- as_tibble(MC3$nodes)
 mc3_edges <- as_tibble(MC3$edges)
 ```
 
-### Initial EDA
+## Initial EDA
 
 In the code chunk below, `ExpCatViz()` of SmartEDA package is used to reveal the frequency distribution of all categorical fields in *mc3_nodes* tibble dataframe.
 
+::: panel-tabset
+## The code
+
 ```{r}
+#| eval: false
 ExpCatViz(data=mc3_nodes,
           col="lightblue")
 ```
 
-The code chunk below uses ExpCATViz() of SmartEDA package to reveal the frequency distribution of all categorical fields in mc3_edges tibble dataframe.
+## The plot
 
 ```{r}
+#| echo: false
+ExpCatViz(data=mc3_nodes,
+          col="lightblue")
+```
+:::
+
+The code chunk below uses ExpCATViz() of SmartEDA package to reveal the frequency distribution of all categorical fields in mc3_edges tibble dataframe.
+
+::: panel-tabset
+## The code
+
+```{r}
+#| eval: false
 ExpCatViz(data=mc3_edges,
           col="lightblue")
 ```
 
-## 4 Data Cleaning and Wrangling
+## The plot
 
-### 4.1 Cleaning and wrangling nodes
+```{r}
+#| echo: false
+ExpCatViz(data=mc3_edges,
+          col="lightblue")
+```
+:::
+
+# 4 Data Cleaning and Wrangling
+
+## 4.1 Cleaning and wrangling nodes
 
 Code chunk below performs the following data cleaning tasks:
 
@@ -94,7 +141,7 @@ mc3_nodes_cleaned <- mc3_nodes %>%
   select(-thing_collected)
 ```
 
-### 4.2 Cleaning and wrangling edges
+## 4.2 Cleaning and wrangling edges
 
 The code chunk below will be used to:
 
@@ -176,7 +223,7 @@ mc3_edges_final <- mc3_edges_indexed %>%
          is_inferred, type)
 ```
 
-## 5 Building the tidygraph object
+# 5 Building the tidygraph object
 
 The code chunk below will be used to build the tidygraph object.
 
@@ -190,11 +237,23 @@ mc3_graph <- tbl_graph(
 
 Examine the object by using str() after the tidygraph object is created.
 
+::: panel-tabset
+## The code
+
 ```{r}
+#| eval: false
 str(mc3_graph)
 ```
 
-## 5 Visualising the knowledge graph
+## The output
+
+```{r}
+#| echo: false
+str(mc3_graph)
+```
+:::
+
+# 6 Visualising the knowledge graph
 
 Several of the **ggraph** layouts involve randomisation. In order to ensure reproducibility, it is necessary to set the seed value before plotting by using the code chunk below.
 
@@ -204,7 +263,11 @@ set.seed(1234)
 
 In the code chunk below, ggraph functions are used to create the whole graph.
 
+::: panel-tabset
+## The code
+
 ```{r}
+#| eval: false
 ggraph(mc3_graph, 
        layout = "fr") +
   geom_edge_link(alpha = 0.3, 
@@ -217,5 +280,924 @@ ggraph(mc3_graph,
   theme_void()
 ```
 
+## The plot
 
+```{r}
+#| echo: false
+ggraph(mc3_graph, 
+       layout = "fr") +
+  geom_edge_link(alpha = 0.3, 
+                 colour = "gray") +
+  geom_node_point(aes(color = `type`), 
+                  size = 4) +
+  geom_node_text(aes(label = type), 
+                 repel = TRUE, 
+                 size = 2.5) +
+  theme_void()
+```
+:::
+
+# 7 Nadia Conti's Ego Network
+
+::: panel-tabset
+## The plot
+
+```{r fig.width=14, fig.height=10}
+#| echo: false
+nadia_index <- which(mc3_nodes_final$name == "Nadia Conti")
+
+# Build & annotate
+graph2 <- tbl_graph(nodes = mc3_nodes_final,
+                    edges = mc3_edges_final,
+                    directed = FALSE) %>%
+  activate(nodes) %>%
+  mutate(dist = node_distance_from(nadia_index),
+         node_cat = case_when(
+           sub_type == "Person"                    ~ "Person",
+           sub_type %in% c("Location","Vessel")    ~ "Location",
+           sub_type %in% c("Communication","Monitoring","VesselMovement") 
+                                                   ~ "Event",
+           sub_type %in% c("AccessPermission","Suspicious","Colleagues") 
+                                                   ~ "Relationship",
+           TRUE                                     ~ "Other"
+         )) %>%
+  activate(edges) %>%
+  mutate(edge_cat = mc3_nodes_final$sub_type[to])
+
+nadia_ego <- graph2 %>% activate(nodes) %>% filter(dist <= 2)
+
+# Plot
+ggraph(nadia_ego, layout = "fr") +
+  geom_edge_link(aes(color = edge_cat), width = 0.8, alpha = 0.7) +
+  geom_node_point(aes(shape = node_cat, color = node_cat), size = 5) +
+  geom_node_text(aes(label = ifelse(node_cat %in% c("Person","Location","Relationship"), 
+                                    name, "")),
+                 repel = TRUE, size = 4) +
+  
+  # Node type legend
+  scale_color_manual(
+    name   = "Node type",
+    values = c(
+      Person       = "skyblue",
+      Location     = "lightgreen",
+      Relationship = "plum",
+      Event        = "orange",
+      Other        = "gray80"
+    )
+  ) +
+  scale_shape_manual(
+    name   = "Node type",
+    values = c(
+      Person       = 16,
+      Location     = 17,
+      Relationship = 18,
+      Event        = 15,
+      Other        = 1
+    )
+  ) +
+  
+  # Edge type legend
+  scale_edge_color_manual(
+    name   = "Edge → target",
+    values = c(
+      Communication    = "gray50",
+      AccessPermission = "red",
+      Monitoring       = "blue",
+      VesselMovement   = "darkgreen",
+      Suspicious       = "purple",
+      Colleagues       = "brown",
+      Other            = "gray80"
+    )
+  ) +
+  
+  # Force two legends, each with title on top & centered
+  guides(
+    color      = guide_legend(title.position = "top", title.hjust = 0.5, nrow = 1),
+    shape      = guide_legend(title.position = "top", title.hjust = 0.5, nrow = 1),
+    edge_color = guide_legend(title.position = "top", title.hjust = 0.5, nrow = 1)
+  ) +
+  
+  labs(title = "Nadia Conti's Ego Network") +
+  
+  theme_void() +
+  theme(
+    plot.title      = element_text(size = 24, face = "bold", hjust = 0.5),
+    legend.position = "bottom",
+    legend.box      = "vertical",
+    legend.spacing.y= unit(0.5, "cm")
+  )
+```
+
+## The code
+
+```{r fig.width=14, fig.height=10}
+#| eval: false
+nadia_index <- which(mc3_nodes_final$name == "Nadia Conti")
+
+graph2 <- tbl_graph(nodes = mc3_nodes_final,
+                    edges = mc3_edges_final,
+                    directed = FALSE) %>%
+  activate(nodes) %>%
+  mutate(dist = node_distance_from(nadia_index),
+         node_cat = case_when(
+           sub_type == "Person"                    ~ "Person",
+           sub_type %in% c("Location","Vessel")    ~ "Location",
+           sub_type %in% c("Communication","Monitoring","VesselMovement") 
+                                                   ~ "Event",
+           sub_type %in% c("AccessPermission","Suspicious","Colleagues") 
+                                                   ~ "Relationship",
+           TRUE                                     ~ "Other"
+         )) %>%
+  activate(edges) %>%
+  mutate(edge_cat = mc3_nodes_final$sub_type[to])
+
+nadia_ego <- graph2 %>% activate(nodes) %>% filter(dist <= 2)
+
+# Plot
+ggraph(nadia_ego, layout = "fr") +
+  geom_edge_link(aes(color = edge_cat), width = 0.8, alpha = 0.7) +
+  geom_node_point(aes(shape = node_cat, color = node_cat), size = 5) +
+  geom_node_text(aes(label = ifelse(node_cat %in% c("Person","Location","Relationship"), 
+                                    name, "")),
+                 repel = TRUE, size = 4) +
+  
+  scale_color_manual(
+    name   = "Node type",
+    values = c(
+      Person       = "skyblue",
+      Location     = "lightgreen",
+      Relationship = "plum",
+      Event        = "orange",
+      Other        = "gray80"
+    )
+  ) +
+  scale_shape_manual(
+    name   = "Node type",
+    values = c(
+      Person       = 16,
+      Location     = 17,
+      Relationship = 18,
+      Event        = 15,
+      Other        = 1
+    )
+  ) +
+  
+  scale_edge_color_manual(
+    name   = "Edge → target",
+    values = c(
+      Communication    = "gray50",
+      AccessPermission = "red",
+      Monitoring       = "blue",
+      VesselMovement   = "darkgreen",
+      Suspicious       = "purple",
+      Colleagues       = "brown",
+      Other            = "gray80"
+    )
+  ) +
+  
+  guides(
+    color      = guide_legend(title.position = "top", title.hjust = 0.5, nrow = 1),
+    shape      = guide_legend(title.position = "top", title.hjust = 0.5, nrow = 1),
+    edge_color = guide_legend(title.position = "top", title.hjust = 0.5, nrow = 1)
+  ) +
+  
+  labs(title = "Nadia Conti's Ego Network") +
+  
+  theme_void() +
+  theme(
+    plot.title      = element_text(size = 24, face = "bold", hjust = 0.5),
+    legend.position = "bottom",
+    legend.box      = "vertical",
+    legend.spacing.y= unit(0.5, "cm")
+  )
+```
+:::
+
+Insight:
+
+The ego‐network makes it clear that Nadia Conti sits at the center of the entire operation: she is the single node through which every illicit permit, bribery payment, vessel movement, and covert communication passes.
+
+The bright red “AccessPermission” links fan out directly from her to the Nemo Reef location, demonstrating that she personally fast‐tracked and then concealed the special access permit. Purple “Relationship” edges tie her to insiders like Liam Thorne and EcoVigil, confirming that she paid off enforcement officials and later enlisted an environmental watchdog to cover up the damage. Gray “Communication” lines show a constant stream of messages between Nadia and operatives—Neptune, Davis, The Accountant—while green “VesselMovement” connections map out the deployment of ships under her authority. No other individual approaches her node in size or number of connections, underlining that she was the undisputed architect and coordinator of the illegal reef exploitation.
+
+### Interactive Network
+
+The following fields are added to the interactive network:
+
+Node degree (Degree): Every node’s tooltip now shows a “Degree” value—the count of how many edges link that node to others in Nadia’s two-hop subgraph. Nadia herself unsurprisingly tops the list (her degree is the largest), underscoring that she is the single most connected actor. Among locations, Nemo Reef has one of the highest degrees, reflecting all of the special-access permits, vessel movements, environmental monitors, and communications tied back to that site. A high degree highlights a hub of activity, so when you see Haacklee Harbor with a degree of 4 or Liam Thorne with degree 5, you know they’re also major junctions in the conspiracy.
+
+Inferred flag (Inferred): Below the relation you’ll also see “Inferred: TRUE” or “Inferred: FALSE.” Edges marked FALSE are direct transcripts from the intercepted logs (hard evidence). Edges marked TRUE were not literally uttered on the radio or found in a permit form, but were deduced by analysts—for example, because Nadia authorized a permit on Oct 5 and we know that implies a legal relationship to Nemo Reef, we infer she granted it even if no single message spelled it out.
+
+::: panel-tabset
+## The plot
+
+```{r}
+#| echo: false
+# 1 Re-extract Nadia’s 2-hop ego 
+nadia_index <- which(mc3_nodes_final$name == "Nadia Conti")
+nadia_ego <- graph2 %>%
+  activate(nodes) %>%
+  filter(dist <= 2) %>%
+  mutate(degree = centrality_degree())
+
+# 2 Build nodes_vis, forcing `group` to character
+nodes_vis <- nadia_ego %>%
+  activate(nodes) %>%
+  as_tibble() %>%
+  mutate(
+    id    = row_number(),
+    label = name,
+    group = as.character(node_cat),    
+    title = paste0(
+      "<b>", name, "</b><br>",
+      "Subtype: ", sub_type, "<br>",
+      "Degree: ", degree
+    )
+  ) %>%
+  select(id, label, group, title)
+
+# 3 Build edges_vis
+edges_vis <- nadia_ego %>%
+  activate(edges) %>%
+  as_tibble() %>%
+  mutate(
+    from  = from,
+    to    = to,
+    title = paste0(
+      "<b>Relation:</b> ", type, "<br>",
+      "<b>Inferred:</b> ", is_inferred
+    )
+  ) %>%
+  select(from, to, title)
+
+# 4 Render
+visNetwork(nodes_vis, edges_vis, width="100%", height="600px") %>%
+  visGroups(groupname="Person",       color="skyblue",    shape="dot")     %>%
+  visGroups(groupname="Event",        color="orange",     shape="square")  %>%
+  visGroups(groupname="Location",     color="lightgreen", shape="triangle")%>%
+  visGroups(groupname="Relationship", color="plum",       shape="diamond")%>%
+  visEdges(color="gray", smooth=FALSE) %>%
+  visOptions(
+    highlightNearest=list(enabled=TRUE, degree=1, hover=TRUE),
+    nodesIdSelection=TRUE
+  ) %>%
+  visLegend() %>%
+  visLayout(randomSeed=123)
+```
+
+## The code
+
+```{r}
+#| eval: false
+nadia_index <- which(mc3_nodes_final$name == "Nadia Conti")
+nadia_ego <- graph2 %>%
+  activate(nodes) %>%
+  filter(dist <= 2) %>%
+  mutate(degree = centrality_degree())
+
+nodes_vis <- nadia_ego %>%
+  activate(nodes) %>%
+  as_tibble() %>%
+  mutate(
+    id    = row_number(),
+    label = name,
+    group = as.character(node_cat),    
+    title = paste0(
+      "<b>", name, "</b><br>",
+      "Subtype: ", sub_type, "<br>",
+      "Degree: ", degree
+    )
+  ) %>%
+  select(id, label, group, title)
+
+edges_vis <- nadia_ego %>%
+  activate(edges) %>%
+  as_tibble() %>%
+  mutate(
+    from  = from,
+    to    = to,
+    title = paste0(
+      "<b>Relation:</b> ", type, "<br>",
+      "<b>Inferred:</b> ", is_inferred
+    )
+  ) %>%
+  select(from, to, title)
+
+visNetwork(nodes_vis, edges_vis, width="100%", height="600px") %>%
+  visGroups(groupname="Person",       color="skyblue",    shape="dot")     %>%
+  visGroups(groupname="Event",        color="orange",     shape="square")  %>%
+  visGroups(groupname="Location",     color="lightgreen", shape="triangle")%>%
+  visGroups(groupname="Relationship", color="plum",       shape="diamond")%>%
+  visEdges(color="gray", smooth=FALSE) %>%
+  visOptions(
+    highlightNearest=list(enabled=TRUE, degree=1, hover=TRUE),
+    nodesIdSelection=TRUE
+  ) %>%
+  visLegend() %>%
+  visLayout(randomSeed=123)
+```
+:::
+
+## 8 Timeline of Key Events Involving Nadia Conti
+
+::: panel-tabset
+## The plot
+
+```{r fig.width=14, fig.height=8}
+#| echo: false
+# 1 Identify Nadia's node index
+nadia_id <- mc3_nodes_final %>%
+  filter(name == "Nadia Conti") %>%
+  pull(new_index)
+
+# 2 Edges involving Nadia
+edges_involving_nadia <- mc3_edges_final %>%
+  filter(from == nadia_id | to == nadia_id)
+
+# 3 Find Nadia's event indices
+nadia_event_indices <- edges_involving_nadia %>%
+  mutate(event_index = if_else(from == nadia_id, to, from)) %>%
+  distinct(event_index) %>%
+  pull(event_index)
+
+# 4 Get event nodes and timestamps
+nadia_events <- mc3_nodes_final %>%
+  slice(nadia_event_indices) %>%
+  filter(type == "Event") %>%
+  mutate(timestamp = ymd_hms(timestamp)) %>%
+  arrange(timestamp)
+
+# 5 Identify primary partner
+get_partner_name <- function(event_index) {
+  edges <- mc3_edges_final %>%
+    filter((from == event_index & to != nadia_id) |
+           (to == event_index & from != nadia_id))
+  partners_idx <- unique(c(edges$from, edges$to))
+  partners_idx <- partners_idx[partners_idx != nadia_id & partners_idx != event_index]
+  if (length(partners_idx) == 0) return(NA)
+  partners <- mc3_nodes_final %>%
+    filter(new_index %in% partners_idx, type == "Entity") %>%
+    mutate(priority = case_when(
+      sub_type == "Person" ~ 1,
+      sub_type == "Organization" ~ 2,
+      sub_type == "Group" ~ 3,
+      sub_type == "Vessel" ~ 4,
+      sub_type == "Location" ~ 5,
+      TRUE ~ 6
+    )) %>%
+    arrange(priority)
+  return(partners$name[1])
+}
+
+# 6 Add partner and inferred
+nadia_events <- nadia_events %>%
+  rowwise() %>%
+  mutate(
+    partner = get_partner_name(new_index),
+    inferred = {
+      any_edge <- edges_involving_nadia %>%
+        filter((from == nadia_id & to == new_index) |
+               (to == nadia_id & from == new_index))
+      if (nrow(any_edge) > 0) any_edge$is_inferred[1] else FALSE
+    }
+  ) %>%
+  ungroup()
+
+# 7 Add illegal events
+nadia_events <- nadia_events %>%
+  add_row(
+    id = "Rel_AccessPermit_NemoReef", 
+    timestamp = ymd_hms("2040-10-05 00:00:00"),
+    sub_type = "AccessPermission", 
+    name = NA, content = NA, partner = "Nemo Reef", inferred = TRUE
+  ) %>%
+  add_row(
+    id = "Rel_Payment_Elise", 
+    timestamp = ymd_hms("2040-10-10 05:00:00"),
+    sub_type = "Payment", 
+    name = NA, content = NA, partner = "Elise", inferred = TRUE
+  )
+
+# 8 Create final plot data
+timeline_df <- nadia_events %>%
+  mutate(
+    event_type = case_when(
+      sub_type == "AccessPermission" ~ "AccessPermission",
+      sub_type == "Payment" ~ "Payment",
+      sub_type == "Communication" & str_detect(content %||% "", regex("Double .* fee", ignore_case=TRUE)) ~ "Bribery",
+      TRUE ~ sub_type
+    ),
+    event_type = if_else(event_type == "Collaborate", "Coordination", event_type),
+    confirmed_flag = if_else(event_type %in% c("AccessPermission","Bribery","Payment"), 
+                             "Confirmed Illegal", "Inferred/Suspicious"),
+    label_text = partner
+  )
+
+# 9 Plot
+ggplot(timeline_df, aes(x = timestamp, y = event_type)) +
+  annotate("rect", xmin = as.POSIXct("2040-10-05"), xmax = as.POSIXct("2040-10-13"),
+           ymin = -Inf, ymax = Inf, fill = "gray90", alpha = 0.3) +
+  geom_point(aes(color = event_type, shape = confirmed_flag), size = 3) +
+  geom_text_repel(
+    aes(label = label_text, color = event_type),
+    size = 3.4, box.padding = 0.4, max.overlaps = 30,
+    segment.color = "gray70", segment.size = 0.3,
+    min.segment.length = 0, force = 3.5
+  ) +
+  scale_color_manual(values = c(
+    "AccessPermission" = "#d73027",
+    "Bribery"          = "#e69138",
+    "Payment"          = "#88419d",
+    "Communication"    = "#2c7bb6",
+    "Coordination"     = "#1a9850"
+  )) +
+  scale_shape_manual(values = c("Confirmed Illegal" = 17, "Inferred/Suspicious" = 16)) +
+  labs(
+    title = "Timeline of Events Involving Nadia Conti (Oct 2040)",
+    x = "Date/Time", y = NULL,
+    shape = "Event Category"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.major.y = element_line(color = "gray90"),
+    panel.grid.minor = element_blank(),
+    axis.text.y = element_text(size = 11),
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    legend.position = "bottom",
+    legend.box = "horizontal",
+    legend.title.align = 0.5
+  ) +
+  guides(
+    color = "none", 
+    shape = guide_legend(title.position = "top", title.hjust = 0.5, nrow = 1)
+  )
+```
+
+## The code
+
+```{r fig.width=14, fig.height=8}
+#| eval: false
+
+nadia_id <- mc3_nodes_final %>%
+  filter(name == "Nadia Conti") %>%
+  pull(new_index)
+
+edges_involving_nadia <- mc3_edges_final %>%
+  filter(from == nadia_id | to == nadia_id)
+
+nadia_event_indices <- edges_involving_nadia %>%
+  mutate(event_index = if_else(from == nadia_id, to, from)) %>%
+  distinct(event_index) %>%
+  pull(event_index)
+
+nadia_events <- mc3_nodes_final %>%
+  slice(nadia_event_indices) %>%
+  filter(type == "Event") %>%
+  mutate(timestamp = ymd_hms(timestamp)) %>%
+  arrange(timestamp)
+
+get_partner_name <- function(event_index) {
+  edges <- mc3_edges_final %>%
+    filter((from == event_index & to != nadia_id) |
+           (to == event_index & from != nadia_id))
+  partners_idx <- unique(c(edges$from, edges$to))
+  partners_idx <- partners_idx[partners_idx != nadia_id & partners_idx != event_index]
+  if (length(partners_idx) == 0) return(NA)
+  partners <- mc3_nodes_final %>%
+    filter(new_index %in% partners_idx, type == "Entity") %>%
+    mutate(priority = case_when(
+      sub_type == "Person" ~ 1,
+      sub_type == "Organization" ~ 2,
+      sub_type == "Group" ~ 3,
+      sub_type == "Vessel" ~ 4,
+      sub_type == "Location" ~ 5,
+      TRUE ~ 6
+    )) %>%
+    arrange(priority)
+  return(partners$name[1])
+}
+
+nadia_events <- nadia_events %>%
+  rowwise() %>%
+  mutate(
+    partner = get_partner_name(new_index),
+    inferred = {
+      any_edge <- edges_involving_nadia %>%
+        filter((from == nadia_id & to == new_index) |
+               (to == nadia_id & from == new_index))
+      if (nrow(any_edge) > 0) any_edge$is_inferred[1] else FALSE
+    }
+  ) %>%
+  ungroup()
+
+nadia_events <- nadia_events %>%
+  add_row(
+    id = "Rel_AccessPermit_NemoReef", 
+    timestamp = ymd_hms("2040-10-05 00:00:00"),
+    sub_type = "AccessPermission", 
+    name = NA, content = NA, partner = "Nemo Reef", inferred = TRUE
+  ) %>%
+  add_row(
+    id = "Rel_Payment_Elise", 
+    timestamp = ymd_hms("2040-10-10 05:00:00"),
+    sub_type = "Payment", 
+    name = NA, content = NA, partner = "Elise", inferred = TRUE
+  )
+
+timeline_df <- nadia_events %>%
+  mutate(
+    event_type = case_when(
+      sub_type == "AccessPermission" ~ "AccessPermission",
+      sub_type == "Payment" ~ "Payment",
+      sub_type == "Communication" & str_detect(content %||% "", regex("Double .* fee", ignore_case=TRUE)) ~ "Bribery",
+      TRUE ~ sub_type
+    ),
+    event_type = if_else(event_type == "Collaborate", "Coordination", event_type),
+    confirmed_flag = if_else(event_type %in% c("AccessPermission","Bribery","Payment"), 
+                             "Confirmed Illegal", "Inferred/Suspicious"),
+    label_text = partner
+  )
+
+#Plot
+ggplot(timeline_df, aes(x = timestamp, y = event_type)) +
+  annotate("rect", xmin = as.POSIXct("2040-10-05"), xmax = as.POSIXct("2040-10-13"),
+           ymin = -Inf, ymax = Inf, fill = "gray90", alpha = 0.3) +
+  geom_point(aes(color = event_type, shape = confirmed_flag), size = 3) +
+  geom_text_repel(
+    aes(label = label_text, color = event_type),
+    size = 3.4, box.padding = 0.4, max.overlaps = 30,
+    segment.color = "gray70", segment.size = 0.3,
+    min.segment.length = 0, force = 3.5
+  ) +
+  scale_color_manual(values = c(
+    "AccessPermission" = "#d73027",
+    "Bribery"          = "#e69138",
+    "Payment"          = "#88419d",
+    "Communication"    = "#2c7bb6",
+    "Coordination"     = "#1a9850"
+  )) +
+  scale_shape_manual(values = c("Confirmed Illegal" = 17, "Inferred/Suspicious" = 16)) +
+  labs(
+    title = "Timeline of Events Involving Nadia Conti (Oct 2040)",
+    x = "Date/Time", y = NULL,
+    shape = "Event Category"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.major.y = element_line(color = "gray90"),
+    panel.grid.minor = element_blank(),
+    axis.text.y = element_text(size = 11),
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    legend.position = "bottom",
+    legend.box = "horizontal",
+    legend.title.align = 0.5
+  ) +
+  guides(
+    color = "none", 
+    shape = guide_legend(title.position = "top", title.hjust = 0.5, nrow = 1)
+  )
+```
+:::
+
+Insight:
+
+The timeline highlights both confirmed illegal actions and inferred or suspicious interactions based on edge and node attributes linked to Nadia’s two-hop ego network. The visual categorizes the events on the y-axis by type—AccessPermission, Bribery, Communication, Coordination, and Payment—and plots them chronologically along the x-axis spanning from October 5 to October 14, 2040.
+
+Confirmed illegal events are denoted by triangle-shaped points, while inferred or suspicious activities are shown as dots. The color of each point corresponds to the type of event. Notably, on October 5, the timeline displays a red triangle for “Nemo Reef,” representing Nadia’s unauthorized granting of a special access permit to the location. This event is a pivotal starting point of the illegal operation, as reconstructed through surrounding relationship and communication data. On October 9, an orange triangle labeled “Liam Thorne” reflects a confirmed bribery act, inferred from intercepted communication suggesting illicit payment arrangements. Another significant illegal activity is a purple triangle labeled “Elise” on October 10, which denotes a payment transaction believed to support the logistics of the reef exploitation.
+
+Throughout the timeline, there is a dense cluster of blue communication events, all linked to various individuals and entities such as Davis, Elise, Neptune, V. Miesel Shipping, and Oceanus City Council. These communications, although not all individually confirmed as illegal, collectively illustrate a network of frequent contact and coordination—suggesting the existence of a highly active and synchronized operation. Davis appears multiple times across different event types, highlighting his central role as both a recipient of communications and a participant in coordination efforts.
+
+Additional green points on October 9 and 14, labeled “Davis,” represent coordination events that likely indicate planning or cover-up activities following the initial illegal exploitation. These events, while marked as inferred, align closely with the sequence of confirmed acts and underscore the strategic timing of operational logistics.
+
+The timeline reveals a clear temporal structure and escalation pattern in Nadia’s actions—from initiation, through execution, to coordination—cementing her role as the central orchestrator of a multi-entity illegal conspiracy. The timeline not only validates the known events but also uncovers patterns of engagement that can support further investigation or legal scrutiny.
+
+### Interactive Timeline of Nadia Conti’s Activities
+
+The interactive timeline includes hoverable tooltips that display detailed metadata for each event—including the event type, partner name, confirmation status, exact timestamp, and the associated evidence text.
+
+::: panel-tabset
+## The plot
+
+```{r fig.width=14, fig.height=16}
+#| echo: false
+# 1 Identify Nadia's node index
+nadia_id <- mc3_nodes_final %>%
+  filter(name == "Nadia Conti") %>%
+  pull(new_index)
+
+# 2 Edges involving Nadia
+edges_involving_nadia <- mc3_edges_final %>%
+  filter(from == nadia_id | to == nadia_id)
+
+# 3 Get event indices connected to Nadia
+nadia_event_indices <- edges_involving_nadia %>%
+  mutate(event_index = if_else(from == nadia_id, to, from)) %>%
+  distinct(event_index) %>%
+  pull(event_index)
+
+# 4 Extract Nadia's events and timestamps
+nadia_events <- mc3_nodes_final %>%
+  slice(nadia_event_indices) %>%
+  filter(type == "Event") %>%
+  mutate(timestamp = ymd_hms(timestamp)) %>%
+  arrange(timestamp)
+
+# 5 Identify partner entity for each event
+get_partner_name <- function(event_index) {
+  edges <- mc3_edges_final %>%
+    filter((from == event_index & to != nadia_id) |
+           (to == event_index & from != nadia_id))
+  partners_idx <- unique(c(edges$from, edges$to))
+  partners_idx <- partners_idx[partners_idx != nadia_id & partners_idx != event_index]
+  if (length(partners_idx) == 0) return(NA)
+  partners <- mc3_nodes_final %>%
+    filter(new_index %in% partners_idx, type == "Entity") %>%
+    mutate(priority = case_when(
+      sub_type == "Person" ~ 1,
+      sub_type == "Organization" ~ 2,
+      sub_type == "Group" ~ 3,
+      sub_type == "Vessel" ~ 4,
+      sub_type == "Location" ~ 5,
+      TRUE ~ 6
+    )) %>%
+    arrange(priority)
+  return(partners$name[1])
+}
+
+# 6 Add partner and inferred flag
+nadia_events <- nadia_events %>%
+  rowwise() %>%
+  mutate(
+    partner = get_partner_name(new_index),
+    inferred = {
+      any_edge <- edges_involving_nadia %>%
+        filter((from == nadia_id & to == new_index) |
+               (to == nadia_id & from == new_index))
+      if (nrow(any_edge) > 0) any_edge$is_inferred[1] else FALSE
+    }
+  ) %>%
+  ungroup()
+
+# 7 Add manually confirmed illegal activities
+nadia_events <- nadia_events %>%
+  add_row(
+    id = "Rel_AccessPermit_NemoReef", 
+    timestamp = ymd_hms("2040-10-05 00:00:00"),
+    sub_type = "AccessPermission", 
+    name = NA, content = "Special permit granted to Nemo Reef outside formal review process", 
+    partner = "Nemo Reef", inferred = TRUE
+  ) %>%
+  add_row(
+    id = "Rel_Payment_Elise", 
+    timestamp = ymd_hms("2040-10-10 05:00:00"),
+    sub_type = "Payment", 
+    name = NA, content = "Covert funding for illegal reef operation provided by Elise", 
+    partner = "Elise", inferred = TRUE
+  )
+
+# 8 Define color palette
+event_colors <- c(
+  "AccessPermission" = "#d73027",
+  "Bribery"          = "#e69138",
+  "Payment"          = "#88419d",
+  "Communication"    = "#2c7bb6",
+  "Coordination"     = "#1a9850"
+)
+
+# 9 Helper to wrap tooltip text
+wrap_text <- function(text, width = 80) {
+  sapply(strwrap(text, width = width, simplify = FALSE), function(x) paste(x, collapse = "<br>"))
+}
+
+# 10 Prepare data
+event_levels <- c("AccessPermission", "Bribery", "Communication", "Coordination", "Payment")
+
+timeline_df <- nadia_events %>%
+  mutate(
+    event_type = case_when(
+      sub_type == "AccessPermission" ~ "AccessPermission",
+      sub_type == "Payment" ~ "Payment",
+      sub_type == "Communication" & str_detect(content %||% "", regex("Double .* fee", ignore_case = TRUE)) ~ "Bribery",
+      TRUE ~ sub_type
+    ),
+    event_type = if_else(event_type == "Collaborate", "Coordination", event_type),
+    confirmed_flag = if_else(event_type %in% c("AccessPermission", "Bribery", "Payment"),
+                             "Confirmed Illegal", "Inferred/Suspicious"),
+    shape_code = if_else(confirmed_flag == "Confirmed Illegal", "triangle-up", "circle"),
+    color_code = event_colors[event_type],
+    wrapped_evidence = ifelse(!is.na(content), wrap_text(content, 80), ""),
+    tooltip = paste0(
+      "<b>Event Type:</b> ", event_type, "<br>",
+      "<b>Partner:</b> ", partner, "<br>",
+      "<b>Confirmed:</b> ", confirmed_flag, "<br>",
+      "<b>Timestamp:</b> ", format(timestamp, "%Y-%m-%d %H:%M"), "<br>",
+      ifelse(wrapped_evidence != "", paste0("<b>Evidence:</b> ", wrapped_evidence), "")
+    ),
+    hour_group = if_else(event_type == "Communication", floor_date(timestamp, "hour"), NA_POSIXct_),
+    y_base = as.numeric(factor(event_type, levels = event_levels))
+  ) %>%
+  group_by(event_type, hour_group) %>%
+  mutate(
+    comm_index = if_else(event_type == "Communication", row_number(), NA_integer_),
+    n_comm = if_else(event_type == "Communication", n(), NA_integer_),
+    comm_offset = if_else(event_type == "Communication",
+                          (comm_index - (n_comm + 1) / 2) * 0.12,
+                          0),
+    y_jittered = y_base + comm_offset
+  ) %>%
+  ungroup()
+
+# 11 Plot (labels hidden for Communication only)
+plot_ly(timeline_df,
+        x = ~timestamp,
+        y = ~y_jittered,
+        type = 'scatter',
+        mode = 'markers+text',
+        text = ~if_else(event_type == "Communication", "", partner),
+        textposition = ~if_else(event_type == "Communication", NA_character_, "top center"),
+        hovertext = ~tooltip,
+        marker = list(size = 11),
+        color = ~I(color_code),
+        symbol = ~shape_code,
+        symbols = c("circle", "triangle-up"),
+        hoverinfo = 'text',
+        textfont = list(size = 12),
+        showlegend = FALSE) %>%
+  layout(
+    title = list(
+      text = "Interactive Timeline of Nadia Conti’s Activities",
+      y = 0.95
+    ),
+    xaxis = list(title = "Date/Time"),
+    yaxis = list(
+      title = "",
+      tickmode = "array",
+      tickvals = 1:5,
+      ticktext = event_levels,
+      range = c(0.5, 5.5)
+    ),
+    hoverlabel = list(align = "left"),
+    margin = list(t = 100)
+  )
+```
+
+## The code
+
+```{r}
+#| eval: false
+
+nadia_id <- mc3_nodes_final %>%
+  filter(name == "Nadia Conti") %>%
+  pull(new_index)
+
+edges_involving_nadia <- mc3_edges_final %>%
+  filter(from == nadia_id | to == nadia_id)
+
+nadia_event_indices <- edges_involving_nadia %>%
+  mutate(event_index = if_else(from == nadia_id, to, from)) %>%
+  distinct(event_index) %>%
+  pull(event_index)
+
+nadia_events <- mc3_nodes_final %>%
+  slice(nadia_event_indices) %>%
+  filter(type == "Event") %>%
+  mutate(timestamp = ymd_hms(timestamp)) %>%
+  arrange(timestamp)
+
+get_partner_name <- function(event_index) {
+  edges <- mc3_edges_final %>%
+    filter((from == event_index & to != nadia_id) |
+           (to == event_index & from != nadia_id))
+  partners_idx <- unique(c(edges$from, edges$to))
+  partners_idx <- partners_idx[partners_idx != nadia_id & partners_idx != event_index]
+  if (length(partners_idx) == 0) return(NA)
+  partners <- mc3_nodes_final %>%
+    filter(new_index %in% partners_idx, type == "Entity") %>%
+    mutate(priority = case_when(
+      sub_type == "Person" ~ 1,
+      sub_type == "Organization" ~ 2,
+      sub_type == "Group" ~ 3,
+      sub_type == "Vessel" ~ 4,
+      sub_type == "Location" ~ 5,
+      TRUE ~ 6
+    )) %>%
+    arrange(priority)
+  return(partners$name[1])
+}
+
+nadia_events <- nadia_events %>%
+  rowwise() %>%
+  mutate(
+    partner = get_partner_name(new_index),
+    inferred = {
+      any_edge <- edges_involving_nadia %>%
+        filter((from == nadia_id & to == new_index) |
+               (to == nadia_id & from == new_index))
+      if (nrow(any_edge) > 0) any_edge$is_inferred[1] else FALSE
+    }
+  ) %>%
+  ungroup()
+
+nadia_events <- nadia_events %>%
+  add_row(
+    id = "Rel_AccessPermit_NemoReef", 
+    timestamp = ymd_hms("2040-10-05 00:00:00"),
+    sub_type = "AccessPermission", 
+    name = NA, content = "Special permit granted to Nemo Reef outside formal review process", 
+    partner = "Nemo Reef", inferred = TRUE
+  ) %>%
+  add_row(
+    id = "Rel_Payment_Elise", 
+    timestamp = ymd_hms("2040-10-10 05:00:00"),
+    sub_type = "Payment", 
+    name = NA, content = "Covert funding for illegal reef operation provided by Elise", 
+    partner = "Elise", inferred = TRUE
+  )
+
+event_colors <- c(
+  "AccessPermission" = "#d73027",
+  "Bribery"          = "#e69138",
+  "Payment"          = "#88419d",
+  "Communication"    = "#2c7bb6",
+  "Coordination"     = "#1a9850"
+)
+
+wrap_text <- function(text, width = 80) {
+  sapply(strwrap(text, width = width, simplify = FALSE), function(x) paste(x, collapse = "<br>"))
+}
+
+event_levels <- c("AccessPermission", "Bribery", "Communication", "Coordination", "Payment")
+
+timeline_df <- nadia_events %>%
+  mutate(
+    event_type = case_when(
+      sub_type == "AccessPermission" ~ "AccessPermission",
+      sub_type == "Payment" ~ "Payment",
+      sub_type == "Communication" & str_detect(content %||% "", regex("Double .* fee", ignore_case = TRUE)) ~ "Bribery",
+      TRUE ~ sub_type
+    ),
+    event_type = if_else(event_type == "Collaborate", "Coordination", event_type),
+    confirmed_flag = if_else(event_type %in% c("AccessPermission", "Bribery", "Payment"),
+                             "Confirmed Illegal", "Inferred/Suspicious"),
+    shape_code = if_else(confirmed_flag == "Confirmed Illegal", "triangle-up", "circle"),
+    color_code = event_colors[event_type],
+    wrapped_evidence = ifelse(!is.na(content), wrap_text(content, 80), ""),
+    tooltip = paste0(
+      "<b>Event Type:</b> ", event_type, "<br>",
+      "<b>Partner:</b> ", partner, "<br>",
+      "<b>Confirmed:</b> ", confirmed_flag, "<br>",
+      "<b>Timestamp:</b> ", format(timestamp, "%Y-%m-%d %H:%M"), "<br>",
+      ifelse(wrapped_evidence != "", paste0("<b>Evidence:</b> ", wrapped_evidence), "")
+    ),
+    hour_group = if_else(event_type == "Communication", floor_date(timestamp, "hour"), NA_POSIXct_),
+    y_base = as.numeric(factor(event_type, levels = event_levels))
+  ) %>%
+  group_by(event_type, hour_group) %>%
+  mutate(
+    comm_index = if_else(event_type == "Communication", row_number(), NA_integer_),
+    n_comm = if_else(event_type == "Communication", n(), NA_integer_),
+    comm_offset = if_else(event_type == "Communication",
+                          (comm_index - (n_comm + 1) / 2) * 0.12,
+                          0),
+    y_jittered = y_base + comm_offset
+  ) %>%
+  ungroup()
+
+#Plot
+plot_ly(timeline_df,
+        x = ~timestamp,
+        y = ~y_jittered,
+        type = 'scatter',
+        mode = 'markers+text',
+        text = ~if_else(event_type == "Communication", "", partner),
+        textposition = ~if_else(event_type == "Communication", NA_character_, "top center"),
+        hovertext = ~tooltip,
+        marker = list(size = 11),
+        color = ~I(color_code),
+        symbol = ~shape_code,
+        symbols = c("circle", "triangle-up"),
+        hoverinfo = 'text',
+        textfont = list(size = 12),
+        showlegend = FALSE) %>%
+  layout(
+    title = list(
+      text = "Interactive Timeline of Nadia Conti’s Activities",
+      y = 0.95
+    ),
+    xaxis = list(title = "Date/Time"),
+    yaxis = list(
+      title = "",
+      tickmode = "array",
+      tickvals = 1:5,
+      ticktext = event_levels,
+      range = c(0.5, 5.5)
+    ),
+    hoverlabel = list(align = "left"),
+    margin = list(t = 100)
+  )
+```
+:::
+
+# 9 Conclusion
+
+Our visual analytics pipeline successfully unmasked Nadia Conti as the linchpin of a multifaceted corruption scheme on Oceanus. The global graph highlighted her overwhelming centrality; her ego network directly connected her to key actors and operations (Neptune vessel movements, Liam Thorne bribes, EcoVigil cover-ups). The interactive timeline then reconstructed the temporal sequence: on October 5, she fast-tracked and concealed a special access permit for Nemo Reef; on October 9, she orchestrated bribes to ensure harbor compliance; on October 10, she funneled payments via “Mrs. Money” to underwrite illicit reef groundwork. A flurry of communications—dense blue clusters—provided the operational heartbeat, linking her to collaborators like Davis and Sailor Shift’s team in real time. By integrating static and interactive views, we not only corroborated known illegal actions but also flagged suspicious gaps and patterns (e.g., tightly aligned morning communications, synchronization of vessel movements and permit signs) that warrant further investigation. 
 

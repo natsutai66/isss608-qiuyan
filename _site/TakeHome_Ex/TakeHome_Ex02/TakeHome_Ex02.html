@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Tai Qiu Yan">
-<meta name="dcterms.date" content="2025-05-22">
+<meta name="dcterms.date" content="2025-05-28">
 <meta name="description" content="Mini-Challenge 3">
 
 <title>Take Home Exercise 2 – ISSS608-VAA</title>
@@ -103,6 +103,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="../../site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+
+<link href="../../site_libs/vis-9.1.0/vis-network.min.css" rel="stylesheet">
+
+<script src="../../site_libs/vis-9.1.0/vis-network.min.js"></script>
+
+<script src="../../site_libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
+
+<link href="../../site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+
+<script src="../../site_libs/plotly-binding-4.10.4/plotly.js"></script>
+
+<script src="../../site_libs/typedarray-0.1/typedarray.min.js"></script>
+
+<script src="../../site_libs/jquery-3.5.1/jquery.min.js"></script>
+
+<link href="../../site_libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
+
+<script src="../../site_libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+
+<link href="../../site_libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet">
+
+<script src="../../site_libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+
 
 
 <link rel="stylesheet" href="../../styles.css">
@@ -244,6 +268,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#inspecting-knowledge-graph-structure" id="toc-inspecting-knowledge-graph-structure" class="nav-link" data-scroll-target="#inspecting-knowledge-graph-structure">Inspecting knowledge graph structure</a></li>
   </ul></li>
+  </ul></li>
   <li><a href="#extracting-the-edges-and-nodes-tables" id="toc-extracting-the-edges-and-nodes-tables" class="nav-link" data-scroll-target="#extracting-the-edges-and-nodes-tables">3 Extracting the edges and nodes tables</a>
   <ul class="collapse">
   <li><a href="#initial-eda" id="toc-initial-eda" class="nav-link" data-scroll-target="#initial-eda">Initial EDA</a></li>
@@ -254,8 +279,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#cleaning-and-wrangling-edges" id="toc-cleaning-and-wrangling-edges" class="nav-link" data-scroll-target="#cleaning-and-wrangling-edges">4.2 Cleaning and wrangling edges</a></li>
   </ul></li>
   <li><a href="#building-the-tidygraph-object" id="toc-building-the-tidygraph-object" class="nav-link" data-scroll-target="#building-the-tidygraph-object">5 Building the tidygraph object</a></li>
-  <li><a href="#visualising-the-knowledge-graph" id="toc-visualising-the-knowledge-graph" class="nav-link" data-scroll-target="#visualising-the-knowledge-graph">5 Visualising the knowledge graph</a></li>
+  <li><a href="#visualising-the-knowledge-graph" id="toc-visualising-the-knowledge-graph" class="nav-link" data-scroll-target="#visualising-the-knowledge-graph">6 Visualising the knowledge graph</a></li>
+  <li><a href="#nadia-contis-ego-network" id="toc-nadia-contis-ego-network" class="nav-link" data-scroll-target="#nadia-contis-ego-network">7 Nadia Conti’s Ego Network</a>
+  <ul class="collapse">
+  <li><a href="#interactive-network" id="toc-interactive-network" class="nav-link" data-scroll-target="#interactive-network">Interactive Network</a></li>
+  <li><a href="#timeline-of-key-events-involving-nadia-conti" id="toc-timeline-of-key-events-involving-nadia-conti" class="nav-link" data-scroll-target="#timeline-of-key-events-involving-nadia-conti">8 Timeline of Key Events Involving Nadia Conti</a>
+  <ul class="collapse">
+  <li><a href="#interactive-timeline-of-nadia-contis-activities" id="toc-interactive-timeline-of-nadia-contis-activities" class="nav-link" data-scroll-target="#interactive-timeline-of-nadia-contis-activities">Interactive Timeline of Nadia Conti’s Activities</a></li>
   </ul></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">9 Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -286,14 +319,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 22, 2025</p>
+      <p class="date">May 28, 2025</p>
     </div>
   </div>
   
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">May 22, 2025</p>
+      <p class="date-modified">May 28, 2025</p>
     </div>
   </div>
     
@@ -306,6 +339,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="overview" class="level1">
 <h1>1 Overview</h1>
+<p>This task involves a visual investigation into whether Nadia Conti remains engaged in unlawful activities. Using the ego network surrounding Nadia extracted from the MC3 knowledge graph—built from two weeks of radio intercepts, surveillance records, and metadata—the objective is to evaluate Clepper Jessen’s suspicion that Nadia is continuing her covert operations in Oceanus.</p>
+<p>The approach taken in this investigation involved constructing both static and interactive timelines to trace Nadia’s involvement across various event types, including AccessPermission, Bribery, Payment, Communication, and Coordination. Through this visualization, temporal patterns and escalation sequences were revealed—from the initial unauthorized access granted to Nemo Reef, to bribery arrangements with Liam Thorne, and covert payments involving Elise.</p>
+<p>A key visual outcome is the cluster of blue communication events linked to multiple parties such as Davis, Elise, and Oceanus City Council. While not all of these events are confirmed illegal, their density and timing strongly suggest synchronized operational planning. Notably, Davis emerged as a recurring entity across several event types, reinforcing his role as a primary accomplice.</p>
+<p>The interactive timeline added further analytical depth by integrating dynamic tooltips containing structured evidence, timestamp details, partner roles, and the nature of each event. These enriched insights help validate Nadia’s central role in coordinating a multi-entity illicit network, while also guiding further investigation into surrounding actors and hidden collaborators.</p>
+<p>This analysis delivers a comprehensive, visually driven narrative for investigative journalist Clepper Jessen—substantiating concerns that Nadia Conti is actively continuing illegal activities in Oceanus and potentially expanding her network of influence.</p>
 </section>
 <section id="getting-started" class="level1">
 <h1>2 Getting Started</h1>
@@ -314,9 +352,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Five R packages will be used. They are tidyverse, jsonlite, tidygraph, ggraph and SmartEDA.</p>
 <p>In the code chunk below, <code>p_load()</code> of <strong>pacman</strong> package is used to load the R packages into R environemnt.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse, jsonlite,</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>               tidygraph, ggraph,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>               SmartEDA)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse, jsonlite,tidygraph, dplyr,</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>               ggraph, ggrepel, SmartEDA, visNetwork, </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>               timevis, lubridate, plotly)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="importing-knowledge-graph-data" class="level2">
@@ -329,8 +367,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="inspecting-knowledge-graph-structure" class="level3">
 <h3 class="anchored" data-anchor-id="inspecting-knowledge-graph-structure">Inspecting knowledge graph structure</h3>
 <p>In the code chunk below glimpse() is used to reveal the structure of mc3 knowledge graph.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">The output</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(MC3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>List of 5
  $ directed  : logi TRUE
@@ -382,28 +428,40 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   ..$ type       : chr [1:3226] NA "sent" NA NA ...</code></pre>
 </div>
 </div>
+</div>
+</div>
+</div>
 </section>
 </section>
-<section id="extracting-the-edges-and-nodes-tables" class="level2">
-<h2 class="anchored" data-anchor-id="extracting-the-edges-and-nodes-tables">3 Extracting the edges and nodes tables</h2>
+</section>
+<section id="extracting-the-edges-and-nodes-tables" class="level1">
+<h1>3 Extracting the edges and nodes tables</h1>
 <p><code>as_tibble()</code> of <strong>tibble</strong> package package is used to extract the nodes and links tibble data frames from <em>mc3</em> tibble dataframe into two separate tibble dataframes called <em>mc3_nodes</em> and <em>mc3_edges</em> respectively.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mc3_nodes <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(MC3<span class="sc">$</span>nodes)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>mc3_edges <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(MC3<span class="sc">$</span>edges)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="initial-eda" class="level3">
-<h3 class="anchored" data-anchor-id="initial-eda">Initial EDA</h3>
+<section id="initial-eda" class="level2">
+<h2 class="anchored" data-anchor-id="initial-eda">Initial EDA</h2>
 <p>In the code chunk below, <code>ExpCatViz()</code> of SmartEDA package is used to reveal the frequency distribution of all categorical fields in <em>mc3_nodes</em> tibble dataframe.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">The plot</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ExpCatViz</span>(<span class="at">data=</span>mc3_nodes,</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">col=</span><span class="st">"lightblue"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]</code></pre>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -414,7 +472,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-7-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -425,7 +483,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-5-3.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-7-3.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -436,7 +494,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-5-4.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-7-4.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -447,7 +505,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-5-5.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-7-5.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -458,7 +516,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-5-6.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-7-6.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -469,7 +527,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-5-7.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-7-7.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -480,7 +538,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-5-8.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-7-8.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -491,7 +549,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-5-9.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-7-9.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -502,7 +560,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-5-10.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-7-10.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -513,7 +571,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-5-11.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-7-11.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -524,7 +582,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-5-12.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-7-12.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -535,7 +593,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-5-13.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-7-13.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -546,32 +604,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-5-14.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-7-14.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+</div>
+</div>
+</div>
 <p>The code chunk below uses ExpCATViz() of SmartEDA package to reveal the frequency distribution of all categorical fields in mc3_edges tibble dataframe.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">The plot</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ExpCatViz</span>(<span class="at">data=</span>mc3_edges,</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">col=</span><span class="st">"lightblue"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]</code></pre>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+</div>
+</div>
+</div>
 </section>
 </section>
-<section id="data-cleaning-and-wrangling" class="level2">
-<h2 class="anchored" data-anchor-id="data-cleaning-and-wrangling">4 Data Cleaning and Wrangling</h2>
-<section id="cleaning-and-wrangling-nodes" class="level3">
-<h3 class="anchored" data-anchor-id="cleaning-and-wrangling-nodes">4.1 Cleaning and wrangling nodes</h3>
+<section id="data-cleaning-and-wrangling" class="level1">
+<h1>4 Data Cleaning and Wrangling</h1>
+<section id="cleaning-and-wrangling-nodes" class="level2">
+<h2 class="anchored" data-anchor-id="cleaning-and-wrangling-nodes">4.1 Cleaning and wrangling nodes</h2>
 <p>Code chunk below performs the following data cleaning tasks:</p>
 <ul>
 <li><p>convert values in id field into character data type,</p></li>
@@ -588,8 +660,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>thing_collected)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="cleaning-and-wrangling-edges" class="level3">
-<h3 class="anchored" data-anchor-id="cleaning-and-wrangling-edges">4.2 Cleaning and wrangling edges</h3>
+<section id="cleaning-and-wrangling-edges" class="level2">
+<h2 class="anchored" data-anchor-id="cleaning-and-wrangling-edges">4.2 Cleaning and wrangling edges</h2>
 <p>The code chunk below will be used to:</p>
 <ul>
 <li><p>rename source and target fields to from_id and to_id respectively,</p></li>
@@ -657,8 +729,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 </section>
-<section id="building-the-tidygraph-object" class="level2">
-<h2 class="anchored" data-anchor-id="building-the-tidygraph-object">5 Building the tidygraph object</h2>
+<section id="building-the-tidygraph-object" class="level1">
+<h1>5 Building the tidygraph object</h1>
 <p>The code chunk below will be used to build the tidygraph object.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>mc3_graph <span class="ot">&lt;-</span> <span class="fu">tbl_graph</span>(</span>
@@ -668,8 +740,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Examine the object by using str() after the tidygraph object is created.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">The output</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(mc3_graph)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
+<div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>Classes 'tbl_graph', 'igraph'  hidden list of 10
  $ : num 1159
@@ -718,18 +798,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   ..$ :List of 2
   .. ..$ is_inferred: logi [1:3226] TRUE FALSE TRUE TRUE TRUE TRUE ...
   .. ..$ type       : chr [1:3226] NA "sent" NA NA ...
- $ :&lt;environment: 0x000002706f90d708&gt; 
+ $ :&lt;environment: 0x0000024c56e39878&gt; 
  - attr(*, "active")= chr "nodes"</code></pre>
 </div>
 </div>
+</div>
+</div>
+</div>
 </section>
-<section id="visualising-the-knowledge-graph" class="level2">
-<h2 class="anchored" data-anchor-id="visualising-the-knowledge-graph">5 Visualising the knowledge graph</h2>
+<section id="visualising-the-knowledge-graph" class="level1">
+<h1>6 Visualising the knowledge graph</h1>
 <p>Several of the&nbsp;<strong>ggraph</strong>&nbsp;layouts involve randomisation. In order to ensure reproducibility, it is necessary to set the seed value before plotting by using the code chunk below.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>In the code chunk below, ggraph functions are used to create the whole graph.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">The code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">The plot</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggraph</span>(mc3_graph, </span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>       <span class="at">layout =</span> <span class="st">"fr"</span>) <span class="sc">+</span></span>
@@ -741,17 +828,517 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">repel =</span> <span class="cn">TRUE</span>, </span>
 <span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">size =</span> <span class="fl">2.5</span>) <span class="sc">+</span></span>
 <span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
+<div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-
-
+</div>
+</div>
+</div>
 </section>
+<section id="nadia-contis-ego-network" class="level1">
+<h1>7 Nadia Conti’s Ego Network</h1>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true">The plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false">The code</a></li></ul>
+<div class="tab-content">
+<div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="1344"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>nadia_index <span class="ot">&lt;-</span> <span class="fu">which</span>(mc3_nodes_final<span class="sc">$</span>name <span class="sc">==</span> <span class="st">"Nadia Conti"</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>graph2 <span class="ot">&lt;-</span> <span class="fu">tbl_graph</span>(<span class="at">nodes =</span> mc3_nodes_final,</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">edges =</span> mc3_edges_final,</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">directed =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dist =</span> <span class="fu">node_distance_from</span>(nadia_index),</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">node_cat =</span> <span class="fu">case_when</span>(</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>           sub_type <span class="sc">==</span> <span class="st">"Person"</span>                    <span class="sc">~</span> <span class="st">"Person"</span>,</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>           sub_type <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Location"</span>,<span class="st">"Vessel"</span>)    <span class="sc">~</span> <span class="st">"Location"</span>,</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>           sub_type <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Communication"</span>,<span class="st">"Monitoring"</span>,<span class="st">"VesselMovement"</span>) </span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>                                                   <span class="sc">~</span> <span class="st">"Event"</span>,</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>           sub_type <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"AccessPermission"</span>,<span class="st">"Suspicious"</span>,<span class="st">"Colleagues"</span>) </span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>                                                   <span class="sc">~</span> <span class="st">"Relationship"</span>,</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>           <span class="cn">TRUE</span>                                     <span class="sc">~</span> <span class="st">"Other"</span></span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>         )) <span class="sc">%&gt;%</span></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(edges) <span class="sc">%&gt;%</span></span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">edge_cat =</span> mc3_nodes_final<span class="sc">$</span>sub_type[to])</span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>nadia_ego <span class="ot">&lt;-</span> graph2 <span class="sc">%&gt;%</span> <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(dist <span class="sc">&lt;=</span> <span class="dv">2</span>)</span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot</span></span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a><span class="fu">ggraph</span>(nadia_ego, <span class="at">layout =</span> <span class="st">"fr"</span>) <span class="sc">+</span></span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link</span>(<span class="fu">aes</span>(<span class="at">color =</span> edge_cat), <span class="at">width =</span> <span class="fl">0.8</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="fu">aes</span>(<span class="at">shape =</span> node_cat, <span class="at">color =</span> node_cat), <span class="at">size =</span> <span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">ifelse</span>(node_cat <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Person"</span>,<span class="st">"Location"</span>,<span class="st">"Relationship"</span>), </span>
+<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a>                                    name, <span class="st">""</span>)),</span>
+<span id="cb35-28"><a href="#cb35-28" aria-hidden="true" tabindex="-1"></a>                 <span class="at">repel =</span> <span class="cn">TRUE</span>, <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb35-29"><a href="#cb35-29" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-30"><a href="#cb35-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(</span>
+<span id="cb35-31"><a href="#cb35-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">name   =</span> <span class="st">"Node type"</span>,</span>
+<span id="cb35-32"><a href="#cb35-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb35-33"><a href="#cb35-33" aria-hidden="true" tabindex="-1"></a>      <span class="at">Person       =</span> <span class="st">"skyblue"</span>,</span>
+<span id="cb35-34"><a href="#cb35-34" aria-hidden="true" tabindex="-1"></a>      <span class="at">Location     =</span> <span class="st">"lightgreen"</span>,</span>
+<span id="cb35-35"><a href="#cb35-35" aria-hidden="true" tabindex="-1"></a>      <span class="at">Relationship =</span> <span class="st">"plum"</span>,</span>
+<span id="cb35-36"><a href="#cb35-36" aria-hidden="true" tabindex="-1"></a>      <span class="at">Event        =</span> <span class="st">"orange"</span>,</span>
+<span id="cb35-37"><a href="#cb35-37" aria-hidden="true" tabindex="-1"></a>      <span class="at">Other        =</span> <span class="st">"gray80"</span></span>
+<span id="cb35-38"><a href="#cb35-38" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb35-39"><a href="#cb35-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb35-40"><a href="#cb35-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(</span>
+<span id="cb35-41"><a href="#cb35-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">name   =</span> <span class="st">"Node type"</span>,</span>
+<span id="cb35-42"><a href="#cb35-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb35-43"><a href="#cb35-43" aria-hidden="true" tabindex="-1"></a>      <span class="at">Person       =</span> <span class="dv">16</span>,</span>
+<span id="cb35-44"><a href="#cb35-44" aria-hidden="true" tabindex="-1"></a>      <span class="at">Location     =</span> <span class="dv">17</span>,</span>
+<span id="cb35-45"><a href="#cb35-45" aria-hidden="true" tabindex="-1"></a>      <span class="at">Relationship =</span> <span class="dv">18</span>,</span>
+<span id="cb35-46"><a href="#cb35-46" aria-hidden="true" tabindex="-1"></a>      <span class="at">Event        =</span> <span class="dv">15</span>,</span>
+<span id="cb35-47"><a href="#cb35-47" aria-hidden="true" tabindex="-1"></a>      <span class="at">Other        =</span> <span class="dv">1</span></span>
+<span id="cb35-48"><a href="#cb35-48" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb35-49"><a href="#cb35-49" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb35-50"><a href="#cb35-50" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-51"><a href="#cb35-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_edge_color_manual</span>(</span>
+<span id="cb35-52"><a href="#cb35-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">name   =</span> <span class="st">"Edge → target"</span>,</span>
+<span id="cb35-53"><a href="#cb35-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb35-54"><a href="#cb35-54" aria-hidden="true" tabindex="-1"></a>      <span class="at">Communication    =</span> <span class="st">"gray50"</span>,</span>
+<span id="cb35-55"><a href="#cb35-55" aria-hidden="true" tabindex="-1"></a>      <span class="at">AccessPermission =</span> <span class="st">"red"</span>,</span>
+<span id="cb35-56"><a href="#cb35-56" aria-hidden="true" tabindex="-1"></a>      <span class="at">Monitoring       =</span> <span class="st">"blue"</span>,</span>
+<span id="cb35-57"><a href="#cb35-57" aria-hidden="true" tabindex="-1"></a>      <span class="at">VesselMovement   =</span> <span class="st">"darkgreen"</span>,</span>
+<span id="cb35-58"><a href="#cb35-58" aria-hidden="true" tabindex="-1"></a>      <span class="at">Suspicious       =</span> <span class="st">"purple"</span>,</span>
+<span id="cb35-59"><a href="#cb35-59" aria-hidden="true" tabindex="-1"></a>      <span class="at">Colleagues       =</span> <span class="st">"brown"</span>,</span>
+<span id="cb35-60"><a href="#cb35-60" aria-hidden="true" tabindex="-1"></a>      <span class="at">Other            =</span> <span class="st">"gray80"</span></span>
+<span id="cb35-61"><a href="#cb35-61" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb35-62"><a href="#cb35-62" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb35-63"><a href="#cb35-63" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-64"><a href="#cb35-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(</span>
+<span id="cb35-65"><a href="#cb35-65" aria-hidden="true" tabindex="-1"></a>    <span class="at">color      =</span> <span class="fu">guide_legend</span>(<span class="at">title.position =</span> <span class="st">"top"</span>, <span class="at">title.hjust =</span> <span class="fl">0.5</span>, <span class="at">nrow =</span> <span class="dv">1</span>),</span>
+<span id="cb35-66"><a href="#cb35-66" aria-hidden="true" tabindex="-1"></a>    <span class="at">shape      =</span> <span class="fu">guide_legend</span>(<span class="at">title.position =</span> <span class="st">"top"</span>, <span class="at">title.hjust =</span> <span class="fl">0.5</span>, <span class="at">nrow =</span> <span class="dv">1</span>),</span>
+<span id="cb35-67"><a href="#cb35-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">edge_color =</span> <span class="fu">guide_legend</span>(<span class="at">title.position =</span> <span class="st">"top"</span>, <span class="at">title.hjust =</span> <span class="fl">0.5</span>, <span class="at">nrow =</span> <span class="dv">1</span>)</span>
+<span id="cb35-68"><a href="#cb35-68" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb35-69"><a href="#cb35-69" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-70"><a href="#cb35-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Nadia Conti's Ego Network"</span>) <span class="sc">+</span></span>
+<span id="cb35-71"><a href="#cb35-71" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-72"><a href="#cb35-72" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb35-73"><a href="#cb35-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb35-74"><a href="#cb35-74" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title      =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">24</span>, <span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>),</span>
+<span id="cb35-75"><a href="#cb35-75" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb35-76"><a href="#cb35-76" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.box      =</span> <span class="st">"vertical"</span>,</span>
+<span id="cb35-77"><a href="#cb35-77" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.spacing.y=</span> <span class="fu">unit</span>(<span class="fl">0.5</span>, <span class="st">"cm"</span>)</span>
+<span id="cb35-78"><a href="#cb35-78" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<p>Insight:</p>
+<p>The ego‐network makes it clear that Nadia Conti sits at the center of the entire operation: she is the single node through which every illicit permit, bribery payment, vessel movement, and covert communication passes.</p>
+<p>The bright red “AccessPermission” links fan out directly from her to the Nemo Reef location, demonstrating that she personally fast‐tracked and then concealed the special access permit. Purple “Relationship” edges tie her to insiders like Liam Thorne and EcoVigil, confirming that she paid off enforcement officials and later enlisted an environmental watchdog to cover up the damage. Gray “Communication” lines show a constant stream of messages between Nadia and operatives—Neptune, Davis, The Accountant—while green “VesselMovement” connections map out the deployment of ships under her authority. No other individual approaches her node in size or number of connections, underlining that she was the undisputed architect and coordinator of the illegal reef exploitation.</p>
+<section id="interactive-network" class="level3">
+<h3 class="anchored" data-anchor-id="interactive-network">Interactive Network</h3>
+<p>The following fields are added to the interactive network:</p>
+<p>Node degree (Degree): Every node’s tooltip now shows a “Degree” value—the count of how many edges link that node to others in Nadia’s two-hop subgraph. Nadia herself unsurprisingly tops the list (her degree is the largest), underscoring that she is the single most connected actor. Among locations, Nemo Reef has one of the highest degrees, reflecting all of the special-access permits, vessel movements, environmental monitors, and communications tied back to that site. A high degree highlights a hub of activity, so when you see Haacklee Harbor with a degree of 4 or Liam Thorne with degree 5, you know they’re also major junctions in the conspiracy.</p>
+<p>Inferred flag (Inferred): Below the relation you’ll also see “Inferred: TRUE” or “Inferred: FALSE.” Edges marked FALSE are direct transcripts from the intercepted logs (hard evidence). Edges marked TRUE were not literally uttered on the radio or found in a permit form, but were deduced by analysts—for example, because Nadia authorized a permit on Oct 5 and we know that implies a legal relationship to Nemo Reef, we infer she granted it even if no single message spelled it out.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-7-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-1" role="tab" aria-controls="tabset-7-1" aria-selected="true">The plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-7-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-2" role="tab" aria-controls="tabset-7-2" aria-selected="false">The code</a></li></ul>
+<div class="tab-content">
+<div id="tabset-7-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-7-1-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div id="htmlwidget-3e7dfef6bc11e374d3aa" style="width:100%;height:600px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3e7dfef6bc11e374d3aa">{"x":{"nodes":{"id":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88],"label":["Sam","Nadia Conti","Elise","Liam Thorne","Davis","Rodriguez","The Accountant","Oceanus City Council","V. Miesel Shipping","Sailor Shifts Team","Neptune","Marlin","EcoVigil","Sentinel","Remora","Haacklee Harbor","Nemo Reef",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"group":["Person","Person","Person","Person","Person","Person","Person","Other","Other","Other","Location","Location","Location","Location","Location","Location","Location","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Event","Other","Other","Other","Event","Event","Other","Other","Relationship","Relationship","Relationship","Relationship","Relationship","Relationship","Relationship","Relationship","Relationship","Relationship","Relationship","Relationship","Relationship","Relationship","Other","Other","Other","Other","Other","Other","Relationship","Relationship","Relationship","Relationship","Other"],"title":["<b>Sam<\/b><br>Subtype: Person<br>Degree: 3","<b>Nadia Conti<\/b><br>Subtype: Person<br>Degree: 37","<b>Elise<\/b><br>Subtype: Person<br>Degree: 8","<b>Liam Thorne<\/b><br>Subtype: Person<br>Degree: 9","<b>Davis<\/b><br>Subtype: Person<br>Degree: 13","<b>Rodriguez<\/b><br>Subtype: Person<br>Degree: 2","<b>The Accountant<\/b><br>Subtype: Person<br>Degree: 1","<b>Oceanus City Council<\/b><br>Subtype: Organization<br>Degree: 6","<b>V. Miesel Shipping<\/b><br>Subtype: Organization<br>Degree: 7","<b>Sailor Shifts Team<\/b><br>Subtype: Organization<br>Degree: 4","<b>Neptune<\/b><br>Subtype: Vessel<br>Degree: 9","<b>Marlin<\/b><br>Subtype: Vessel<br>Degree: 2","<b>EcoVigil<\/b><br>Subtype: Vessel<br>Degree: 3","<b>Sentinel<\/b><br>Subtype: Vessel<br>Degree: 3","<b>Remora<\/b><br>Subtype: Vessel<br>Degree: 7","<b>Haacklee Harbor<\/b><br>Subtype: Location<br>Degree: 4","<b>Nemo Reef<\/b><br>Subtype: Location<br>Degree: 14","<b>NA<\/b><br>Subtype: Monitoring<br>Degree: 3","<b>NA<\/b><br>Subtype: Monitoring<br>Degree: 3","<b>NA<\/b><br>Subtype: Monitoring<br>Degree: 3","<b>NA<\/b><br>Subtype: Monitoring<br>Degree: 2","<b>NA<\/b><br>Subtype: Monitoring<br>Degree: 2","<b>NA<\/b><br>Subtype: Monitoring<br>Degree: 2","<b>NA<\/b><br>Subtype: Monitoring<br>Degree: 2","<b>NA<\/b><br>Subtype: Monitoring<br>Degree: 3","<b>NA<\/b><br>Subtype: Communication<br>Degree: 4","<b>NA<\/b><br>Subtype: Communication<br>Degree: 3","<b>NA<\/b><br>Subtype: Communication<br>Degree: 3","<b>NA<\/b><br>Subtype: Communication<br>Degree: 2","<b>NA<\/b><br>Subtype: Communication<br>Degree: 2","<b>NA<\/b><br>Subtype: Communication<br>Degree: 3","<b>NA<\/b><br>Subtype: Communication<br>Degree: 2","<b>NA<\/b><br>Subtype: Communication<br>Degree: 2","<b>NA<\/b><br>Subtype: Communication<br>Degree: 7","<b>NA<\/b><br>Subtype: Communication<br>Degree: 3","<b>NA<\/b><br>Subtype: Communication<br>Degree: 5","<b>NA<\/b><br>Subtype: Communication<br>Degree: 2","<b>NA<\/b><br>Subtype: Communication<br>Degree: 5","<b>NA<\/b><br>Subtype: Communication<br>Degree: 3","<b>NA<\/b><br>Subtype: Communication<br>Degree: 3","<b>NA<\/b><br>Subtype: Communication<br>Degree: 3","<b>NA<\/b><br>Subtype: Communication<br>Degree: 3","<b>NA<\/b><br>Subtype: Communication<br>Degree: 3","<b>NA<\/b><br>Subtype: Communication<br>Degree: 4","<b>NA<\/b><br>Subtype: Communication<br>Degree: 5","<b>NA<\/b><br>Subtype: Communication<br>Degree: 8","<b>NA<\/b><br>Subtype: Communication<br>Degree: 5","<b>NA<\/b><br>Subtype: Communication<br>Degree: 4","<b>NA<\/b><br>Subtype: Communication<br>Degree: 5","<b>NA<\/b><br>Subtype: Communication<br>Degree: 5","<b>NA<\/b><br>Subtype: Communication<br>Degree: 5","<b>NA<\/b><br>Subtype: Communication<br>Degree: 4","<b>NA<\/b><br>Subtype: Communication<br>Degree: 2","<b>NA<\/b><br>Subtype: Communication<br>Degree: 3","<b>NA<\/b><br>Subtype: Communication<br>Degree: 4","<b>NA<\/b><br>Subtype: Communication<br>Degree: 6","<b>NA<\/b><br>Subtype: Assessment<br>Degree: 3","<b>NA<\/b><br>Subtype: Assessment<br>Degree: 2","<b>NA<\/b><br>Subtype: Assessment<br>Degree: 4","<b>NA<\/b><br>Subtype: VesselMovement<br>Degree: 3","<b>NA<\/b><br>Subtype: VesselMovement<br>Degree: 4","<b>NA<\/b><br>Subtype: Collaborate<br>Degree: 3","<b>NA<\/b><br>Subtype: Collaborate<br>Degree: 3","<b>NA<\/b><br>Subtype: Colleagues<br>Degree: 3","<b>NA<\/b><br>Subtype: Colleagues<br>Degree: 3","<b>NA<\/b><br>Subtype: Colleagues<br>Degree: 5","<b>NA<\/b><br>Subtype: Colleagues<br>Degree: 3","<b>NA<\/b><br>Subtype: Colleagues<br>Degree: 4","<b>NA<\/b><br>Subtype: Colleagues<br>Degree: 3","<b>NA<\/b><br>Subtype: Colleagues<br>Degree: 5","<b>NA<\/b><br>Subtype: Colleagues<br>Degree: 9","<b>NA<\/b><br>Subtype: Colleagues<br>Degree: 3","<b>NA<\/b><br>Subtype: AccessPermission<br>Degree: 5","<b>NA<\/b><br>Subtype: AccessPermission<br>Degree: 3","<b>NA<\/b><br>Subtype: AccessPermission<br>Degree: 2","<b>NA<\/b><br>Subtype: AccessPermission<br>Degree: 3","<b>NA<\/b><br>Subtype: AccessPermission<br>Degree: 2","<b>NA<\/b><br>Subtype: Jurisdiction<br>Degree: 3","<b>NA<\/b><br>Subtype: Coordinates<br>Degree: 3","<b>NA<\/b><br>Subtype: Coordinates<br>Degree: 3","<b>NA<\/b><br>Subtype: Operates<br>Degree: 3","<b>NA<\/b><br>Subtype: Operates<br>Degree: 4","<b>NA<\/b><br>Subtype: Operates<br>Degree: 3","<b>NA<\/b><br>Subtype: Suspicious<br>Degree: 3","<b>NA<\/b><br>Subtype: Suspicious<br>Degree: 3","<b>NA<\/b><br>Subtype: Suspicious<br>Degree: 3","<b>NA<\/b><br>Subtype: Suspicious<br>Degree: 3","<b>NA<\/b><br>Subtype: Unfriendly<br>Degree: 2"]},"edges":{"from":[1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,6,6,7,8,8,9,9,9,9,10,10,10,11,11,11,11,13,13,14,14,14,15,15,15,15,15,16,16,16,17,17,17,17,17,17,2,26,26,16,27,8,28,2,8,10,31,2,2,2,34,20,34,34,34,4,35,2,19,36,36,11,2,38,38,38,11,39,40,40,2,41,12,42,2,43,2,44,44,2,45,45,18,2,46,46,46,46,21,46,2,22,47,47,4,48,48,2,23,49,49,9,50,50,50,2,51,51,51,2,52,52,9,11,54,2,55,55,2,24,25,56,56,17,17,17,11,2,17,17,17,17,17,2,13,12,15,11,15,8,9,8,4],"to":[59,68,69,73,27,30,35,37,66,39,42,80,70,48,53,63,69,71,67,64,34,85,44,79,46,68,66,65,76,19,84,36,47,70,33,62,40,41,58,81,43,50,51,63,55,72,71,49,72,67,29,78,74,88,52,54,32,83,77,38,20,64,65,22,87,18,86,45,31,61,24,25,56,57,26,28,18,19,20,21,23,25,26,57,73,27,73,28,73,29,30,31,71,32,33,34,88,34,60,68,66,35,76,36,36,84,70,37,38,64,65,66,39,67,60,62,41,71,42,58,43,81,44,59,85,45,86,78,45,46,79,68,69,59,46,66,47,47,87,70,48,80,70,49,49,75,72,50,61,82,71,51,61,82,71,52,71,74,53,54,71,55,63,71,56,56,56,83,77,57,59,60,61,62,73,74,75,76,78,79,80,81,82,82,83,84,85,86,87],"title":["<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> sent<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> received<br><b>Inferred:<\/b> FALSE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> evidence_for<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE","<b>Relation:<\/b> NA<br><b>Inferred:<\/b> TRUE"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot"},"manipulation":{"enabled":false},"groups":{"Person":{"color":"skyblue","shape":"dot"},"Event":{"color":"orange","shape":"square"},"Location":{"color":"lightgreen","shape":"triangle"},"useDefaultGroups":true,"Relationship":{"color":"plum","shape":"diamond"}},"edges":{"color":"gray","smooth":false},"interaction":{"hover":true,"zoomSpeed":1},"layout":{"randomSeed":123}},"groups":["Person","Other","Location","Event","Relationship"],"width":"100%","height":"600px","idselection":{"enabled":true,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":null,"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","highlight":{"enabled":true,"hoverNearest":true,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":false,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":true,"position":"left","ncol":1,"stepX":100,"stepY":100,"zoom":true}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+<div id="tabset-7-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-7-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>nadia_index <span class="ot">&lt;-</span> <span class="fu">which</span>(mc3_nodes_final<span class="sc">$</span>name <span class="sc">==</span> <span class="st">"Nadia Conti"</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>nadia_ego <span class="ot">&lt;-</span> graph2 <span class="sc">%&gt;%</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(dist <span class="sc">&lt;=</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">degree =</span> <span class="fu">centrality_degree</span>())</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>nodes_vis <span class="ot">&lt;-</span> nadia_ego <span class="sc">%&gt;%</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">id    =</span> <span class="fu">row_number</span>(),</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> name,</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">group =</span> <span class="fu">as.character</span>(node_cat),    </span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">paste0</span>(</span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;b&gt;"</span>, name, <span class="st">"&lt;/b&gt;&lt;br&gt;"</span>,</span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Subtype: "</span>, sub_type, <span class="st">"&lt;br&gt;"</span>,</span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Degree: "</span>, degree</span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id, label, group, title)</span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>edges_vis <span class="ot">&lt;-</span> nadia_ego <span class="sc">%&gt;%</span></span>
+<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(edges) <span class="sc">%&gt;%</span></span>
+<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb36-25"><a href="#cb36-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb36-26"><a href="#cb36-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">from  =</span> from,</span>
+<span id="cb36-27"><a href="#cb36-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">to    =</span> to,</span>
+<span id="cb36-28"><a href="#cb36-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">paste0</span>(</span>
+<span id="cb36-29"><a href="#cb36-29" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;b&gt;Relation:&lt;/b&gt; "</span>, type, <span class="st">"&lt;br&gt;"</span>,</span>
+<span id="cb36-30"><a href="#cb36-30" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;b&gt;Inferred:&lt;/b&gt; "</span>, is_inferred</span>
+<span id="cb36-31"><a href="#cb36-31" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb36-32"><a href="#cb36-32" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb36-33"><a href="#cb36-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(from, to, title)</span>
+<span id="cb36-34"><a href="#cb36-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-35"><a href="#cb36-35" aria-hidden="true" tabindex="-1"></a><span class="fu">visNetwork</span>(nodes_vis, edges_vis, <span class="at">width=</span><span class="st">"100%"</span>, <span class="at">height=</span><span class="st">"600px"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb36-36"><a href="#cb36-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visGroups</span>(<span class="at">groupname=</span><span class="st">"Person"</span>,       <span class="at">color=</span><span class="st">"skyblue"</span>,    <span class="at">shape=</span><span class="st">"dot"</span>)     <span class="sc">%&gt;%</span></span>
+<span id="cb36-37"><a href="#cb36-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visGroups</span>(<span class="at">groupname=</span><span class="st">"Event"</span>,        <span class="at">color=</span><span class="st">"orange"</span>,     <span class="at">shape=</span><span class="st">"square"</span>)  <span class="sc">%&gt;%</span></span>
+<span id="cb36-38"><a href="#cb36-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visGroups</span>(<span class="at">groupname=</span><span class="st">"Location"</span>,     <span class="at">color=</span><span class="st">"lightgreen"</span>, <span class="at">shape=</span><span class="st">"triangle"</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb36-39"><a href="#cb36-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visGroups</span>(<span class="at">groupname=</span><span class="st">"Relationship"</span>, <span class="at">color=</span><span class="st">"plum"</span>,       <span class="at">shape=</span><span class="st">"diamond"</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb36-40"><a href="#cb36-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visEdges</span>(<span class="at">color=</span><span class="st">"gray"</span>, <span class="at">smooth=</span><span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb36-41"><a href="#cb36-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visOptions</span>(</span>
+<span id="cb36-42"><a href="#cb36-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">highlightNearest=</span><span class="fu">list</span>(<span class="at">enabled=</span><span class="cn">TRUE</span>, <span class="at">degree=</span><span class="dv">1</span>, <span class="at">hover=</span><span class="cn">TRUE</span>),</span>
+<span id="cb36-43"><a href="#cb36-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">nodesIdSelection=</span><span class="cn">TRUE</span></span>
+<span id="cb36-44"><a href="#cb36-44" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb36-45"><a href="#cb36-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visLegend</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb36-46"><a href="#cb36-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visLayout</span>(<span class="at">randomSeed=</span><span class="dv">123</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="timeline-of-key-events-involving-nadia-conti" class="level2">
+<h2 class="anchored" data-anchor-id="timeline-of-key-events-involving-nadia-conti">8 Timeline of Key Events Involving Nadia Conti</h2>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-8-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-1" role="tab" aria-controls="tabset-8-1" aria-selected="true">The plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-8-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-2" role="tab" aria-controls="tabset-8-2" aria-selected="false">The code</a></li></ul>
+<div class="tab-content">
+<div id="tabset-8-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-8-1-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="TakeHome_Ex02_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="1344"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-8-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>nadia_id <span class="ot">&lt;-</span> mc3_nodes_final <span class="sc">%&gt;%</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(name <span class="sc">==</span> <span class="st">"Nadia Conti"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(new_index)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>edges_involving_nadia <span class="ot">&lt;-</span> mc3_edges_final <span class="sc">%&gt;%</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(from <span class="sc">==</span> nadia_id <span class="sc">|</span> to <span class="sc">==</span> nadia_id)</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>nadia_event_indices <span class="ot">&lt;-</span> edges_involving_nadia <span class="sc">%&gt;%</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">event_index =</span> <span class="fu">if_else</span>(from <span class="sc">==</span> nadia_id, to, from)) <span class="sc">%&gt;%</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(event_index) <span class="sc">%&gt;%</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(event_index)</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>nadia_events <span class="ot">&lt;-</span> mc3_nodes_final <span class="sc">%&gt;%</span></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(nadia_event_indices) <span class="sc">%&gt;%</span></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(type <span class="sc">==</span> <span class="st">"Event"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">timestamp =</span> <span class="fu">ymd_hms</span>(timestamp)) <span class="sc">%&gt;%</span></span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(timestamp)</span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>get_partner_name <span class="ot">&lt;-</span> <span class="cf">function</span>(event_index) {</span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>  edges <span class="ot">&lt;-</span> mc3_edges_final <span class="sc">%&gt;%</span></span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>((from <span class="sc">==</span> event_index <span class="sc">&amp;</span> to <span class="sc">!=</span> nadia_id) <span class="sc">|</span></span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>           (to <span class="sc">==</span> event_index <span class="sc">&amp;</span> from <span class="sc">!=</span> nadia_id))</span>
+<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>  partners_idx <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">c</span>(edges<span class="sc">$</span>from, edges<span class="sc">$</span>to))</span>
+<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a>  partners_idx <span class="ot">&lt;-</span> partners_idx[partners_idx <span class="sc">!=</span> nadia_id <span class="sc">&amp;</span> partners_idx <span class="sc">!=</span> event_index]</span>
+<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">length</span>(partners_idx) <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">return</span>(<span class="cn">NA</span>)</span>
+<span id="cb37-26"><a href="#cb37-26" aria-hidden="true" tabindex="-1"></a>  partners <span class="ot">&lt;-</span> mc3_nodes_final <span class="sc">%&gt;%</span></span>
+<span id="cb37-27"><a href="#cb37-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(new_index <span class="sc">%in%</span> partners_idx, type <span class="sc">==</span> <span class="st">"Entity"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-28"><a href="#cb37-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">priority =</span> <span class="fu">case_when</span>(</span>
+<span id="cb37-29"><a href="#cb37-29" aria-hidden="true" tabindex="-1"></a>      sub_type <span class="sc">==</span> <span class="st">"Person"</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb37-30"><a href="#cb37-30" aria-hidden="true" tabindex="-1"></a>      sub_type <span class="sc">==</span> <span class="st">"Organization"</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
+<span id="cb37-31"><a href="#cb37-31" aria-hidden="true" tabindex="-1"></a>      sub_type <span class="sc">==</span> <span class="st">"Group"</span> <span class="sc">~</span> <span class="dv">3</span>,</span>
+<span id="cb37-32"><a href="#cb37-32" aria-hidden="true" tabindex="-1"></a>      sub_type <span class="sc">==</span> <span class="st">"Vessel"</span> <span class="sc">~</span> <span class="dv">4</span>,</span>
+<span id="cb37-33"><a href="#cb37-33" aria-hidden="true" tabindex="-1"></a>      sub_type <span class="sc">==</span> <span class="st">"Location"</span> <span class="sc">~</span> <span class="dv">5</span>,</span>
+<span id="cb37-34"><a href="#cb37-34" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">6</span></span>
+<span id="cb37-35"><a href="#cb37-35" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">%&gt;%</span></span>
+<span id="cb37-36"><a href="#cb37-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(priority)</span>
+<span id="cb37-37"><a href="#cb37-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(partners<span class="sc">$</span>name[<span class="dv">1</span>])</span>
+<span id="cb37-38"><a href="#cb37-38" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb37-39"><a href="#cb37-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-40"><a href="#cb37-40" aria-hidden="true" tabindex="-1"></a>nadia_events <span class="ot">&lt;-</span> nadia_events <span class="sc">%&gt;%</span></span>
+<span id="cb37-41"><a href="#cb37-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb37-42"><a href="#cb37-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb37-43"><a href="#cb37-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">partner =</span> <span class="fu">get_partner_name</span>(new_index),</span>
+<span id="cb37-44"><a href="#cb37-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">inferred =</span> {</span>
+<span id="cb37-45"><a href="#cb37-45" aria-hidden="true" tabindex="-1"></a>      any_edge <span class="ot">&lt;-</span> edges_involving_nadia <span class="sc">%&gt;%</span></span>
+<span id="cb37-46"><a href="#cb37-46" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>((from <span class="sc">==</span> nadia_id <span class="sc">&amp;</span> to <span class="sc">==</span> new_index) <span class="sc">|</span></span>
+<span id="cb37-47"><a href="#cb37-47" aria-hidden="true" tabindex="-1"></a>               (to <span class="sc">==</span> nadia_id <span class="sc">&amp;</span> from <span class="sc">==</span> new_index))</span>
+<span id="cb37-48"><a href="#cb37-48" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">nrow</span>(any_edge) <span class="sc">&gt;</span> <span class="dv">0</span>) any_edge<span class="sc">$</span>is_inferred[<span class="dv">1</span>] <span class="cf">else</span> <span class="cn">FALSE</span></span>
+<span id="cb37-49"><a href="#cb37-49" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb37-50"><a href="#cb37-50" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb37-51"><a href="#cb37-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb37-52"><a href="#cb37-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-53"><a href="#cb37-53" aria-hidden="true" tabindex="-1"></a>nadia_events <span class="ot">&lt;-</span> nadia_events <span class="sc">%&gt;%</span></span>
+<span id="cb37-54"><a href="#cb37-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_row</span>(</span>
+<span id="cb37-55"><a href="#cb37-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">id =</span> <span class="st">"Rel_AccessPermit_NemoReef"</span>, </span>
+<span id="cb37-56"><a href="#cb37-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">timestamp =</span> <span class="fu">ymd_hms</span>(<span class="st">"2040-10-05 00:00:00"</span>),</span>
+<span id="cb37-57"><a href="#cb37-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">sub_type =</span> <span class="st">"AccessPermission"</span>, </span>
+<span id="cb37-58"><a href="#cb37-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="cn">NA</span>, <span class="at">content =</span> <span class="cn">NA</span>, <span class="at">partner =</span> <span class="st">"Nemo Reef"</span>, <span class="at">inferred =</span> <span class="cn">TRUE</span></span>
+<span id="cb37-59"><a href="#cb37-59" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb37-60"><a href="#cb37-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_row</span>(</span>
+<span id="cb37-61"><a href="#cb37-61" aria-hidden="true" tabindex="-1"></a>    <span class="at">id =</span> <span class="st">"Rel_Payment_Elise"</span>, </span>
+<span id="cb37-62"><a href="#cb37-62" aria-hidden="true" tabindex="-1"></a>    <span class="at">timestamp =</span> <span class="fu">ymd_hms</span>(<span class="st">"2040-10-10 05:00:00"</span>),</span>
+<span id="cb37-63"><a href="#cb37-63" aria-hidden="true" tabindex="-1"></a>    <span class="at">sub_type =</span> <span class="st">"Payment"</span>, </span>
+<span id="cb37-64"><a href="#cb37-64" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="cn">NA</span>, <span class="at">content =</span> <span class="cn">NA</span>, <span class="at">partner =</span> <span class="st">"Elise"</span>, <span class="at">inferred =</span> <span class="cn">TRUE</span></span>
+<span id="cb37-65"><a href="#cb37-65" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb37-66"><a href="#cb37-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-67"><a href="#cb37-67" aria-hidden="true" tabindex="-1"></a>timeline_df <span class="ot">&lt;-</span> nadia_events <span class="sc">%&gt;%</span></span>
+<span id="cb37-68"><a href="#cb37-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb37-69"><a href="#cb37-69" aria-hidden="true" tabindex="-1"></a>    <span class="at">event_type =</span> <span class="fu">case_when</span>(</span>
+<span id="cb37-70"><a href="#cb37-70" aria-hidden="true" tabindex="-1"></a>      sub_type <span class="sc">==</span> <span class="st">"AccessPermission"</span> <span class="sc">~</span> <span class="st">"AccessPermission"</span>,</span>
+<span id="cb37-71"><a href="#cb37-71" aria-hidden="true" tabindex="-1"></a>      sub_type <span class="sc">==</span> <span class="st">"Payment"</span> <span class="sc">~</span> <span class="st">"Payment"</span>,</span>
+<span id="cb37-72"><a href="#cb37-72" aria-hidden="true" tabindex="-1"></a>      sub_type <span class="sc">==</span> <span class="st">"Communication"</span> <span class="sc">&amp;</span> <span class="fu">str_detect</span>(content <span class="sc">%||%</span> <span class="st">""</span>, <span class="fu">regex</span>(<span class="st">"Double .* fee"</span>, <span class="at">ignore_case=</span><span class="cn">TRUE</span>)) <span class="sc">~</span> <span class="st">"Bribery"</span>,</span>
+<span id="cb37-73"><a href="#cb37-73" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> sub_type</span>
+<span id="cb37-74"><a href="#cb37-74" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb37-75"><a href="#cb37-75" aria-hidden="true" tabindex="-1"></a>    <span class="at">event_type =</span> <span class="fu">if_else</span>(event_type <span class="sc">==</span> <span class="st">"Collaborate"</span>, <span class="st">"Coordination"</span>, event_type),</span>
+<span id="cb37-76"><a href="#cb37-76" aria-hidden="true" tabindex="-1"></a>    <span class="at">confirmed_flag =</span> <span class="fu">if_else</span>(event_type <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"AccessPermission"</span>,<span class="st">"Bribery"</span>,<span class="st">"Payment"</span>), </span>
+<span id="cb37-77"><a href="#cb37-77" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"Confirmed Illegal"</span>, <span class="st">"Inferred/Suspicious"</span>),</span>
+<span id="cb37-78"><a href="#cb37-78" aria-hidden="true" tabindex="-1"></a>    <span class="at">label_text =</span> partner</span>
+<span id="cb37-79"><a href="#cb37-79" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb37-80"><a href="#cb37-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-81"><a href="#cb37-81" aria-hidden="true" tabindex="-1"></a><span class="co">#Plot</span></span>
+<span id="cb37-82"><a href="#cb37-82" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(timeline_df, <span class="fu">aes</span>(<span class="at">x =</span> timestamp, <span class="at">y =</span> event_type)) <span class="sc">+</span></span>
+<span id="cb37-83"><a href="#cb37-83" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"rect"</span>, <span class="at">xmin =</span> <span class="fu">as.POSIXct</span>(<span class="st">"2040-10-05"</span>), <span class="at">xmax =</span> <span class="fu">as.POSIXct</span>(<span class="st">"2040-10-13"</span>),</span>
+<span id="cb37-84"><a href="#cb37-84" aria-hidden="true" tabindex="-1"></a>           <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>, <span class="at">ymax =</span> <span class="cn">Inf</span>, <span class="at">fill =</span> <span class="st">"gray90"</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb37-85"><a href="#cb37-85" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> event_type, <span class="at">shape =</span> confirmed_flag), <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb37-86"><a href="#cb37-86" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text_repel</span>(</span>
+<span id="cb37-87"><a href="#cb37-87" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> label_text, <span class="at">color =</span> event_type),</span>
+<span id="cb37-88"><a href="#cb37-88" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">3.4</span>, <span class="at">box.padding =</span> <span class="fl">0.4</span>, <span class="at">max.overlaps =</span> <span class="dv">30</span>,</span>
+<span id="cb37-89"><a href="#cb37-89" aria-hidden="true" tabindex="-1"></a>    <span class="at">segment.color =</span> <span class="st">"gray70"</span>, <span class="at">segment.size =</span> <span class="fl">0.3</span>,</span>
+<span id="cb37-90"><a href="#cb37-90" aria-hidden="true" tabindex="-1"></a>    <span class="at">min.segment.length =</span> <span class="dv">0</span>, <span class="at">force =</span> <span class="fl">3.5</span></span>
+<span id="cb37-91"><a href="#cb37-91" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb37-92"><a href="#cb37-92" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb37-93"><a href="#cb37-93" aria-hidden="true" tabindex="-1"></a>    <span class="st">"AccessPermission"</span> <span class="ot">=</span> <span class="st">"#d73027"</span>,</span>
+<span id="cb37-94"><a href="#cb37-94" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Bribery"</span>          <span class="ot">=</span> <span class="st">"#e69138"</span>,</span>
+<span id="cb37-95"><a href="#cb37-95" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Payment"</span>          <span class="ot">=</span> <span class="st">"#88419d"</span>,</span>
+<span id="cb37-96"><a href="#cb37-96" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Communication"</span>    <span class="ot">=</span> <span class="st">"#2c7bb6"</span>,</span>
+<span id="cb37-97"><a href="#cb37-97" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Coordination"</span>     <span class="ot">=</span> <span class="st">"#1a9850"</span></span>
+<span id="cb37-98"><a href="#cb37-98" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
+<span id="cb37-99"><a href="#cb37-99" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Confirmed Illegal"</span> <span class="ot">=</span> <span class="dv">17</span>, <span class="st">"Inferred/Suspicious"</span> <span class="ot">=</span> <span class="dv">16</span>)) <span class="sc">+</span></span>
+<span id="cb37-100"><a href="#cb37-100" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb37-101"><a href="#cb37-101" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Timeline of Events Involving Nadia Conti (Oct 2040)"</span>,</span>
+<span id="cb37-102"><a href="#cb37-102" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Date/Time"</span>, <span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb37-103"><a href="#cb37-103" aria-hidden="true" tabindex="-1"></a>    <span class="at">shape =</span> <span class="st">"Event Category"</span></span>
+<span id="cb37-104"><a href="#cb37-104" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb37-105"><a href="#cb37-105" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb37-106"><a href="#cb37-106" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb37-107"><a href="#cb37-107" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.y =</span> <span class="fu">element_line</span>(<span class="at">color =</span> <span class="st">"gray90"</span>),</span>
+<span id="cb37-108"><a href="#cb37-108" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb37-109"><a href="#cb37-109" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>),</span>
+<span id="cb37-110"><a href="#cb37-110" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>),</span>
+<span id="cb37-111"><a href="#cb37-111" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb37-112"><a href="#cb37-112" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.box =</span> <span class="st">"horizontal"</span>,</span>
+<span id="cb37-113"><a href="#cb37-113" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title.align =</span> <span class="fl">0.5</span></span>
+<span id="cb37-114"><a href="#cb37-114" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb37-115"><a href="#cb37-115" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(</span>
+<span id="cb37-116"><a href="#cb37-116" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"none"</span>, </span>
+<span id="cb37-117"><a href="#cb37-117" aria-hidden="true" tabindex="-1"></a>    <span class="at">shape =</span> <span class="fu">guide_legend</span>(<span class="at">title.position =</span> <span class="st">"top"</span>, <span class="at">title.hjust =</span> <span class="fl">0.5</span>, <span class="at">nrow =</span> <span class="dv">1</span>)</span>
+<span id="cb37-118"><a href="#cb37-118" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<p>Insight:</p>
+<p>The timeline highlights both confirmed illegal actions and inferred or suspicious interactions based on edge and node attributes linked to Nadia’s two-hop ego network. The visual categorizes the events on the y-axis by type—AccessPermission, Bribery, Communication, Coordination, and Payment—and plots them chronologically along the x-axis spanning from October 5 to October 14, 2040.</p>
+<p>Confirmed illegal events are denoted by triangle-shaped points, while inferred or suspicious activities are shown as dots. The color of each point corresponds to the type of event. Notably, on October 5, the timeline displays a red triangle for “Nemo Reef,” representing Nadia’s unauthorized granting of a special access permit to the location. This event is a pivotal starting point of the illegal operation, as reconstructed through surrounding relationship and communication data. On October 9, an orange triangle labeled “Liam Thorne” reflects a confirmed bribery act, inferred from intercepted communication suggesting illicit payment arrangements. Another significant illegal activity is a purple triangle labeled “Elise” on October 10, which denotes a payment transaction believed to support the logistics of the reef exploitation.</p>
+<p>Throughout the timeline, there is a dense cluster of blue communication events, all linked to various individuals and entities such as Davis, Elise, Neptune, V. Miesel Shipping, and Oceanus City Council. These communications, although not all individually confirmed as illegal, collectively illustrate a network of frequent contact and coordination—suggesting the existence of a highly active and synchronized operation. Davis appears multiple times across different event types, highlighting his central role as both a recipient of communications and a participant in coordination efforts.</p>
+<p>Additional green points on October 9 and 14, labeled “Davis,” represent coordination events that likely indicate planning or cover-up activities following the initial illegal exploitation. These events, while marked as inferred, align closely with the sequence of confirmed acts and underscore the strategic timing of operational logistics.</p>
+<p>The timeline reveals a clear temporal structure and escalation pattern in Nadia’s actions—from initiation, through execution, to coordination—cementing her role as the central orchestrator of a multi-entity illegal conspiracy. The timeline not only validates the known events but also uncovers patterns of engagement that can support further investigation or legal scrutiny.</p>
+<section id="interactive-timeline-of-nadia-contis-activities" class="level3">
+<h3 class="anchored" data-anchor-id="interactive-timeline-of-nadia-contis-activities">Interactive Timeline of Nadia Conti’s Activities</h3>
+<p>The interactive timeline includes hoverable tooltips that display detailed metadata for each event—including the event type, partner name, confirmation status, exact timestamp, and the associated evidence text.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-9-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-1" role="tab" aria-controls="tabset-9-1" aria-selected="true">The plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-9-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-2" role="tab" aria-controls="tabset-9-2" aria-selected="false">The code</a></li></ul>
+<div class="tab-content">
+<div id="tabset-9-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-9-1-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-6144dd959cb6ee35444c" style="width:100%;height:742px;"></div>
+<script type="application/json" data-for="htmlwidget-6144dd959cb6ee35444c">{"x":{"visdat":{"2a4c26fc14b2":["function () ","plotlyVisDat"]},"cur_data":"2a4c26fc14b2","attrs":{"2a4c26fc14b2":{"x":{},"y":{},"mode":"markers+text","text":{},"textposition":{},"hovertext":{},"marker":{"size":11},"hoverinfo":"text","textfont":{"size":12},"showlegend":false,"color":{},"symbol":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"symbols":["circle","triangle-up"],"type":"scatter"}},"layout":{"margin":{"b":40,"l":60,"t":100,"r":10},"title":{"text":"Interactive Timeline of Nadia Conti’s Activities","y":0.94999999999999996},"xaxis":{"domain":[0,1],"automargin":true,"title":"Date/Time"},"yaxis":{"domain":[0,1],"automargin":true,"title":"","tickmode":"array","tickvals":[1,2,3,4,5],"ticktext":["AccessPermission","Bribery","Communication","Coordination","Payment"],"range":[0.5,5.5]},"hoverlabel":{"align":"left"},"hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":["2040-10-05 09:44:00.000000","2040-10-05 09:45:00.000000","2040-10-05 09:48:00.000000","2040-10-05 09:49:00.000000","2040-10-07 11:57:00.000000","2040-10-07 12:00:00.000000","2040-10-08 08:15:00.000000","2040-10-08 08:24:00.000000","2040-10-08 08:25:00.000000","2040-10-08 08:27:00.000000","2040-10-08 08:30:00.000000","2040-10-08 11:21:00.000000","2040-10-08 11:23:00.000000","2040-10-08 11:26:00.000000","2040-10-08 19:00:00.000000","2040-10-09 08:54:00.000000","2040-10-10 10:45:00.000000","2040-10-10 12:30:00.000000","2040-10-11 09:20:00.000000","2040-10-12 08:44:00.000000","2040-10-12 09:24:00.000000","2040-10-12 11:14:00.000000","2040-10-12 11:17:00.000000","2040-10-12 11:19:00.000000","2040-10-13 08:21:00.000000","2040-10-14 08:34:00.000000","2040-10-14 09:00:00.000000"],"y":[2.8199999999999998,2.9399999999999999,3.0600000000000001,3.1800000000000002,3,3,2.7599999999999998,2.8799999999999999,3,3.1200000000000001,3.2400000000000002,2.8799999999999999,3,3.1200000000000001,4,3,3,3,3,3,3,2.8799999999999999,3,3.1200000000000001,3,3,4],"mode":"markers+text","text":["","","","","","","","","","","","","","","Davis","","","","","","","","","","","","Davis"],"textposition":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,"top center",null,null,null,null,null,null,null,null,null,null,null,"top center"],"hovertext":["<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Haacklee Harbor<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-05 09:44<br><b>Evidence:<\/b> Haacklee Harbor to Nadia Conti. Following your visit yesterday regarding the<br>Nemo Reef event logistics, we've prepared the necessary documentation. Harbor<br>staff is ready to facilitate the special access corridor arrangements as<br>discussed. Please confirm timeline for implementation.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Haacklee Harbor<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-05 09:45<br><b>Evidence:<\/b> Haacklee Harbor, this is Nadia Conti. I need to cancel the special access<br>corridor arrangements for Nemo Reef immediately. Plans have changed due to<br>unforeseen circumstances. Destroy all related documentation. I'll contact you<br>when we're ready to proceed with alternative locations.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Oceanus City Council<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-05 09:48<br><b>Evidence:<\/b> Ms. Conti, this is Oceanus City Council. We need clarification regarding your<br>canceled Nemo Reef event arrangements at Haacklee Harbor. Please explain your<br>documentation destruction request immediately. This relates to our newly<br>expedited permit approvals.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Oceanus City Council<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-05 09:49<br><b>Evidence:<\/b> This is Nadia Conti. My cancellation was due to scheduling conflicts with our<br>tourism development initiatives. I wasn't aware of any permit approvals. I'll<br>submit revised documentation for alternative sustainable tourism proposals next<br>week.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Sailor Shifts Team<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-07 11:57<br><b>Evidence:<\/b> Hi Nadia, this is the Sailor Shifts Team. Received your message about permit<br>assistance - thank you! We urgently need to discuss tomorrow's staffing<br>requirements. Can you confirm how many additional crew members we should bring<br>for the setup?","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Davis<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-07 12:00<br><b>Evidence:<\/b> Davis, Nadia here. Let's meet at 7PM at the marina office to review<br>documentation. I've been working with alternative channels for permits. Bring<br>all shipping manifests - we'll need to create a clean paper trail immediately.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Elise<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-08 08:15<br><b>Evidence:<\/b> Nadia, Elise here. Meeting at Nemo Reef 0500 tomorrow to establish payment<br>protocols. Sam uncovered V. Miesel shipping lanes overlapping with Mako by 40%.<br>Neptune mentioned 'underwater foundation work' - outside our original scope.<br>Need your assessment.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Liam Thorne<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-08 08:24<br><b>Evidence:<\/b> Nadia, Liam here. Meeting confirmed for tomorrow at 10PM. I've redirected<br>Harbor Master's attention and implemented new patrol schedules that work in our<br>favor. Council suspects nothing about Nemo Reef. Bring payment as discussed.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Neptune<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-08 08:25<br><b>Evidence:<\/b> Neptune, this is Nadia. Need clarity on 'underwater foundation work' at Nemo<br>Reef. This extends beyond our agreed scope. Meet me at the marina tomorrow at<br>6AM to discuss implications and additional resource requirements.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Neptune<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-08 08:27<br><b>Evidence:<\/b> Neptune to Nadia. I'm aware of the foundation work concerns. We're delivering<br>the additional heavy equipment today as requested. Will meet you at 0600 as<br>planned to discuss resource adjustments and review modified equipment<br>specifications that Elise has approved funding for.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Neptune<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-08 08:30<br><b>Evidence:<\/b> Neptune, Nadia here. Just confirming our 0600 meeting at the marina. I've<br>reviewed the modified equipment specs with The Accountant. Please bring<br>detailed timeline for foundation work and cost implications. We need to stay<br>under radar.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Davis<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-08 11:21<br><b>Evidence:<\/b> Nadia, Davis here. I'll be at the marina office at 7PM with all shipping<br>manifests. Could you bring copies of permit #CR-7844? Marlin's asking about<br>unusual vessel routes near eastern shoals - might need to address this.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Marlin<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-08 11:23<br><b>Evidence:<\/b> Marlin, Nadia here. I understand you're inquiring about eastern shoal routes.<br>Those are temporary diversions due to equipment transport needs. I'll have<br>Davis provide the necessary documentation tonight. Nothing to be concerned<br>about.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Davis<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-08 11:26<br><b>Evidence:<\/b> Davis, Marlin here again. Nadia mentioned you'd provide documentation about<br>those eastern shoal diversions tonight. Just checking if that's still coming<br>through. Need to understand these new patterns while my vessel's being<br>repaired.","<b>Event Type:<\/b> Coordination<br><b>Partner:<\/b> Davis<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-08 19:00<br>","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Elise<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-09 08:54<br><b>Evidence:<\/b> Nadia, Elise here. Situation escalating. Permanent underwater construction<br>confirmed at Nemo Reef. Sam reports concrete forms suggesting structures beyond<br>equipment installation. Need urgent clarification on real scope and V. Miesel's<br>involvement before tomorrow's meeting. Prepare contingencies.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Sentinel<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-10 10:45<br><b>Evidence:<\/b> Nadia, Sentinel here. Have you received any scientific data supporting the Nemo<br>Reef closure? Our water quality tests show normal parameters. City Council<br>claims reports are with Maritime Authority, but I suspect potential ulterior<br>motives.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Elise<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-10 12:30<br><b>Evidence:<\/b> Nadia, Elise here. Meeting confirmed for 0500 at Nemo Reef. Sam's evidence<br>shows clear V. Miesel connection to permanent structures. Conservation vessels<br>increasing surveillance - could complicate our operation. Bring alternate<br>financial channels in case we need quick adaptation.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Liam Thorne<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-11 09:20<br><b>Evidence:<\/b> Nadia, Liam here. EcoVigil is questioning the ROV delay. I've redirected them<br>to the northern quadrant, but they're suspicious about the southwest. We need<br>to clean up operations there immediately. What's our contingency plan?","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Liam Thorne<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-12 08:44<br><b>Evidence:<\/b> Liam, Nadia here. Redirect all remaining operations from southwest immediately.<br>Move equipment to our secondary location. I'll handle EcoVigil through proper<br>channels. Meet me at the usual place at 2100 hours with updated documentation.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Rodriguez<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-12 09:24<br><b>Evidence:<\/b> Rodriguez, Davis here. Maintain current position with Mako at Nemo Reef.<br>Security team arriving at 0600. Continue operating under permit #CR-7844 and<br>keep tourism appearance. I'll update after meeting with Nadia tonight.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Davis<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-12 11:14<br><b>Evidence:<\/b> Davis here to V. Miesel Shipping. Crew reallocation from Remora to Neptune<br>underway as requested. Will maintain confidentiality regarding permit #CR-7844.<br>Security team arrives 0600 tomorrow. Meeting Nadia tonight to finalize<br>documentation.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> V. Miesel Shipping<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-12 11:17<br><b>Evidence:<\/b> V. Miesel HQ to Nadia. Need your immediate confirmation that all documentation<br>for permit #CR-7844 is finalized before tomorrow's 0600 Nemo Reef closure.<br>Davis mentioned meeting you tonight. Any complications we should be aware of?","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> V. Miesel Shipping<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-12 11:19<br><b>Evidence:<\/b> This is Nadia. Documentation for permit #CR-7844 is complete. Meeting The<br>Middleman at 2100 to handle final details. Recommend accelerating timeline due<br>to EcoVigil's ROV approval. Shifting operations from southwest immediately.<br>Will update after meeting.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Davis<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-13 08:21<br><b>Evidence:<\/b> Davis, Nadia here. Need you to verify final equipment transport tonight at Nemo<br>Reef. The Middleman reports increased surveillance. Ensure all operations<br>follow encrypted protocols. Meet me at V. Miesel HQ tomorrow at 0900 to discuss<br>contingency plans.","<b>Event Type:<\/b> Communication<br><b>Partner:<\/b> Remora<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-14 08:34<br><b>Evidence:<\/b> Nadia, Remora vessel reporting. All preparations for Sailor Shifts complete at<br>south dock. Delta-3 protocols active, tourism facade maintained. Conservation<br>vessels being monitored. Need final approval for underwater lighting placement<br>at Nemo Reef.","<b>Event Type:<\/b> Coordination<br><b>Partner:<\/b> Davis<br><b>Confirmed:<\/b> Inferred/Suspicious<br><b>Timestamp:<\/b> 2040-10-14 09:00<br>"],"marker":{"color":["rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(26,152,80,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(26,152,80,1)"],"symbol":"circle","size":11,"line":{"color":["rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(26,152,80,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(26,152,80,1)"]}},"hoverinfo":["text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text"],"textfont":{"color":["rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(26,152,80,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(44,123,182,1)","rgba(26,152,80,1)"],"size":12},"showlegend":false,"type":"scatter","name":"circle","xaxis":"x","yaxis":"y","frame":null},{"x":["2040-10-08 08:18:00.000000","2040-10-05 00:00:00.000000","2040-10-10 05:00:00.000000"],"y":[2,1,5],"mode":"markers+text","text":["Liam Thorne","Nemo Reef","Elise"],"textposition":["top center","top center","top center"],"hovertext":["<b>Event Type:<\/b> Bribery<br><b>Partner:<\/b> Liam Thorne<br><b>Confirmed:<\/b> Confirmed Illegal<br><b>Timestamp:<\/b> 2040-10-08 08:18<br><b>Evidence:<\/b> Liam, Nadia here. Need your services urgently. Investigation brewing around<br>Nemo Reef permits. Double your usual fee if you can ensure Harbor Master<br>remains cooperative through next week. Meet at the usual place tomorrow, 10PM.","<b>Event Type:<\/b> AccessPermission<br><b>Partner:<\/b> Nemo Reef<br><b>Confirmed:<\/b> Confirmed Illegal<br><b>Timestamp:<\/b> 2040-10-05 00:00<br><b>Evidence:<\/b> Special permit granted to Nemo Reef outside formal review process","<b>Event Type:<\/b> Payment<br><b>Partner:<\/b> Elise<br><b>Confirmed:<\/b> Confirmed Illegal<br><b>Timestamp:<\/b> 2040-10-10 05:00<br><b>Evidence:<\/b> Covert funding for illegal reef operation provided by Elise"],"marker":{"color":["rgba(230,145,56,1)","rgba(215,48,39,1)","rgba(136,65,157,1)"],"symbol":"triangle-up","size":11,"line":{"color":["rgba(230,145,56,1)","rgba(215,48,39,1)","rgba(136,65,157,1)"]}},"hoverinfo":["text","text","text"],"textfont":{"color":["rgba(230,145,56,1)","rgba(215,48,39,1)","rgba(136,65,157,1)"],"size":12},"showlegend":false,"type":"scatter","name":"triangle-up","xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+<div id="tabset-9-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-9-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>nadia_id <span class="ot">&lt;-</span> mc3_nodes_final <span class="sc">%&gt;%</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(name <span class="sc">==</span> <span class="st">"Nadia Conti"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(new_index)</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>edges_involving_nadia <span class="ot">&lt;-</span> mc3_edges_final <span class="sc">%&gt;%</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(from <span class="sc">==</span> nadia_id <span class="sc">|</span> to <span class="sc">==</span> nadia_id)</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>nadia_event_indices <span class="ot">&lt;-</span> edges_involving_nadia <span class="sc">%&gt;%</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">event_index =</span> <span class="fu">if_else</span>(from <span class="sc">==</span> nadia_id, to, from)) <span class="sc">%&gt;%</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(event_index) <span class="sc">%&gt;%</span></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(event_index)</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>nadia_events <span class="ot">&lt;-</span> mc3_nodes_final <span class="sc">%&gt;%</span></span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(nadia_event_indices) <span class="sc">%&gt;%</span></span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(type <span class="sc">==</span> <span class="st">"Event"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">timestamp =</span> <span class="fu">ymd_hms</span>(timestamp)) <span class="sc">%&gt;%</span></span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(timestamp)</span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>get_partner_name <span class="ot">&lt;-</span> <span class="cf">function</span>(event_index) {</span>
+<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a>  edges <span class="ot">&lt;-</span> mc3_edges_final <span class="sc">%&gt;%</span></span>
+<span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>((from <span class="sc">==</span> event_index <span class="sc">&amp;</span> to <span class="sc">!=</span> nadia_id) <span class="sc">|</span></span>
+<span id="cb38-22"><a href="#cb38-22" aria-hidden="true" tabindex="-1"></a>           (to <span class="sc">==</span> event_index <span class="sc">&amp;</span> from <span class="sc">!=</span> nadia_id))</span>
+<span id="cb38-23"><a href="#cb38-23" aria-hidden="true" tabindex="-1"></a>  partners_idx <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">c</span>(edges<span class="sc">$</span>from, edges<span class="sc">$</span>to))</span>
+<span id="cb38-24"><a href="#cb38-24" aria-hidden="true" tabindex="-1"></a>  partners_idx <span class="ot">&lt;-</span> partners_idx[partners_idx <span class="sc">!=</span> nadia_id <span class="sc">&amp;</span> partners_idx <span class="sc">!=</span> event_index]</span>
+<span id="cb38-25"><a href="#cb38-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">length</span>(partners_idx) <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">return</span>(<span class="cn">NA</span>)</span>
+<span id="cb38-26"><a href="#cb38-26" aria-hidden="true" tabindex="-1"></a>  partners <span class="ot">&lt;-</span> mc3_nodes_final <span class="sc">%&gt;%</span></span>
+<span id="cb38-27"><a href="#cb38-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(new_index <span class="sc">%in%</span> partners_idx, type <span class="sc">==</span> <span class="st">"Entity"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb38-28"><a href="#cb38-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">priority =</span> <span class="fu">case_when</span>(</span>
+<span id="cb38-29"><a href="#cb38-29" aria-hidden="true" tabindex="-1"></a>      sub_type <span class="sc">==</span> <span class="st">"Person"</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb38-30"><a href="#cb38-30" aria-hidden="true" tabindex="-1"></a>      sub_type <span class="sc">==</span> <span class="st">"Organization"</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
+<span id="cb38-31"><a href="#cb38-31" aria-hidden="true" tabindex="-1"></a>      sub_type <span class="sc">==</span> <span class="st">"Group"</span> <span class="sc">~</span> <span class="dv">3</span>,</span>
+<span id="cb38-32"><a href="#cb38-32" aria-hidden="true" tabindex="-1"></a>      sub_type <span class="sc">==</span> <span class="st">"Vessel"</span> <span class="sc">~</span> <span class="dv">4</span>,</span>
+<span id="cb38-33"><a href="#cb38-33" aria-hidden="true" tabindex="-1"></a>      sub_type <span class="sc">==</span> <span class="st">"Location"</span> <span class="sc">~</span> <span class="dv">5</span>,</span>
+<span id="cb38-34"><a href="#cb38-34" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">6</span></span>
+<span id="cb38-35"><a href="#cb38-35" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">%&gt;%</span></span>
+<span id="cb38-36"><a href="#cb38-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(priority)</span>
+<span id="cb38-37"><a href="#cb38-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(partners<span class="sc">$</span>name[<span class="dv">1</span>])</span>
+<span id="cb38-38"><a href="#cb38-38" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-39"><a href="#cb38-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-40"><a href="#cb38-40" aria-hidden="true" tabindex="-1"></a>nadia_events <span class="ot">&lt;-</span> nadia_events <span class="sc">%&gt;%</span></span>
+<span id="cb38-41"><a href="#cb38-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb38-42"><a href="#cb38-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb38-43"><a href="#cb38-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">partner =</span> <span class="fu">get_partner_name</span>(new_index),</span>
+<span id="cb38-44"><a href="#cb38-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">inferred =</span> {</span>
+<span id="cb38-45"><a href="#cb38-45" aria-hidden="true" tabindex="-1"></a>      any_edge <span class="ot">&lt;-</span> edges_involving_nadia <span class="sc">%&gt;%</span></span>
+<span id="cb38-46"><a href="#cb38-46" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>((from <span class="sc">==</span> nadia_id <span class="sc">&amp;</span> to <span class="sc">==</span> new_index) <span class="sc">|</span></span>
+<span id="cb38-47"><a href="#cb38-47" aria-hidden="true" tabindex="-1"></a>               (to <span class="sc">==</span> nadia_id <span class="sc">&amp;</span> from <span class="sc">==</span> new_index))</span>
+<span id="cb38-48"><a href="#cb38-48" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">nrow</span>(any_edge) <span class="sc">&gt;</span> <span class="dv">0</span>) any_edge<span class="sc">$</span>is_inferred[<span class="dv">1</span>] <span class="cf">else</span> <span class="cn">FALSE</span></span>
+<span id="cb38-49"><a href="#cb38-49" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb38-50"><a href="#cb38-50" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb38-51"><a href="#cb38-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb38-52"><a href="#cb38-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-53"><a href="#cb38-53" aria-hidden="true" tabindex="-1"></a>nadia_events <span class="ot">&lt;-</span> nadia_events <span class="sc">%&gt;%</span></span>
+<span id="cb38-54"><a href="#cb38-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_row</span>(</span>
+<span id="cb38-55"><a href="#cb38-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">id =</span> <span class="st">"Rel_AccessPermit_NemoReef"</span>, </span>
+<span id="cb38-56"><a href="#cb38-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">timestamp =</span> <span class="fu">ymd_hms</span>(<span class="st">"2040-10-05 00:00:00"</span>),</span>
+<span id="cb38-57"><a href="#cb38-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">sub_type =</span> <span class="st">"AccessPermission"</span>, </span>
+<span id="cb38-58"><a href="#cb38-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="cn">NA</span>, <span class="at">content =</span> <span class="st">"Special permit granted to Nemo Reef outside formal review process"</span>, </span>
+<span id="cb38-59"><a href="#cb38-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">partner =</span> <span class="st">"Nemo Reef"</span>, <span class="at">inferred =</span> <span class="cn">TRUE</span></span>
+<span id="cb38-60"><a href="#cb38-60" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb38-61"><a href="#cb38-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_row</span>(</span>
+<span id="cb38-62"><a href="#cb38-62" aria-hidden="true" tabindex="-1"></a>    <span class="at">id =</span> <span class="st">"Rel_Payment_Elise"</span>, </span>
+<span id="cb38-63"><a href="#cb38-63" aria-hidden="true" tabindex="-1"></a>    <span class="at">timestamp =</span> <span class="fu">ymd_hms</span>(<span class="st">"2040-10-10 05:00:00"</span>),</span>
+<span id="cb38-64"><a href="#cb38-64" aria-hidden="true" tabindex="-1"></a>    <span class="at">sub_type =</span> <span class="st">"Payment"</span>, </span>
+<span id="cb38-65"><a href="#cb38-65" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="cn">NA</span>, <span class="at">content =</span> <span class="st">"Covert funding for illegal reef operation provided by Elise"</span>, </span>
+<span id="cb38-66"><a href="#cb38-66" aria-hidden="true" tabindex="-1"></a>    <span class="at">partner =</span> <span class="st">"Elise"</span>, <span class="at">inferred =</span> <span class="cn">TRUE</span></span>
+<span id="cb38-67"><a href="#cb38-67" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb38-68"><a href="#cb38-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-69"><a href="#cb38-69" aria-hidden="true" tabindex="-1"></a>event_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb38-70"><a href="#cb38-70" aria-hidden="true" tabindex="-1"></a>  <span class="st">"AccessPermission"</span> <span class="ot">=</span> <span class="st">"#d73027"</span>,</span>
+<span id="cb38-71"><a href="#cb38-71" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Bribery"</span>          <span class="ot">=</span> <span class="st">"#e69138"</span>,</span>
+<span id="cb38-72"><a href="#cb38-72" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Payment"</span>          <span class="ot">=</span> <span class="st">"#88419d"</span>,</span>
+<span id="cb38-73"><a href="#cb38-73" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Communication"</span>    <span class="ot">=</span> <span class="st">"#2c7bb6"</span>,</span>
+<span id="cb38-74"><a href="#cb38-74" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Coordination"</span>     <span class="ot">=</span> <span class="st">"#1a9850"</span></span>
+<span id="cb38-75"><a href="#cb38-75" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb38-76"><a href="#cb38-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-77"><a href="#cb38-77" aria-hidden="true" tabindex="-1"></a>wrap_text <span class="ot">&lt;-</span> <span class="cf">function</span>(text, <span class="at">width =</span> <span class="dv">80</span>) {</span>
+<span id="cb38-78"><a href="#cb38-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sapply</span>(<span class="fu">strwrap</span>(text, <span class="at">width =</span> width, <span class="at">simplify =</span> <span class="cn">FALSE</span>), <span class="cf">function</span>(x) <span class="fu">paste</span>(x, <span class="at">collapse =</span> <span class="st">"&lt;br&gt;"</span>))</span>
+<span id="cb38-79"><a href="#cb38-79" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-80"><a href="#cb38-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-81"><a href="#cb38-81" aria-hidden="true" tabindex="-1"></a>event_levels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"AccessPermission"</span>, <span class="st">"Bribery"</span>, <span class="st">"Communication"</span>, <span class="st">"Coordination"</span>, <span class="st">"Payment"</span>)</span>
+<span id="cb38-82"><a href="#cb38-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-83"><a href="#cb38-83" aria-hidden="true" tabindex="-1"></a>timeline_df <span class="ot">&lt;-</span> nadia_events <span class="sc">%&gt;%</span></span>
+<span id="cb38-84"><a href="#cb38-84" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb38-85"><a href="#cb38-85" aria-hidden="true" tabindex="-1"></a>    <span class="at">event_type =</span> <span class="fu">case_when</span>(</span>
+<span id="cb38-86"><a href="#cb38-86" aria-hidden="true" tabindex="-1"></a>      sub_type <span class="sc">==</span> <span class="st">"AccessPermission"</span> <span class="sc">~</span> <span class="st">"AccessPermission"</span>,</span>
+<span id="cb38-87"><a href="#cb38-87" aria-hidden="true" tabindex="-1"></a>      sub_type <span class="sc">==</span> <span class="st">"Payment"</span> <span class="sc">~</span> <span class="st">"Payment"</span>,</span>
+<span id="cb38-88"><a href="#cb38-88" aria-hidden="true" tabindex="-1"></a>      sub_type <span class="sc">==</span> <span class="st">"Communication"</span> <span class="sc">&amp;</span> <span class="fu">str_detect</span>(content <span class="sc">%||%</span> <span class="st">""</span>, <span class="fu">regex</span>(<span class="st">"Double .* fee"</span>, <span class="at">ignore_case =</span> <span class="cn">TRUE</span>)) <span class="sc">~</span> <span class="st">"Bribery"</span>,</span>
+<span id="cb38-89"><a href="#cb38-89" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> sub_type</span>
+<span id="cb38-90"><a href="#cb38-90" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb38-91"><a href="#cb38-91" aria-hidden="true" tabindex="-1"></a>    <span class="at">event_type =</span> <span class="fu">if_else</span>(event_type <span class="sc">==</span> <span class="st">"Collaborate"</span>, <span class="st">"Coordination"</span>, event_type),</span>
+<span id="cb38-92"><a href="#cb38-92" aria-hidden="true" tabindex="-1"></a>    <span class="at">confirmed_flag =</span> <span class="fu">if_else</span>(event_type <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"AccessPermission"</span>, <span class="st">"Bribery"</span>, <span class="st">"Payment"</span>),</span>
+<span id="cb38-93"><a href="#cb38-93" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"Confirmed Illegal"</span>, <span class="st">"Inferred/Suspicious"</span>),</span>
+<span id="cb38-94"><a href="#cb38-94" aria-hidden="true" tabindex="-1"></a>    <span class="at">shape_code =</span> <span class="fu">if_else</span>(confirmed_flag <span class="sc">==</span> <span class="st">"Confirmed Illegal"</span>, <span class="st">"triangle-up"</span>, <span class="st">"circle"</span>),</span>
+<span id="cb38-95"><a href="#cb38-95" aria-hidden="true" tabindex="-1"></a>    <span class="at">color_code =</span> event_colors[event_type],</span>
+<span id="cb38-96"><a href="#cb38-96" aria-hidden="true" tabindex="-1"></a>    <span class="at">wrapped_evidence =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(content), <span class="fu">wrap_text</span>(content, <span class="dv">80</span>), <span class="st">""</span>),</span>
+<span id="cb38-97"><a href="#cb38-97" aria-hidden="true" tabindex="-1"></a>    <span class="at">tooltip =</span> <span class="fu">paste0</span>(</span>
+<span id="cb38-98"><a href="#cb38-98" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;b&gt;Event Type:&lt;/b&gt; "</span>, event_type, <span class="st">"&lt;br&gt;"</span>,</span>
+<span id="cb38-99"><a href="#cb38-99" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;b&gt;Partner:&lt;/b&gt; "</span>, partner, <span class="st">"&lt;br&gt;"</span>,</span>
+<span id="cb38-100"><a href="#cb38-100" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;b&gt;Confirmed:&lt;/b&gt; "</span>, confirmed_flag, <span class="st">"&lt;br&gt;"</span>,</span>
+<span id="cb38-101"><a href="#cb38-101" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;b&gt;Timestamp:&lt;/b&gt; "</span>, <span class="fu">format</span>(timestamp, <span class="st">"%Y-%m-%d %H:%M"</span>), <span class="st">"&lt;br&gt;"</span>,</span>
+<span id="cb38-102"><a href="#cb38-102" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ifelse</span>(wrapped_evidence <span class="sc">!=</span> <span class="st">""</span>, <span class="fu">paste0</span>(<span class="st">"&lt;b&gt;Evidence:&lt;/b&gt; "</span>, wrapped_evidence), <span class="st">""</span>)</span>
+<span id="cb38-103"><a href="#cb38-103" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb38-104"><a href="#cb38-104" aria-hidden="true" tabindex="-1"></a>    <span class="at">hour_group =</span> <span class="fu">if_else</span>(event_type <span class="sc">==</span> <span class="st">"Communication"</span>, <span class="fu">floor_date</span>(timestamp, <span class="st">"hour"</span>), NA_POSIXct_),</span>
+<span id="cb38-105"><a href="#cb38-105" aria-hidden="true" tabindex="-1"></a>    <span class="at">y_base =</span> <span class="fu">as.numeric</span>(<span class="fu">factor</span>(event_type, <span class="at">levels =</span> event_levels))</span>
+<span id="cb38-106"><a href="#cb38-106" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb38-107"><a href="#cb38-107" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(event_type, hour_group) <span class="sc">%&gt;%</span></span>
+<span id="cb38-108"><a href="#cb38-108" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb38-109"><a href="#cb38-109" aria-hidden="true" tabindex="-1"></a>    <span class="at">comm_index =</span> <span class="fu">if_else</span>(event_type <span class="sc">==</span> <span class="st">"Communication"</span>, <span class="fu">row_number</span>(), <span class="cn">NA_integer_</span>),</span>
+<span id="cb38-110"><a href="#cb38-110" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_comm =</span> <span class="fu">if_else</span>(event_type <span class="sc">==</span> <span class="st">"Communication"</span>, <span class="fu">n</span>(), <span class="cn">NA_integer_</span>),</span>
+<span id="cb38-111"><a href="#cb38-111" aria-hidden="true" tabindex="-1"></a>    <span class="at">comm_offset =</span> <span class="fu">if_else</span>(event_type <span class="sc">==</span> <span class="st">"Communication"</span>,</span>
+<span id="cb38-112"><a href="#cb38-112" aria-hidden="true" tabindex="-1"></a>                          (comm_index <span class="sc">-</span> (n_comm <span class="sc">+</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="dv">2</span>) <span class="sc">*</span> <span class="fl">0.12</span>,</span>
+<span id="cb38-113"><a href="#cb38-113" aria-hidden="true" tabindex="-1"></a>                          <span class="dv">0</span>),</span>
+<span id="cb38-114"><a href="#cb38-114" aria-hidden="true" tabindex="-1"></a>    <span class="at">y_jittered =</span> y_base <span class="sc">+</span> comm_offset</span>
+<span id="cb38-115"><a href="#cb38-115" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb38-116"><a href="#cb38-116" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb38-117"><a href="#cb38-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-118"><a href="#cb38-118" aria-hidden="true" tabindex="-1"></a><span class="co">#Plot</span></span>
+<span id="cb38-119"><a href="#cb38-119" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_ly</span>(timeline_df,</span>
+<span id="cb38-120"><a href="#cb38-120" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="sc">~</span>timestamp,</span>
+<span id="cb38-121"><a href="#cb38-121" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="sc">~</span>y_jittered,</span>
+<span id="cb38-122"><a href="#cb38-122" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">'scatter'</span>,</span>
+<span id="cb38-123"><a href="#cb38-123" aria-hidden="true" tabindex="-1"></a>        <span class="at">mode =</span> <span class="st">'markers+text'</span>,</span>
+<span id="cb38-124"><a href="#cb38-124" aria-hidden="true" tabindex="-1"></a>        <span class="at">text =</span> <span class="sc">~</span><span class="fu">if_else</span>(event_type <span class="sc">==</span> <span class="st">"Communication"</span>, <span class="st">""</span>, partner),</span>
+<span id="cb38-125"><a href="#cb38-125" aria-hidden="true" tabindex="-1"></a>        <span class="at">textposition =</span> <span class="sc">~</span><span class="fu">if_else</span>(event_type <span class="sc">==</span> <span class="st">"Communication"</span>, <span class="cn">NA_character_</span>, <span class="st">"top center"</span>),</span>
+<span id="cb38-126"><a href="#cb38-126" aria-hidden="true" tabindex="-1"></a>        <span class="at">hovertext =</span> <span class="sc">~</span>tooltip,</span>
+<span id="cb38-127"><a href="#cb38-127" aria-hidden="true" tabindex="-1"></a>        <span class="at">marker =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">11</span>),</span>
+<span id="cb38-128"><a href="#cb38-128" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> <span class="sc">~</span><span class="fu">I</span>(color_code),</span>
+<span id="cb38-129"><a href="#cb38-129" aria-hidden="true" tabindex="-1"></a>        <span class="at">symbol =</span> <span class="sc">~</span>shape_code,</span>
+<span id="cb38-130"><a href="#cb38-130" aria-hidden="true" tabindex="-1"></a>        <span class="at">symbols =</span> <span class="fu">c</span>(<span class="st">"circle"</span>, <span class="st">"triangle-up"</span>),</span>
+<span id="cb38-131"><a href="#cb38-131" aria-hidden="true" tabindex="-1"></a>        <span class="at">hoverinfo =</span> <span class="st">'text'</span>,</span>
+<span id="cb38-132"><a href="#cb38-132" aria-hidden="true" tabindex="-1"></a>        <span class="at">textfont =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb38-133"><a href="#cb38-133" aria-hidden="true" tabindex="-1"></a>        <span class="at">showlegend =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb38-134"><a href="#cb38-134" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layout</span>(</span>
+<span id="cb38-135"><a href="#cb38-135" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">list</span>(</span>
+<span id="cb38-136"><a href="#cb38-136" aria-hidden="true" tabindex="-1"></a>      <span class="at">text =</span> <span class="st">"Interactive Timeline of Nadia Conti’s Activities"</span>,</span>
+<span id="cb38-137"><a href="#cb38-137" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="fl">0.95</span></span>
+<span id="cb38-138"><a href="#cb38-138" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb38-139"><a href="#cb38-139" aria-hidden="true" tabindex="-1"></a>    <span class="at">xaxis =</span> <span class="fu">list</span>(<span class="at">title =</span> <span class="st">"Date/Time"</span>),</span>
+<span id="cb38-140"><a href="#cb38-140" aria-hidden="true" tabindex="-1"></a>    <span class="at">yaxis =</span> <span class="fu">list</span>(</span>
+<span id="cb38-141"><a href="#cb38-141" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">""</span>,</span>
+<span id="cb38-142"><a href="#cb38-142" aria-hidden="true" tabindex="-1"></a>      <span class="at">tickmode =</span> <span class="st">"array"</span>,</span>
+<span id="cb38-143"><a href="#cb38-143" aria-hidden="true" tabindex="-1"></a>      <span class="at">tickvals =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,</span>
+<span id="cb38-144"><a href="#cb38-144" aria-hidden="true" tabindex="-1"></a>      <span class="at">ticktext =</span> event_levels,</span>
+<span id="cb38-145"><a href="#cb38-145" aria-hidden="true" tabindex="-1"></a>      <span class="at">range =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">5.5</span>)</span>
+<span id="cb38-146"><a href="#cb38-146" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb38-147"><a href="#cb38-147" aria-hidden="true" tabindex="-1"></a>    <span class="at">hoverlabel =</span> <span class="fu">list</span>(<span class="at">align =</span> <span class="st">"left"</span>),</span>
+<span id="cb38-148"><a href="#cb38-148" aria-hidden="true" tabindex="-1"></a>    <span class="at">margin =</span> <span class="fu">list</span>(<span class="at">t =</span> <span class="dv">100</span>)</span>
+<span id="cb38-149"><a href="#cb38-149" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>9 Conclusion</h1>
+<p>Our visual analytics pipeline successfully unmasked Nadia Conti as the linchpin of a multifaceted corruption scheme on Oceanus. The global graph highlighted her overwhelming centrality; her ego network directly connected her to key actors and operations (Neptune vessel movements, Liam Thorne bribes, EcoVigil cover-ups). The interactive timeline then reconstructed the temporal sequence: on October 5, she fast-tracked and concealed a special access permit for Nemo Reef; on October 9, she orchestrated bribes to ensure harbor compliance; on October 10, she funneled payments via “Mrs.&nbsp;Money” to underwrite illicit reef groundwork. A flurry of communications—dense blue clusters—provided the operational heartbeat, linking her to collaborators like Davis and Sailor Shift’s team in real time. By integrating static and interactive views, we not only corroborated known illegal actions but also flagged suspicious gaps and patterns (e.g., tightly aligned morning communications, synchronization of vessel movements and permit signs) that warrant further investigation.</p>
+
+
 </section>
 
 </main> <!-- /main -->
