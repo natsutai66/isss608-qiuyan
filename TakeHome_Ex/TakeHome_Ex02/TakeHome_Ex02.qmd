@@ -33,8 +33,8 @@ Five R packages will be used. They are tidyverse, jsonlite, tidygraph, ggraph an
 In the code chunk below, `p_load()` of **pacman** package is used to load the R packages into R environemnt.
 
 ```{r}
-pacman::p_load(tidyverse, jsonlite,tidygraph, dplyr,
-               ggraph, ggrepel, SmartEDA, visNetwork, 
+pacman::p_load(tidyverse, jsonlite,tidygraph, dplyr, stringr, 
+               ggraph, ggrepel, SmartEDA, visNetwork, ggplot2, 
                timevis, lubridate, plotly)
 ```
 
@@ -877,9 +877,9 @@ The interactive timeline includes hoverable tooltips that display detailed metad
 ::: panel-tabset
 ## The plot
 
-```{r fig.width=14, fig.height=16}
+```{r fig.width=12, fig.height=10}
 #| echo: false
-# 1 Identify Nadia's node index
+# 1 Identify Nadia’s node index
 nadia_id <- mc3_nodes_final %>%
   filter(name == "Nadia Conti") %>%
   pull(new_index)
@@ -888,155 +888,189 @@ nadia_id <- mc3_nodes_final %>%
 edges_involving_nadia <- mc3_edges_final %>%
   filter(from == nadia_id | to == nadia_id)
 
-# 3 Get event indices connected to Nadia
+# 3 Find Nadia’s event indices 
 nadia_event_indices <- edges_involving_nadia %>%
   mutate(event_index = if_else(from == nadia_id, to, from)) %>%
   distinct(event_index) %>%
   pull(event_index)
 
-# 4 Extract Nadia's events and timestamps
+# 4 Get event nodes and timestamps
 nadia_events <- mc3_nodes_final %>%
   slice(nadia_event_indices) %>%
   filter(type == "Event") %>%
   mutate(timestamp = ymd_hms(timestamp)) %>%
   arrange(timestamp)
 
-# 5 Identify partner entity for each event
+# 5 Identify partner entity
 get_partner_name <- function(event_index) {
   edges <- mc3_edges_final %>%
     filter((from == event_index & to != nadia_id) |
-           (to == event_index & from != nadia_id))
+           (to   == event_index & from != nadia_id))
   partners_idx <- unique(c(edges$from, edges$to))
-  partners_idx <- partners_idx[partners_idx != nadia_id & partners_idx != event_index]
+  partners_idx <- setdiff(partners_idx, c(nadia_id, event_index))
   if (length(partners_idx) == 0) return(NA)
-  partners <- mc3_nodes_final %>%
+  mc3_nodes_final %>%
     filter(new_index %in% partners_idx, type == "Entity") %>%
     mutate(priority = case_when(
-      sub_type == "Person" ~ 1,
+      sub_type == "Person"       ~ 1,
       sub_type == "Organization" ~ 2,
-      sub_type == "Group" ~ 3,
-      sub_type == "Vessel" ~ 4,
-      sub_type == "Location" ~ 5,
-      TRUE ~ 6
+      sub_type == "Group"        ~ 3,
+      sub_type == "Vessel"       ~ 4,
+      sub_type == "Location"     ~ 5,
+      TRUE                       ~ 6
     )) %>%
-    arrange(priority)
-  return(partners$name[1])
+    arrange(priority) %>%
+    pull(name) %>%
+    first()
 }
 
-# 6 Add partner and inferred flag
+# 6 Add partner & inferred flag
 nadia_events <- nadia_events %>%
   rowwise() %>%
   mutate(
     partner = get_partner_name(new_index),
     inferred = {
-      any_edge <- edges_involving_nadia %>%
+      e <- edges_involving_nadia %>%
         filter((from == nadia_id & to == new_index) |
-               (to == nadia_id & from == new_index))
-      if (nrow(any_edge) > 0) any_edge$is_inferred[1] else FALSE
+               (to   == nadia_id & from == new_index))
+      if (nrow(e) > 0) e$is_inferred[1] else FALSE
     }
   ) %>%
   ungroup()
 
-# 7 Add manually confirmed illegal activities
+# 7 Add confirmed illegal events
 nadia_events <- nadia_events %>%
   add_row(
-    id = "Rel_AccessPermit_NemoReef", 
+    id        = "Rel_AccessPermit_NemoReef",
     timestamp = ymd_hms("2040-10-05 00:00:00"),
-    sub_type = "AccessPermission", 
-    name = NA, content = "Special permit granted to Nemo Reef outside formal review process", 
-    partner = "Nemo Reef", inferred = TRUE
+    sub_type  = "AccessPermission",
+    name      = NA,
+    content   = "Special permit granted to Nemo Reef outside formal review process",
+    partner   = "Nemo Reef",
+    inferred  = TRUE
   ) %>%
   add_row(
-    id = "Rel_Payment_Elise", 
+    id        = "Rel_Payment_Elise",
     timestamp = ymd_hms("2040-10-10 05:00:00"),
-    sub_type = "Payment", 
-    name = NA, content = "Covert funding for illegal reef operation provided by Elise", 
-    partner = "Elise", inferred = TRUE
+    sub_type  = "Payment",
+    name      = NA,
+    content   = "Covert funding for illegal reef operation provided by Elise",
+    partner   = "Elise",
+    inferred  = TRUE
   )
 
-# 8 Define color palette
+# 8 Palette & wrap helper
 event_colors <- c(
-  "AccessPermission" = "#d73027",
-  "Bribery"          = "#e69138",
-  "Payment"          = "#88419d",
-  "Communication"    = "#2c7bb6",
-  "Coordination"     = "#1a9850"
+  AccessPermission = "#d73027",
+  Bribery          = "#e69138",
+  Payment          = "#88419d",
+  Communication    = "#2c7bb6",
+  Coordination     = "#1a9850"
 )
-
-# 9 Helper to wrap tooltip text
 wrap_text <- function(text, width = 80) {
-  sapply(strwrap(text, width = width, simplify = FALSE), function(x) paste(x, collapse = "<br>"))
+  sapply(strwrap(text, width = width, simplify = FALSE),
+         function(x) paste(x, collapse = "<br>"))
 }
 
-# 10 Prepare data
-event_levels <- c("AccessPermission", "Bribery", "Communication", "Coordination", "Payment")
-
+# 9 Prepare timeline_df with jitter & full tooltip
+levels <- c("AccessPermission", "Bribery", "Communication", "Coordination", "Payment")
 timeline_df <- nadia_events %>%
   mutate(
     event_type = case_when(
       sub_type == "AccessPermission" ~ "AccessPermission",
-      sub_type == "Payment" ~ "Payment",
-      sub_type == "Communication" & str_detect(content %||% "", regex("Double .* fee", ignore_case = TRUE)) ~ "Bribery",
+      sub_type == "Payment"          ~ "Payment",
+      sub_type == "Communication" & str_detect(content %||% "",
+        regex("Double .* fee", ignore_case = TRUE)) ~ "Bribery",
       TRUE ~ sub_type
     ),
-    event_type = if_else(event_type == "Collaborate", "Coordination", event_type),
-    confirmed_flag = if_else(event_type %in% c("AccessPermission", "Bribery", "Payment"),
+    event_type     = if_else(event_type == "Collaborate", "Coordination", event_type),
+    confirmed_flag = if_else(event_type %in% c("AccessPermission","Bribery","Payment"),
                              "Confirmed Illegal", "Inferred/Suspicious"),
-    shape_code = if_else(confirmed_flag == "Confirmed Illegal", "triangle-up", "circle"),
-    color_code = event_colors[event_type],
     wrapped_evidence = ifelse(!is.na(content), wrap_text(content, 80), ""),
     tooltip = paste0(
       "<b>Event Type:</b> ", event_type, "<br>",
       "<b>Partner:</b> ", partner, "<br>",
       "<b>Confirmed:</b> ", confirmed_flag, "<br>",
-      "<b>Timestamp:</b> ", format(timestamp, "%Y-%m-%d %H:%M"), "<br>",
-      ifelse(wrapped_evidence != "", paste0("<b>Evidence:</b> ", wrapped_evidence), "")
+      "<b>Timestamp:</b> ", format(timestamp, "%Y-%m-%d %H:%M"),
+      if_else(wrapped_evidence != "",
+              paste0("<br><b>Evidence:</b> ", wrapped_evidence), "")
     ),
-    hour_group = if_else(event_type == "Communication", floor_date(timestamp, "hour"), NA_POSIXct_),
-    y_base = as.numeric(factor(event_type, levels = event_levels))
+    y_base   = as.numeric(factor(event_type, levels = levels)),
+    hour_grp = if_else(event_type == "Communication",
+                       floor_date(timestamp, "hour"),
+                       as.POSIXct(NA))
   ) %>%
-  group_by(event_type, hour_group) %>%
+  group_by(event_type, hour_grp) %>%
   mutate(
-    comm_index = if_else(event_type == "Communication", row_number(), NA_integer_),
-    n_comm = if_else(event_type == "Communication", n(), NA_integer_),
-    comm_offset = if_else(event_type == "Communication",
-                          (comm_index - (n_comm + 1) / 2) * 0.12,
-                          0),
-    y_jittered = y_base + comm_offset
+    idx      = if_else(event_type == "Communication", row_number(), NA_integer_),
+    n_comm   = if_else(event_type == "Communication", n(), NA_integer_),
+    offset   = if_else(event_type == "Communication",
+                       (idx - (n_comm + 1) / 2) * 0.20,
+                       0),
+    y_jitter = y_base + offset
   ) %>%
   ungroup()
 
-# 11 Plot (labels hidden for Communication only)
-plot_ly(timeline_df,
-        x = ~timestamp,
-        y = ~y_jittered,
-        type = 'scatter',
-        mode = 'markers+text',
-        text = ~if_else(event_type == "Communication", "", partner),
-        textposition = ~if_else(event_type == "Communication", NA_character_, "top center"),
-        hovertext = ~tooltip,
-        marker = list(size = 11),
-        color = ~I(color_code),
-        symbol = ~shape_code,
-        symbols = c("circle", "triangle-up"),
-        hoverinfo = 'text',
-        textfont = list(size = 12),
-        showlegend = FALSE) %>%
+# 10 Build ggplot
+p <- ggplot() +
+  annotate("rect",
+           xmin = as.POSIXct("2040-10-05"),
+           xmax = as.POSIXct("2040-10-13"),
+           ymin = -Inf, ymax = Inf,
+           fill = "gray90", alpha = 0.3) +
+  geom_point(
+    data = filter(timeline_df, event_type != "Communication"),
+    aes(x = timestamp, y = y_jitter,
+        color = event_type, shape = confirmed_flag, text = tooltip),
+    size = 3
+  ) +
+  geom_text_repel(
+    data = filter(timeline_df, event_type != "Communication"),
+    aes(x = timestamp, y = y_jitter, label = partner),
+    size = 3, box.padding = 0.4, segment.color = "gray70",
+    segment.size = 0.3, force = 3
+  ) +
+  geom_point(
+    data = filter(timeline_df, event_type == "Communication"),
+    aes(x = timestamp, y = y_jitter,
+        color = event_type, shape = confirmed_flag, text = tooltip),
+    size = 2, alpha = 0.6
+  ) +
+  scale_y_continuous(
+    breaks = seq_along(levels),
+    labels = levels,
+    name   = NULL
+  ) +
+  scale_color_manual(values = event_colors) +
+  scale_shape_manual(values = c("Confirmed Illegal" = 17,
+                                "Inferred/Suspicious" = 16)) +
+  labs(
+    title = "Interactive Timeline of Nadia Conti’s Activities",
+    x     = NULL      
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    axis.title.y       = element_blank(),
+    axis.title.x       = element_blank(),                  
+    axis.text.y        = element_text(size = 11),
+    axis.text.x        = element_text(size = 12),
+    panel.grid.major.y = element_line(color = "gray90"),
+    panel.grid.minor   = element_blank(),
+    plot.title         = element_text(
+                           face   = "bold",
+                           size   = 12,
+                           hjust  = 0.5,
+                           margin = margin(b = 10)     
+                         ),
+    plot.margin        = margin(t = 40, r = 20, b = 0, l = 0),
+    legend.position    = "none"
+  )
+
+# 11 Convert to plotly 
+ggplotly(p, tooltip = "text") %>%
   layout(
-    title = list(
-      text = "Interactive Timeline of Nadia Conti’s Activities",
-      y = 0.95
-    ),
-    xaxis = list(title = "Date/Time"),
-    yaxis = list(
-      title = "",
-      tickmode = "array",
-      tickvals = 1:5,
-      ticktext = event_levels,
-      range = c(0.5, 5.5)
-    ),
-    hoverlabel = list(align = "left"),
-    margin = list(t = 100)
+    showlegend = FALSE,
+    yaxis      = list(title = "")
   )
 ```
 
@@ -1044,7 +1078,6 @@ plot_ly(timeline_df,
 
 ```{r}
 #| eval: false
-
 nadia_id <- mc3_nodes_final %>%
   filter(name == "Nadia Conti") %>%
   pull(new_index)
@@ -1066,22 +1099,23 @@ nadia_events <- mc3_nodes_final %>%
 get_partner_name <- function(event_index) {
   edges <- mc3_edges_final %>%
     filter((from == event_index & to != nadia_id) |
-           (to == event_index & from != nadia_id))
+           (to   == event_index & from != nadia_id))
   partners_idx <- unique(c(edges$from, edges$to))
-  partners_idx <- partners_idx[partners_idx != nadia_id & partners_idx != event_index]
+  partners_idx <- setdiff(partners_idx, c(nadia_id, event_index))
   if (length(partners_idx) == 0) return(NA)
-  partners <- mc3_nodes_final %>%
+  mc3_nodes_final %>%
     filter(new_index %in% partners_idx, type == "Entity") %>%
     mutate(priority = case_when(
-      sub_type == "Person" ~ 1,
+      sub_type == "Person"       ~ 1,
       sub_type == "Organization" ~ 2,
-      sub_type == "Group" ~ 3,
-      sub_type == "Vessel" ~ 4,
-      sub_type == "Location" ~ 5,
-      TRUE ~ 6
+      sub_type == "Group"        ~ 3,
+      sub_type == "Vessel"       ~ 4,
+      sub_type == "Location"     ~ 5,
+      TRUE                       ~ 6
     )) %>%
-    arrange(priority)
-  return(partners$name[1])
+    arrange(priority) %>%
+    pull(name) %>%
+    first()
 }
 
 nadia_events <- nadia_events %>%
@@ -1089,110 +1123,142 @@ nadia_events <- nadia_events %>%
   mutate(
     partner = get_partner_name(new_index),
     inferred = {
-      any_edge <- edges_involving_nadia %>%
+      e <- edges_involving_nadia %>%
         filter((from == nadia_id & to == new_index) |
-               (to == nadia_id & from == new_index))
-      if (nrow(any_edge) > 0) any_edge$is_inferred[1] else FALSE
+               (to   == nadia_id & from == new_index))
+      if (nrow(e) > 0) e$is_inferred[1] else FALSE
     }
   ) %>%
   ungroup()
 
 nadia_events <- nadia_events %>%
   add_row(
-    id = "Rel_AccessPermit_NemoReef", 
+    id        = "Rel_AccessPermit_NemoReef",
     timestamp = ymd_hms("2040-10-05 00:00:00"),
-    sub_type = "AccessPermission", 
-    name = NA, content = "Special permit granted to Nemo Reef outside formal review process", 
-    partner = "Nemo Reef", inferred = TRUE
+    sub_type  = "AccessPermission",
+    name      = NA,
+    content   = "Special permit granted to Nemo Reef outside formal review process",
+    partner   = "Nemo Reef",
+    inferred  = TRUE
   ) %>%
   add_row(
-    id = "Rel_Payment_Elise", 
+    id        = "Rel_Payment_Elise",
     timestamp = ymd_hms("2040-10-10 05:00:00"),
-    sub_type = "Payment", 
-    name = NA, content = "Covert funding for illegal reef operation provided by Elise", 
-    partner = "Elise", inferred = TRUE
+    sub_type  = "Payment",
+    name      = NA,
+    content   = "Covert funding for illegal reef operation provided by Elise",
+    partner   = "Elise",
+    inferred  = TRUE
   )
 
 event_colors <- c(
-  "AccessPermission" = "#d73027",
-  "Bribery"          = "#e69138",
-  "Payment"          = "#88419d",
-  "Communication"    = "#2c7bb6",
-  "Coordination"     = "#1a9850"
+  AccessPermission = "#d73027",
+  Bribery          = "#e69138",
+  Payment          = "#88419d",
+  Communication    = "#2c7bb6",
+  Coordination     = "#1a9850"
 )
-
 wrap_text <- function(text, width = 80) {
-  sapply(strwrap(text, width = width, simplify = FALSE), function(x) paste(x, collapse = "<br>"))
+  sapply(strwrap(text, width = width, simplify = FALSE),
+         function(x) paste(x, collapse = "<br>"))
 }
 
-event_levels <- c("AccessPermission", "Bribery", "Communication", "Coordination", "Payment")
-
+levels <- c("AccessPermission", "Bribery", "Communication", "Coordination", "Payment")
 timeline_df <- nadia_events %>%
   mutate(
     event_type = case_when(
       sub_type == "AccessPermission" ~ "AccessPermission",
-      sub_type == "Payment" ~ "Payment",
-      sub_type == "Communication" & str_detect(content %||% "", regex("Double .* fee", ignore_case = TRUE)) ~ "Bribery",
+      sub_type == "Payment"          ~ "Payment",
+      sub_type == "Communication" & str_detect(content %||% "",
+        regex("Double .* fee", ignore_case = TRUE)) ~ "Bribery",
       TRUE ~ sub_type
     ),
-    event_type = if_else(event_type == "Collaborate", "Coordination", event_type),
-    confirmed_flag = if_else(event_type %in% c("AccessPermission", "Bribery", "Payment"),
+    event_type     = if_else(event_type == "Collaborate", "Coordination", event_type),
+    confirmed_flag = if_else(event_type %in% c("AccessPermission","Bribery","Payment"),
                              "Confirmed Illegal", "Inferred/Suspicious"),
-    shape_code = if_else(confirmed_flag == "Confirmed Illegal", "triangle-up", "circle"),
-    color_code = event_colors[event_type],
     wrapped_evidence = ifelse(!is.na(content), wrap_text(content, 80), ""),
     tooltip = paste0(
       "<b>Event Type:</b> ", event_type, "<br>",
       "<b>Partner:</b> ", partner, "<br>",
       "<b>Confirmed:</b> ", confirmed_flag, "<br>",
-      "<b>Timestamp:</b> ", format(timestamp, "%Y-%m-%d %H:%M"), "<br>",
-      ifelse(wrapped_evidence != "", paste0("<b>Evidence:</b> ", wrapped_evidence), "")
+      "<b>Timestamp:</b> ", format(timestamp, "%Y-%m-%d %H:%M"),
+      if_else(wrapped_evidence != "",
+              paste0("<br><b>Evidence:</b> ", wrapped_evidence), "")
     ),
-    hour_group = if_else(event_type == "Communication", floor_date(timestamp, "hour"), NA_POSIXct_),
-    y_base = as.numeric(factor(event_type, levels = event_levels))
+    y_base   = as.numeric(factor(event_type, levels = levels)),
+    hour_grp = if_else(event_type == "Communication",
+                       floor_date(timestamp, "hour"),
+                       as.POSIXct(NA))
   ) %>%
-  group_by(event_type, hour_group) %>%
+  group_by(event_type, hour_grp) %>%
   mutate(
-    comm_index = if_else(event_type == "Communication", row_number(), NA_integer_),
-    n_comm = if_else(event_type == "Communication", n(), NA_integer_),
-    comm_offset = if_else(event_type == "Communication",
-                          (comm_index - (n_comm + 1) / 2) * 0.12,
-                          0),
-    y_jittered = y_base + comm_offset
+    idx      = if_else(event_type == "Communication", row_number(), NA_integer_),
+    n_comm   = if_else(event_type == "Communication", n(), NA_integer_),
+    offset   = if_else(event_type == "Communication",
+                       (idx - (n_comm + 1) / 2) * 0.20,
+                       0),
+    y_jitter = y_base + offset
   ) %>%
   ungroup()
 
-#Plot
-plot_ly(timeline_df,
-        x = ~timestamp,
-        y = ~y_jittered,
-        type = 'scatter',
-        mode = 'markers+text',
-        text = ~if_else(event_type == "Communication", "", partner),
-        textposition = ~if_else(event_type == "Communication", NA_character_, "top center"),
-        hovertext = ~tooltip,
-        marker = list(size = 11),
-        color = ~I(color_code),
-        symbol = ~shape_code,
-        symbols = c("circle", "triangle-up"),
-        hoverinfo = 'text',
-        textfont = list(size = 12),
-        showlegend = FALSE) %>%
+p <- ggplot() +
+  annotate("rect",
+           xmin = as.POSIXct("2040-10-05"),
+           xmax = as.POSIXct("2040-10-13"),
+           ymin = -Inf, ymax = Inf,
+           fill = "gray90", alpha = 0.3) +
+  geom_point(
+    data = filter(timeline_df, event_type != "Communication"),
+    aes(x = timestamp, y = y_jitter,
+        color = event_type, shape = confirmed_flag, text = tooltip),
+    size = 3
+  ) +
+  geom_text_repel(
+    data = filter(timeline_df, event_type != "Communication"),
+    aes(x = timestamp, y = y_jitter, label = partner),
+    size = 3, box.padding = 0.4, segment.color = "gray70",
+    segment.size = 0.3, force = 3
+  ) +
+  geom_point(
+    data = filter(timeline_df, event_type == "Communication"),
+    aes(x = timestamp, y = y_jitter,
+        color = event_type, shape = confirmed_flag, text = tooltip),
+    size = 2, alpha = 0.6
+  ) +
+  scale_y_continuous(
+    breaks = seq_along(levels),
+    labels = levels,
+    name   = NULL
+  ) +
+  scale_color_manual(values = event_colors) +
+  scale_shape_manual(values = c("Confirmed Illegal" = 17,
+                                "Inferred/Suspicious" = 16)) +
+  labs(
+    title = "Interactive Timeline of Nadia Conti’s Activities",
+    x     = NULL      
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    axis.title.y       = element_blank(),
+    axis.title.x       = element_blank(),                  
+    axis.text.y        = element_text(size = 11),
+    axis.text.x        = element_text(size = 12),
+    panel.grid.major.y = element_line(color = "gray90"),
+    panel.grid.minor   = element_blank(),
+    plot.title         = element_text(
+                           face   = "bold",
+                           size   = 12,
+                           hjust  = 0.5,
+                           margin = margin(b = 10)     
+                         ),
+    plot.margin        = margin(t = 40, r = 20, b = 0, l = 0),
+    legend.position    = "none"
+  )
+
+ggplotly(p, tooltip = "text") %>%
   layout(
-    title = list(
-      text = "Interactive Timeline of Nadia Conti’s Activities",
-      y = 0.95
-    ),
-    xaxis = list(title = "Date/Time"),
-    yaxis = list(
-      title = "",
-      tickmode = "array",
-      tickvals = 1:5,
-      ticktext = event_levels,
-      range = c(0.5, 5.5)
-    ),
-    hoverlabel = list(align = "left"),
-    margin = list(t = 100)
+    showlegend = FALSE,
+    yaxis      = list(title = "")
   )
 ```
 :::
@@ -1200,4 +1266,14 @@ plot_ly(timeline_df,
 # 9 Conclusion
 
 Our visual analytics pipeline successfully unmasked Nadia Conti as the linchpin of a multifaceted corruption scheme on Oceanus. The global graph highlighted her overwhelming centrality; her ego network directly connected her to key actors and operations (Neptune vessel movements, Liam Thorne bribes, EcoVigil cover-ups). The interactive timeline then reconstructed the temporal sequence: on October 5, she fast-tracked and concealed a special access permit for Nemo Reef; on October 9, she orchestrated bribes to ensure harbor compliance; on October 10, she funneled payments via “Mrs. Money” to underwrite illicit reef groundwork. A flurry of communications—dense blue clusters—provided the operational heartbeat, linking her to collaborators like Davis and Sailor Shift’s team in real time. By integrating static and interactive views, we not only corroborated known illegal actions but also flagged suspicious gaps and patterns (e.g., tightly aligned morning communications, synchronization of vessel movements and permit signs) that warrant further investigation. 
+
+
+
+
+
+
+
+
+
+
 
