@@ -2,7 +2,7 @@
 title: "Take Home Exercise 2"
 description: "Mini-Challenge 3"
 author: "Tai Qiu Yan"
-date: "May 28, 2025"
+date: "May 23, 2025"
 date-modified: "last-modified"
 format: html
 editor: visual
@@ -14,15 +14,7 @@ execute:
 
 # 1 Overview
 
-This task involves a visual investigation into whether Nadia Conti remains engaged in unlawful activities. Using the ego network surrounding Nadia extracted from the MC3 knowledge graph—built from two weeks of radio intercepts, surveillance records, and metadata—the objective is to evaluate Clepper Jessen’s suspicion that Nadia is continuing her covert operations in Oceanus.
-
-The approach taken in this investigation involved constructing both static and interactive timelines to trace Nadia’s involvement across various event types, including AccessPermission, Bribery, Payment, Communication, and Coordination. Through this visualization, temporal patterns and escalation sequences were revealed—from the initial unauthorized access granted to Nemo Reef, to bribery arrangements with Liam Thorne, and covert payments involving Elise.
-
-A key visual outcome is the cluster of blue communication events linked to multiple parties such as Davis, Elise, and Oceanus City Council. While not all of these events are confirmed illegal, their density and timing strongly suggest synchronized operational planning. Notably, Davis emerged as a recurring entity across several event types, reinforcing his role as a primary accomplice.
-
-The interactive timeline added further analytical depth by integrating dynamic tooltips containing structured evidence, timestamp details, partner roles, and the nature of each event. These enriched insights help validate Nadia’s central role in coordinating a multi-entity illicit network, while also guiding further investigation into surrounding actors and hidden collaborators.
-
-This analysis delivers a comprehensive, visually driven narrative for investigative journalist Clepper Jessen—substantiating concerns that Nadia Conti is actively continuing illegal activities in Oceanus and potentially expanding her network of influence.
+In this exercise, we set out to determine whether Nadia Conti remains an active coordinator of illicit reef exploitation in Oceanus by mining and visualizing a two-week corpus of radio intercepts, surveillance logs, and permit metadata from the MC3 knowledge graph. After loading and cleaning the raw JSON data into tidy node and edge tables, we built a tidygraph object and examined Nadia’s two-hop ego network through both static and interactive layouts. We then computed normalized betweenness separately on the “Event” and “Relationship” subgraphs to spotlight which communications and ties most heavily bridge Nadia to the wider conspiracy. Finally, we constructed both a detailed static timeline and an interactive ggplotly timeline—annotated with confirmed‐illegal (“triangle”) versus suspicious (“dot”) events—to trace the temporal escalation from an unauthorized Nemo Reef permit on October 5, 2040, through bribery with Liam Thorne on October 9, and covert payments on October 10. By combining these layered views, the analysis paints a multidimensional portrait of Nadia’s dual role as information conduit and conspiracy facilitator.
 
 # 2 Getting Started
 
@@ -33,7 +25,7 @@ Five R packages will be used. They are tidyverse, jsonlite, tidygraph, ggraph an
 In the code chunk below, `p_load()` of **pacman** package is used to load the R packages into R environemnt.
 
 ```{r}
-pacman::p_load(tidyverse, jsonlite,tidygraph, dplyr, stringr, 
+pacman::p_load(tidyverse, jsonlite, tidygraph, dplyr, stringr, 
                ggraph, ggrepel, SmartEDA, visNetwork, ggplot2, 
                timevis, lubridate, plotly)
 ```
@@ -299,6 +291,10 @@ ggraph(mc3_graph,
 
 # 7 Nadia Conti's Ego Network
 
+The ego‐network makes it clear that Nadia Conti sits at the center of the entire operation: she is the single node through which every illicit permit, bribery payment, vessel movement, and covert communication passes.
+
+The bright red “AccessPermission” links fan out directly from her to the Nemo Reef location, demonstrating that she personally fast‐tracked and then concealed the special access permit. Purple “Relationship” edges tie her to insiders like Liam Thorne and EcoVigil, confirming that she paid off enforcement officials and later enlisted an environmental watchdog to cover up the damage. Gray “Communication” lines show a constant stream of messages between Nadia and operatives—Neptune, Davis, The Accountant—while green “VesselMovement” connections map out the deployment of ships under her authority. No other individual approaches her node in size or number of connections, underlining that she was the undisputed architect and coordinator of the illegal reef exploitation.
+
 ::: panel-tabset
 ## The plot
 
@@ -472,12 +468,6 @@ ggraph(nadia_ego, layout = "fr") +
   )
 ```
 :::
-
-Insight:
-
-The ego‐network makes it clear that Nadia Conti sits at the center of the entire operation: she is the single node through which every illicit permit, bribery payment, vessel movement, and covert communication passes.
-
-The bright red “AccessPermission” links fan out directly from her to the Nemo Reef location, demonstrating that she personally fast‐tracked and then concealed the special access permit. Purple “Relationship” edges tie her to insiders like Liam Thorne and EcoVigil, confirming that she paid off enforcement officials and later enlisted an environmental watchdog to cover up the damage. Gray “Communication” lines show a constant stream of messages between Nadia and operatives—Neptune, Davis, The Accountant—while green “VesselMovement” connections map out the deployment of ships under her authority. No other individual approaches her node in size or number of connections, underlining that she was the undisputed architect and coordinator of the illegal reef exploitation.
 
 ### Interactive Network
 
@@ -684,7 +674,251 @@ visNetwork(nodes_vis, edges_vis,
 ```
 :::
 
+### Betweenness of Nadia
+
+In the event-based ego network, the largest orange nodes—most notably the “Nemo Reef” communication event and key transmissions at “Remora”—sit at the highest betweenness scores just one hop from Nadia. This indicates that Nadia is the primary information conduit: she channels a disproportionate share of critical messages about reef activity, positioning her as the indispensable broker in every major operational exchange.
+
+In the relationship-based ego network, the most central purple nodes correspond to her AccessPermission and Suspicious ties linking Nadia to “Nemo Reef” itself and to figures like Davis. Here she emerges as the core conspiracy facilitator, bridging otherwise disconnected vessels, officials, and intermediaries through permits and bribes. Taken together, these two views reveal Nadia’s dual role—carrying sensitive event-level intelligence and arranging the illicit permissions—that underpins her centrality in the reef exploitation scheme.
+
+::: panel-tabset
+
+## Event
+
+```{r}
+#| echo: false
+nadia_index <- which(mc3_nodes_final$name == "Nadia Conti")
+
+graph2 <- tbl_graph(
+  nodes    = mc3_nodes_final,
+  edges    = mc3_edges_final,
+  directed = FALSE
+) %>%
+  activate(nodes) %>%
+  mutate(
+    dist = node_distance_from(nadia_index),
+    node_cat = case_when(
+      sub_type == "Person"                         ~ "Person",
+      sub_type %in% c("Location","Vessel")         ~ "Location",
+      sub_type %in% c("Communication","Monitoring","VesselMovement") 
+                                                   ~ "Event",
+      sub_type %in% c("AccessPermission","Suspicious","Colleagues") 
+                                                   ~ "Relationship",
+      TRUE                                         ~ "Other"
+    )
+  ) %>%
+  activate(edges) %>%
+  mutate(
+    edge_cat = mc3_nodes_final$sub_type[to]
+  )
+
+plot_betweenness_ego <- function(ego_graph, title_text) {
+  ego_graph %>%
+    activate(nodes) %>%
+    mutate(betw = centrality_betweenness(normalized = TRUE)) %>%
+    ggraph(layout = "fr") +
+    
+    geom_edge_link(color = "gray80", width = 0.5, alpha = 0.7) +
+    
+    geom_node_point(aes(size = betw, fill = node_cat),
+                    shape = 21, color = "black") +
+    
+    geom_node_text(aes(label = ifelse(node_cat != "Other", name, "")),
+                   repel = TRUE, size = 3) +
+    
+    scale_size_continuous(
+      name  = "Betweenness\n(normalized)",
+      range = c(3, 12)
+    ) +
+    
+    scale_fill_manual(
+      name   = "Node type",
+      values = c(
+        Person       = "skyblue",
+        Location     = "lightgreen",
+        Event        = "orange",
+        Relationship = "plum",
+        Other        = "gray90"
+      ),
+      guide = guide_legend(
+        title.position = "left",
+        title.hjust     = 0.5,
+        nrow            = 1,
+        override.aes    = list(
+          shape  = 21,       # filled circle
+          size   = 6,        # larger symbol
+          colour = "black"   # border for contrast
+        )
+      )
+    ) +
+    
+    labs(title = title_text) +
+    
+    theme_void() +
+    theme(
+      plot.title      = element_text(size = 20, face = "bold", hjust = 0.5),
+      legend.position = "bottom",
+      legend.box      = "vertical",
+      legend.key.size = unit(1, "cm"),
+      legend.spacing.y= unit(0.3, "cm")
+    )
+}
+
+event_ego <- graph2 %>%
+  activate(nodes) %>%
+  filter(
+    dist <= 2,
+    (dist == 0) |
+    (dist == 1 & node_cat == "Event") |
+    (dist == 2)
+  )
+
+plot_betweenness_ego(
+  event_ego,
+  title_text = "Betweenness: Nadia → Event"
+)
+```
+
+## Relationship
+
+```{r}
+#| echo: false
+rel_ego <- graph2 %>%
+  activate(nodes) %>%
+  filter(
+    dist <= 2,
+    (dist == 0) |
+    (dist == 1 & node_cat == "Relationship") |
+    (dist == 2)
+  )
+
+plot_betweenness_ego(
+  rel_ego,
+  title_text = "Betweenness: Nadia → Relationship"
+)
+```
+
+## The code
+
+```{r}
+#| eval: false
+nadia_index <- which(mc3_nodes_final$name == "Nadia Conti")
+
+graph2 <- tbl_graph(
+  nodes    = mc3_nodes_final,
+  edges    = mc3_edges_final,
+  directed = FALSE
+) %>%
+  activate(nodes) %>%
+  mutate(
+    dist = node_distance_from(nadia_index),
+    node_cat = case_when(
+      sub_type == "Person"                         ~ "Person",
+      sub_type %in% c("Location","Vessel")         ~ "Location",
+      sub_type %in% c("Communication","Monitoring","VesselMovement") 
+                                                   ~ "Event",
+      sub_type %in% c("AccessPermission","Suspicious","Colleagues") 
+                                                   ~ "Relationship",
+      TRUE                                         ~ "Other"
+    )
+  ) %>%
+  activate(edges) %>%
+  mutate(
+    edge_cat = mc3_nodes_final$sub_type[to]
+  )
+
+plot_betweenness_ego <- function(ego_graph, title_text) {
+  ego_graph %>%
+    activate(nodes) %>%
+    mutate(betw = centrality_betweenness(normalized = TRUE)) %>%
+    ggraph(layout = "fr") +
+    
+    geom_edge_link(color = "gray80", width = 0.5, alpha = 0.7) +
+    
+    geom_node_point(aes(size = betw, fill = node_cat),
+                    shape = 21, color = "black") +
+    
+    geom_node_text(aes(label = ifelse(node_cat != "Other", name, "")),
+                   repel = TRUE, size = 3) +
+    
+    scale_size_continuous(
+      name  = "Betweenness\n(normalized)",
+      range = c(3, 12)
+    ) +
+    
+    scale_fill_manual(
+      name   = "Node type",
+      values = c(
+        Person       = "skyblue",
+        Location     = "lightgreen",
+        Event        = "orange",
+        Relationship = "plum",
+        Other        = "gray90"
+      ),
+      guide = guide_legend(
+        title.position = "left",
+        title.hjust     = 0.5,
+        nrow            = 1,
+        override.aes    = list(
+          shape  = 21,       # filled circle
+          size   = 6,        # larger symbol
+          colour = "black"   # border for contrast
+        )
+      )
+    ) +
+    
+    labs(title = title_text) +
+    
+    theme_void() +
+    theme(
+      plot.title      = element_text(size = 20, face = "bold", hjust = 0.5),
+      legend.position = "bottom",
+      legend.box      = "vertical",
+      legend.key.size = unit(1, "cm"),
+      legend.spacing.y= unit(0.3, "cm")
+    )
+}
+
+event_ego <- graph2 %>%
+  activate(nodes) %>%
+  filter(
+    dist <= 2,
+    (dist == 0) |
+    (dist == 1 & node_cat == "Event") |
+    (dist == 2)
+  )
+
+plot_betweenness_ego(
+  event_ego,
+  title_text = "Betweenness: Nadia → Event"
+)
+
+rel_ego <- graph2 %>%
+  activate(nodes) %>%
+  filter(
+    dist <= 2,
+    (dist == 0) |
+    (dist == 1 & node_cat == "Relationship") |
+    (dist == 2)
+  )
+
+plot_betweenness_ego(
+  rel_ego,
+  title_text = "Betweenness: Nadia → Relationship"
+)
+```
+:::
+
 ## 8 Timeline of Key Events Involving Nadia Conti
+
+The timeline highlights both confirmed illegal actions and inferred or suspicious interactions based on edge and node attributes linked to Nadia’s two-hop ego network. The visual categorizes the events on the y-axis by type—AccessPermission, Bribery, Communication, Coordination, and Payment—and plots them chronologically along the x-axis spanning from October 5 to October 14, 2040.
+
+Confirmed illegal events are denoted by triangle-shaped points, while inferred or suspicious activities are shown as dots. The color of each point corresponds to the type of event. Notably, on October 5, the timeline displays a red triangle for “Nemo Reef,” representing Nadia’s unauthorized granting of a special access permit to the location. This event is a pivotal starting point of the illegal operation, as reconstructed through surrounding relationship and communication data. On October 9, an orange triangle labeled “Liam Thorne” reflects a confirmed bribery act, inferred from intercepted communication suggesting illicit payment arrangements. Another significant illegal activity is a purple triangle labeled “Elise” on October 10, which denotes a payment transaction believed to support the logistics of the reef exploitation.
+
+Throughout the timeline, there is a dense cluster of blue communication events, all linked to various individuals and entities such as Davis, Elise, Neptune, V. Miesel Shipping, and Oceanus City Council. These communications, although not all individually confirmed as illegal, collectively illustrate a network of frequent contact and coordination—suggesting the existence of a highly active and synchronized operation. Davis appears multiple times across different event types, highlighting his central role as both a recipient of communications and a participant in coordination efforts.
+
+Additional green points on October 9 and 14, labeled “Davis,” represent coordination events that likely indicate planning or cover-up activities following the initial illegal exploitation. These events, while marked as inferred, align closely with the sequence of confirmed acts and underscore the strategic timing of operational logistics.
+
+The timeline reveals a clear temporal structure and escalation pattern in Nadia’s actions—from initiation, through execution, to coordination—cementing her role as the central orchestrator of a multi-entity illegal conspiracy. The timeline not only validates the known events but also uncovers patterns of engagement that can support further investigation or legal scrutiny.
 
 ::: panel-tabset
 ## The plot
@@ -781,7 +1015,7 @@ timeline_df <- nadia_events %>%
 
 # 9 Plot
 ggplot(timeline_df, aes(x = timestamp, y = event_type)) +
-  annotate("rect", xmin = as.POSIXct("2040-10-05"), xmax = as.POSIXct("2040-10-13"),
+  annotate("rect", xmin = as.POSIXct("2040-10-05"), xmax = as.POSIXct("2040-10-15"),
            ymin = -Inf, ymax = Inf, fill = "gray90", alpha = 0.3) +
   geom_point(aes(color = event_type, shape = confirmed_flag), size = 3) +
   geom_text_repel(
@@ -906,7 +1140,7 @@ timeline_df <- nadia_events %>%
 
 #Plot
 ggplot(timeline_df, aes(x = timestamp, y = event_type)) +
-  annotate("rect", xmin = as.POSIXct("2040-10-05"), xmax = as.POSIXct("2040-10-13"),
+  annotate("rect", xmin = as.POSIXct("2040-10-05"), xmax = as.POSIXct("2040-10-15"),
            ymin = -Inf, ymax = Inf, fill = "gray90", alpha = 0.3) +
   geom_point(aes(color = event_type, shape = confirmed_flag), size = 3) +
   geom_text_repel(
@@ -944,18 +1178,6 @@ ggplot(timeline_df, aes(x = timestamp, y = event_type)) +
   )
 ```
 :::
-
-Insight:
-
-The timeline highlights both confirmed illegal actions and inferred or suspicious interactions based on edge and node attributes linked to Nadia’s two-hop ego network. The visual categorizes the events on the y-axis by type—AccessPermission, Bribery, Communication, Coordination, and Payment—and plots them chronologically along the x-axis spanning from October 5 to October 14, 2040.
-
-Confirmed illegal events are denoted by triangle-shaped points, while inferred or suspicious activities are shown as dots. The color of each point corresponds to the type of event. Notably, on October 5, the timeline displays a red triangle for “Nemo Reef,” representing Nadia’s unauthorized granting of a special access permit to the location. This event is a pivotal starting point of the illegal operation, as reconstructed through surrounding relationship and communication data. On October 9, an orange triangle labeled “Liam Thorne” reflects a confirmed bribery act, inferred from intercepted communication suggesting illicit payment arrangements. Another significant illegal activity is a purple triangle labeled “Elise” on October 10, which denotes a payment transaction believed to support the logistics of the reef exploitation.
-
-Throughout the timeline, there is a dense cluster of blue communication events, all linked to various individuals and entities such as Davis, Elise, Neptune, V. Miesel Shipping, and Oceanus City Council. These communications, although not all individually confirmed as illegal, collectively illustrate a network of frequent contact and coordination—suggesting the existence of a highly active and synchronized operation. Davis appears multiple times across different event types, highlighting his central role as both a recipient of communications and a participant in coordination efforts.
-
-Additional green points on October 9 and 14, labeled “Davis,” represent coordination events that likely indicate planning or cover-up activities following the initial illegal exploitation. These events, while marked as inferred, align closely with the sequence of confirmed acts and underscore the strategic timing of operational logistics.
-
-The timeline reveals a clear temporal structure and escalation pattern in Nadia’s actions—from initiation, through execution, to coordination—cementing her role as the central orchestrator of a multi-entity illegal conspiracy. The timeline not only validates the known events but also uncovers patterns of engagement that can support further investigation or legal scrutiny.
 
 ### Interactive Timeline of Nadia Conti’s Activities
 
@@ -1352,7 +1574,5 @@ ggplotly(p, tooltip = "text") %>%
 
 # 9 Conclusion
 
-Our visual analytics pipeline successfully unmasked Nadia Conti as the linchpin of a multifaceted corruption scheme on Oceanus. The global graph highlighted her overwhelming centrality; her ego network directly connected her to key actors and operations (Neptune vessel movements, Liam Thorne bribes, EcoVigil cover-ups). The interactive timeline then reconstructed the temporal sequence: on October 5, she fast-tracked and concealed a special access permit for Nemo Reef; on October 9, she orchestrated bribes to ensure harbor compliance; on October 10, she funneled payments via “Mrs. Money” to underwrite illicit reef groundwork. A flurry of communications—dense blue clusters—provided the operational heartbeat, linking her to collaborators like Davis and Sailor Shift’s team in real time. By integrating static and interactive views, we not only corroborated known illegal actions but also flagged suspicious gaps and patterns (e.g., tightly aligned morning communications, synchronization of vessel movements and permit signs) that warrant further investigation. 
-
-
+The visual investigation confirms that Nadia Conti occupies a uniquely central position in both the event and relationship spheres of the MC3 network. In the event-based betweenness plot, the Nemo Reef communication and the Remora vessel transmissions emerge as the highest‐traffic hubs, underscoring her function as the indispensable messenger. In the relationship-based view, her AccessPermission and Suspicious ties to Nemo Reef and to key actors like Davis and Liam Thorne rise to the top, revealing her as the principal architect of permits and payoffs. The timeline then situates these insights in time—beginning with the October 5 permit, spiking with October 9’s bribery arrangement, and flowing into October 10 payments—while dense clusters of communication events mark moments of synchronized operational coordination. Taken together, the static and interactive outputs not only validate Clepper Jessen’s concerns but also surface hidden patterns (e.g., synchronized morning intercepts, overlapping vessel-movement and permit sign-offs) that merit deeper forensic scrutiny.
 
