@@ -52,6 +52,7 @@ glimpse(MC3)
 ```
 
 ## The output
+
 ```{r}
 #| echo: false
 glimpse(MC3)
@@ -681,7 +682,6 @@ In the event-based ego network, the largest orange nodes—most notably the “N
 In the relationship-based ego network, the most central purple nodes correspond to her AccessPermission and Suspicious ties linking Nadia to “Nemo Reef” itself and to figures like Davis. Here she emerges as the core conspiracy facilitator, bridging otherwise disconnected vessels, officials, and intermediaries through permits and bribes. Taken together, these two views reveal Nadia’s dual role—carrying sensitive event-level intelligence and arranging the illicit permissions—that underpins her centrality in the reef exploitation scheme.
 
 ::: panel-tabset
-
 ## Event
 
 ```{r}
@@ -1575,4 +1575,3 @@ ggplotly(p, tooltip = "text") %>%
 # 9 Conclusion
 
 The visual investigation confirms that Nadia Conti occupies a uniquely central position in both the event and relationship spheres of the MC3 network. In the event-based betweenness plot, the Nemo Reef communication and the Remora vessel transmissions emerge as the highest‐traffic hubs, underscoring her function as the indispensable messenger. In the relationship-based view, her AccessPermission and Suspicious ties to Nemo Reef and to key actors like Davis and Liam Thorne rise to the top, revealing her as the principal architect of permits and payoffs. The timeline then situates these insights in time—beginning with the October 5 permit, spiking with October 9’s bribery arrangement, and flowing into October 10 payments—while dense clusters of communication events mark moments of synchronized operational coordination. Taken together, the static and interactive outputs not only validate Clepper Jessen’s concerns but also surface hidden patterns (e.g., synchronized morning intercepts, overlapping vessel-movement and permit sign-offs) that merit deeper forensic scrutiny.
-

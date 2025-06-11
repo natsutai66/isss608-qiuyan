@@ -1,0 +1,98 @@
+---
+title: "Take Home Exercise 3"
+description: "Mini-Challenge 3"
+author: "Tai Qiu Yan"
+date: "June 10, 2025"
+date-modified: "last-modified"
+format: html
+editor: visual
+execute:
+  eval: true
+  echo: true
+  warning: false
+---
+
+# 1 Overview
+
+# 2 Storyboard
+
+## 2.1 Communication patterns
+
+![](images/Image_20250610082902-01.jpg)
+
+This interface is designed to reveal temporal communication patterns and how they change over two weeks. The user can adjust time granularity (hourly, daily, weekly) and filter the date range to spot recurring daily peaks in message traffic. Interactive controls allow focusing on a specific person or entity, highlighting that entity’s communications to determine who frequently contacts or influences them. This addresses Clepper’s goal of identifying regular daily communication times and shifts in these patterns, and seeing influence relationships for a chosen entity.
+
+::: panel-tabset
+## UI Components & Layout
+
++-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+| **Component**           | **description**                                                                                                                                                                                                                                                                       | **Shiny & R packages**    |
++-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+| Time Granularity Filter | A dropdown to aggregate messages by hour-of-day or by day/week. This lets the user switch the resolution of the trend analysis.                                                                                                                                                       | selectInput               |
+|                         |                                                                                                                                                                                                                                                                                       |                           |
+|                         |                                                                                                                                                                                                                                                                                       | shinyWidgets::pickerInput |
++-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+| Date Range Slider       | An interactive date slider to select the two-week observation window or a specific subrange.                                                                                                                                                                                          | sliderInput               |
++-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+| Entity Selector         | A dropdown search input to select a specific entity (person or vessel) of interest. When an entity is chosen, the plots highlight or filter to communications involving that entity.                                                                                                  | selectInput               |
+|                         |                                                                                                                                                                                                                                                                                       |                           |
+|                         |                                                                                                                                                                                                                                                                                       | shinyWidgets::pickerInput |
++-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+| Message Trend           | A line chart showing the count of messages over time. X-axis as date/time, y-axis as message count. This reveals daily spikes and how they shift over the two weeks. The chart updates based on the chosen granularity.                                                               | ggplotly                  |
++-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+| Daily Pattern Heatmap   | A heatmap visualizing message frequency by hour-of-day (columns) vs date (rows). Each cell’s color intensity reflects the number of communications at that hour on that day, making it easy to spot recurring daily time slots with heavy activity                                    | geom_tile()\              |
+|                         |                                                                                                                                                                                                                                                                                       | ggplotly                  |
+|                         |                                                                                                                                                                                                                                                                                       |                           |
+|                         |                                                                                                                                                                                                                                                                                       | heatmaply                 |
++-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+| Message Distribution    | When the user selects a specific day, a sub-chart displays the distribution of that day’s communications. This could be a bar plot of messages by hour for that day. If focusing on a specific entity, the chart might show inbound vs outbound messages for that person on that day. | ggplot2                   |
+|                         |                                                                                                                                                                                                                                                                                       |                           |
+|                         |                                                                                                                                                                                                                                                                                       | ggplotly                  |
++-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+| Interpretation Panel    | A short text box aligned in the sidebar providing guidance on how to read the charts, and legends.                                                                                                                                                                                    | helpText()                |
+|                         |                                                                                                                                                                                                                                                                                       |                           |
+|                         |                                                                                                                                                                                                                                                                                       | wellPanel()               |
++-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+:::
+
+## 2.2 Network analysis
+
+![](images/Image_20250610082923.jpg)
+
+This interface enables Clepper to explore how people and vessels are interconnected in the knowledge graph, and to discover groupings of entities that frequently interact. The user can toggle between different network views to examine specific interaction types. They can also identify cohesive clusters (communities) in the network and discern which thematic “group” each cluster might represent. The interface also supports selecting an individual node to highlight its connections, helping reveal sub-networks or tightly knit groups, and ultimately addresses which entities form closely associated groups and what topics characterize those groups.
+
+::: panel-tabset
+## UI Components & Layout
+
++--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+| Component                      | description                                                                                                                                                                                                                  | Shiny & R packages |
++================================+==============================================================================================================================================================================================================================+====================+
+| Network View Selector          | A set of tabs or radio buttons to switch between sub-views of the network analysis, listed as “Overview, Relationship, Interaction, Clustering” in a sidebar menu. Each sub-view filters or formats the network differently. | tabsetPanel        |
+|                                |                                                                                                                                                                                                                              |                    |
+|                                |                                                                                                                                                                                                                              | navlistPanel       |
+|                                |                                                                                                                                                                                                                              |                    |
+|                                |                                                                                                                                                                                                                              | radioButtons       |
++--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+| Node Type Legend               | The network uses distinct shapes or colors for different entity types.                                                                                                                                                       | visLegend()        |
++--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+| Network Graph Display          | An interactive network diagram that visualizes nodes and their connections. Users can pan/zoom, and hovering on a node can show its name or details. The graph updates based on the selected view/filter.                    |                    |
++--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+| Centrality Metric Highlighting |                                                                                                                                                                                                                              |                    |
++--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+| Node Selection & Details       |                                                                                                                                                                                                                              |                    |
++--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+| Cluster Exploration Aids       |                                                                                                                                                                                                                              |                    |
++--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+|                                |                                                                                                                                                                                                                              |                    |
++--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+:::
+
+## 2.3 Nadia Condi's illegal activities
+
+![](images/Image_20250610082928.jpg)
+
+This interface is a case-focused dashboard examining Nadia Conti’s involvement in potentially illegal activities. The goal is to provide visual evidence of Nadia’s illicit actions and to summarize her role over time. The user can see Nadia’s ego-network of connections, highlighting how she is linked to key events and individuals, and view a timeline of critical events involving Nadia. Interactive elements allow the investigator to filter or distinguish confirmed illegal acts from inferred or suspected ones, reinforcing whether Nadia is indeed at the center of wrongdoing. The design thus helps answer whether Nadia is doing something illegal and visually summarize her actions over the two-week period.
+
+::: panel-tabset
+## UI Components & Layout
+:::
