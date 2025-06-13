@@ -64,27 +64,25 @@ This interface enables Clepper to explore how people and vessels are interconnec
 ::: panel-tabset
 ## UI Components & Layout
 
-+--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
-| Component                      | description                                                                                                                                                                                                                  | Shiny & R packages |
-+================================+==============================================================================================================================================================================================================================+====================+
-| Network View Selector          | A set of tabs or radio buttons to switch between sub-views of the network analysis, listed as “Overview, Relationship, Interaction, Clustering” in a sidebar menu. Each sub-view filters or formats the network differently. | tabsetPanel        |
-|                                |                                                                                                                                                                                                                              |                    |
-|                                |                                                                                                                                                                                                                              | navlistPanel       |
-|                                |                                                                                                                                                                                                                              |                    |
-|                                |                                                                                                                                                                                                                              | radioButtons       |
-+--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
-| Node Type Legend               | The network uses distinct shapes or colors for different entity types.                                                                                                                                                       | visLegend()        |
-+--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
-| Network Graph Display          | An interactive network diagram that visualizes nodes and their connections. Users can pan/zoom, and hovering on a node can show its name or details. The graph updates based on the selected view/filter.                    |                    |
-+--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
-| Centrality Metric Highlighting |                                                                                                                                                                                                                              |                    |
-+--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
-| Node Selection & Details       |                                                                                                                                                                                                                              |                    |
-+--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
-| Cluster Exploration Aids       |                                                                                                                                                                                                                              |                    |
-+--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
-|                                |                                                                                                                                                                                                                              |                    |
-+--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
++------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+| Component                    | description                                                                                                                                                                                                                  | Shiny & R packages |
++==============================+==============================================================================================================================================================================================================================+====================+
+| Network View Selector        | A set of tabs or radio buttons to switch between sub-views of the network analysis, listed as “Overview, Relationship, Interaction, Clustering” in a sidebar menu. Each sub-view filters or formats the network differently. | tabsetPanel        |
+|                              |                                                                                                                                                                                                                              |                    |
+|                              |                                                                                                                                                                                                                              | navlistPanel       |
+|                              |                                                                                                                                                                                                                              |                    |
+|                              |                                                                                                                                                                                                                              | radioButtons       |
++------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+| Node Type Legend             | The network uses distinct shapes or colors for different entity types.                                                                                                                                                       | visLegend()        |
++------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+| Network Graph Display        | An interactive network diagram that visualizes nodes and their connections. Users can pan/zoom, and hovering on a node can show its name or details. The graph updates based on the selected view/filter.                    | visNetwork         |
++------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+| Centrality Metric Info Panel | When users hover over a node in the network, a dynamic info panel will display that node’s centrality metrics: Degree, Betweenness, Closeness, and Eigenvector. This allows real-time inspection of each node's importance.  | igraph             |
+|                              |                                                                                                                                                                                                                              |                    |
+|                              |                                                                                                                                                                                                                              | visNetwork         |
++------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+| Node Selection               | A dropdown to select a specific entity by name/ID and highlight it on the graph.                                                                                                                                             | selectInput        |
++------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
 :::
 
 ## 2.3 Nadia Condi's illegal activities
@@ -95,4 +93,183 @@ This interface is a case-focused dashboard examining Nadia Conti’s involvement
 
 ::: panel-tabset
 ## UI Components & Layout
+
++-----------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+| Component                         | description                                                                                                                                                                                                                                                                                                                                               | Shiny & R packages |
++===================================+===========================================================================================================================================================================================================================================================================================================================================================+====================+
+| Nadia’s Ego Network Visualization | The interactive network centered on Nadia includes Nadia as a focal node and all directly connected nodes (and possibly second-degree connections)                                                                                                                                                                                                        | visNetwork         |
+|                                   |                                                                                                                                                                                                                                                                                                                                                           |                    |
+|                                   |                                                                                                                                                                                                                                                                                                                                                           | igraph             |
++-----------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+| Illegal Activity Markers          | The interface distinguishes confirmed illegal actions from suspicious ones.                                                                                                                                                                                                                                                                               |                    |
++-----------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+| Timeline of Events                | A timeline chart at the bottom chronicles key events involving Nadia. The y-axis lists categories of events, matching the types of actions Nadia is involved in. Each event is plotted as a point on the timeline. Different shapes or colors denote the nature of the event. This timeline allows user to scan chronologically what Nadia did and when.  | timevis            |
+|                                   |                                                                                                                                                                                                                                                                                                                                                           |                    |
+|                                   |                                                                                                                                                                                                                                                                                                                                                           | ggplotly           |
++-----------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+| Evidence Detail Panel             | When the user clicks on an event in the timeline or a connection in the network, a detail panel can display the underlying evidence. It serves to back up the visual marks with concrete information, helping justify whether Nadia’s actions were illegal.                                                                                               | renderText         |
+|                                   |                                                                                                                                                                                                                                                                                                                                                           |                    |
+|                                   |                                                                                                                                                                                                                                                                                                                                                           | renderTable        |
++-----------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+
+:::
+
+# 3 Code
+
+::: panel-tabset
+## UI
+```{r}
+#| eval: false
+shinyUI(
+  fluidPage(
+    titlePanel("Take-Home Exercise 3 — Full Dashboard"),
+    
+    sidebarLayout(
+      sidebarPanel(
+        airDatepickerInput("dateRange", "Select Date Range:", range = TRUE,
+          value = c(as.Date("2040-10-05"), as.Date("2040-10-14")),
+          minDate = as.Date("2040-10-01"), maxDate = as.Date("2040-10-31")),
+        
+        pickerInput("eventType", "Select Event Types:", 
+          choices = c("AccessPermission", "Bribery", "Payment", "Communication", "Coordination"),
+          multiple = TRUE,
+          selected = c("AccessPermission", "Bribery", "Payment", "Communication", "Coordination"),
+          options = list(`actions-box` = TRUE, `live-search` = TRUE)),
+        
+        downloadButton("download_filtered", "Download Filtered Timeline Data")
+      ),
+      
+      mainPanel(
+        tabsetPanel(
+          tabPanel("Communication Pattern", plotlyOutput("commPlot")),
+          tabPanel("Network Analysis", visNetworkOutput("networkPlot")),
+          tabPanel("Nadia Conti's Illegal Activities", 
+            visNetworkOutput("illegalNetworkPlot"),
+            plotlyOutput("betweennessPlot"),
+            plotlyOutput("timelinePlot")
+          )
+        )
+      )
+    )
+  )
+)
+```
+
+
+## Server
+```{r}
+#| eval: false
+shinyServer(function(input, output, session) {
+  
+  ### Communication Pattern ###
+  output$commPlot <- renderPlotly({
+    comm_count <- communication_edges %>%
+      count(Sender, Receiver) %>%
+      arrange(desc(n))
+    
+    p <- ggplot(comm_count[1:20,], aes(x = reorder(paste(Sender, "→", Receiver), -n), y = n)) +
+      geom_bar(stat = "identity", fill = "steelblue") +
+      labs(title = "Top Communication Pairs", x = "Sender → Receiver", y = "Message Count") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    
+    ggplotly(p)
+  })
+  
+  ### Network Analysis ###
+  output$networkPlot <- renderVisNetwork({
+    ego_graph <- mc3_graph %>%
+      activate(nodes) %>%
+      mutate(dist = node_distance_from(nadia_id)) %>%
+      filter(dist <= 2)
+    
+    nodes <- ego_graph %>%
+      activate(nodes) %>%
+      as_tibble() %>%
+      mutate(id = row_number(),
+             label = name,
+             group = sub_type,
+             title = paste("Type:", sub_type)) %>%
+      select(id, label, group, title)
+    
+    edges <- ego_graph %>%
+      activate(edges) %>%
+      as_tibble() %>%
+      select(from, to)
+    
+    visNetwork(nodes, edges) %>%
+      visOptions(highlightNearest = TRUE, nodesIdSelection = TRUE)
+  })
+  
+  ### Nadia's Illegal Activities ###
+  filtered_data <- reactive({
+    timeline_df %>%
+      filter(timestamp >= input$dateRange[1],
+             timestamp <= input$dateRange[2],
+             event_type %in% input$eventType)
+  })
+  
+  # Ego network with evidence hover
+  output$illegalNetworkPlot <- renderVisNetwork({
+    ego_graph <- mc3_graph %>%
+      activate(nodes) %>%
+      mutate(dist = node_distance_from(nadia_id)) %>%
+      filter(dist <= 2)
+    
+    nodes <- ego_graph %>%
+      activate(nodes) %>%
+      as_tibble() %>%
+      mutate(id = row_number(),
+             label = name,
+             group = sub_type,
+             title = paste("Node:", name, "<br>Type:", sub_type)) %>%
+      select(id, label, group, title)
+    
+    edges <- ego_graph %>%
+      activate(edges) %>%
+      as_tibble() %>%
+      select(from, to)
+    
+    visNetwork(nodes, edges) %>%
+      visOptions(highlightNearest = TRUE, nodesIdSelection = TRUE)
+  })
+  
+  # Betweenness graph
+  output$betweennessPlot <- renderPlotly({
+    ego_graph <- mc3_graph %>%
+      activate(nodes) %>%
+      mutate(dist = node_distance_from(nadia_id)) %>%
+      filter(dist <= 2) %>%
+      mutate(betweenness = centrality_betweenness())
+    
+    df <- ego_graph %>%
+      activate(nodes) %>%
+      as_tibble()
+    
+    p <- ggplot(df, aes(x = name, y = betweenness)) +
+      geom_point(aes(size = betweenness), color = "tomato") +
+      coord_flip() +
+      labs(title = "Betweenness of Nodes") +
+      theme_minimal()
+    
+    ggplotly(p)
+  })
+  
+  # Timeline
+  output$timelinePlot <- renderPlotly({
+    p <- ggplot(filtered_data(), aes(x = timestamp, y = event_type, text = evidence)) +
+      geom_point(aes(color = event_type, shape = confirmed_flag), size = 3) +
+      labs(title = "Timeline of Nadia Conti's Activities") +
+      theme_minimal()
+    
+    ggplotly(p, tooltip = "text")
+  })
+  
+  output$download_filtered <- downloadHandler(
+    filename = function() { paste0("filtered_timeline_", Sys.Date(), ".csv") },
+    content = function(file) {
+      write.csv(filtered_data(), file, row.names = FALSE)
+    }
+  )
+  
+})
+```
 :::

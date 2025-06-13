@@ -23,6 +23,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -132,6 +166,22 @@ ul.task-list li input[type="checkbox"] {
     <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex05/Hands-on_Ex05.html">
  <span class="dropdown-text">Hands-on Exercise 5</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html">
+ <span class="dropdown-text">Hands-on Exercise 6</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex08/Hands-on_Ex08_part1.html">
+ <span class="dropdown-text">Hands-on Exercise 8 part 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex08/Hands-on_Ex08_part2.html">
+ <span class="dropdown-text">Hands-on Exercise 8 part 2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex08/Hands-on_Ex08_part3.html">
+ <span class="dropdown-text">Hands-on Exercise 8 part 3</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
@@ -213,6 +263,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#network-analysis" id="toc-network-analysis" class="nav-link" data-scroll-target="#network-analysis">2.2 Network analysis</a></li>
   <li><a href="#nadia-condis-illegal-activities" id="toc-nadia-condis-illegal-activities" class="nav-link" data-scroll-target="#nadia-condis-illegal-activities">2.3 Nadia Condi’s illegal activities</a></li>
   </ul></li>
+  <li><a href="#code" id="toc-code" class="nav-link" data-scroll-target="#code">3 Code</a></li>
   </ul>
 </nav>
     </div>
@@ -250,7 +301,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">June 10, 2025</p>
+      <p class="date-modified">June 13, 2025</p>
     </div>
   </div>
     
@@ -370,27 +421,18 @@ ggplotly</p>
 <tr class="odd">
 <td>Network Graph Display</td>
 <td>An interactive network diagram that visualizes nodes and their connections. Users can pan/zoom, and hovering on a node can show its name or details. The graph updates based on the selected view/filter.</td>
-<td></td>
+<td>visNetwork</td>
 </tr>
 <tr class="even">
-<td>Centrality Metric Highlighting</td>
-<td></td>
-<td></td>
+<td>Centrality Metric Info Panel</td>
+<td>When users hover over a node in the network, a dynamic info panel will display that node’s centrality metrics: Degree, Betweenness, Closeness, and Eigenvector. This allows real-time inspection of each node’s importance.</td>
+<td><p>igraph</p>
+<p>visNetwork</p></td>
 </tr>
 <tr class="odd">
-<td>Node Selection &amp; Details</td>
-<td></td>
-<td></td>
-</tr>
-<tr class="even">
-<td>Cluster Exploration Aids</td>
-<td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td></td>
-<td></td>
-<td></td>
+<td>Node Selection</td>
+<td>A dropdown to select a specific entity by name/ID and highlight it on the graph.</td>
+<td>selectInput</td>
 </tr>
 </tbody>
 </table>
@@ -406,13 +448,213 @@ ggplotly</p>
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">UI Components &amp; Layout</a></li></ul>
 <div class="tab-content">
 <div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
-
+<table class="caption-top table">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 85%">
+<col style="width: 5%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Component</th>
+<th>description</th>
+<th>Shiny &amp; R packages</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Nadia’s Ego Network Visualization</td>
+<td>The interactive network centered on Nadia includes Nadia as a focal node and all directly connected nodes (and possibly second-degree connections)</td>
+<td><p>visNetwork</p>
+<p>igraph</p></td>
+</tr>
+<tr class="even">
+<td>Illegal Activity Markers</td>
+<td>The interface distinguishes confirmed illegal actions from suspicious ones.</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Timeline of Events</td>
+<td>A timeline chart at the bottom chronicles key events involving Nadia. The y-axis lists categories of events, matching the types of actions Nadia is involved in. Each event is plotted as a point on the timeline. Different shapes or colors denote the nature of the event. This timeline allows user to scan chronologically what Nadia did and when.</td>
+<td><p>timevis</p>
+<p>ggplotly</p></td>
+</tr>
+<tr class="even">
+<td>Evidence Detail Panel</td>
+<td>When the user clicks on an event in the timeline or a connection in the network, a detail panel can display the underlying evidence. It serves to back up the visual marks with concrete information, helping justify whether Nadia’s actions were illegal.</td>
+<td><p>renderText</p>
+<p>renderTable</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
-
-
 </section>
+</section>
+<section id="code" class="level1">
+<h1>3 Code</h1>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">UI</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">Server</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shinyUI</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fluidPage</span>(</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">titlePanel</span>(<span class="st">"Take-Home Exercise 3 — Full Dashboard"</span>),</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sidebarLayout</span>(</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sidebarPanel</span>(</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">airDatepickerInput</span>(<span class="st">"dateRange"</span>, <span class="st">"Select Date Range:"</span>, <span class="at">range =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">value =</span> <span class="fu">c</span>(<span class="fu">as.Date</span>(<span class="st">"2040-10-05"</span>), <span class="fu">as.Date</span>(<span class="st">"2040-10-14"</span>)),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>          <span class="at">minDate =</span> <span class="fu">as.Date</span>(<span class="st">"2040-10-01"</span>), <span class="at">maxDate =</span> <span class="fu">as.Date</span>(<span class="st">"2040-10-31"</span>)),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">pickerInput</span>(<span class="st">"eventType"</span>, <span class="st">"Select Event Types:"</span>, </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>          <span class="at">choices =</span> <span class="fu">c</span>(<span class="st">"AccessPermission"</span>, <span class="st">"Bribery"</span>, <span class="st">"Payment"</span>, <span class="st">"Communication"</span>, <span class="st">"Coordination"</span>),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">multiple =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>          <span class="at">selected =</span> <span class="fu">c</span>(<span class="st">"AccessPermission"</span>, <span class="st">"Bribery"</span>, <span class="st">"Payment"</span>, <span class="st">"Communication"</span>, <span class="st">"Coordination"</span>),</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">options =</span> <span class="fu">list</span>(<span class="st">`</span><span class="at">actions-box</span><span class="st">`</span> <span class="ot">=</span> <span class="cn">TRUE</span>, <span class="st">`</span><span class="at">live-search</span><span class="st">`</span> <span class="ot">=</span> <span class="cn">TRUE</span>)),</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="fu">downloadButton</span>(<span class="st">"download_filtered"</span>, <span class="st">"Download Filtered Timeline Data"</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mainPanel</span>(</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">tabsetPanel</span>(</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>          <span class="fu">tabPanel</span>(<span class="st">"Communication Pattern"</span>, <span class="fu">plotlyOutput</span>(<span class="st">"commPlot"</span>)),</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>          <span class="fu">tabPanel</span>(<span class="st">"Network Analysis"</span>, <span class="fu">visNetworkOutput</span>(<span class="st">"networkPlot"</span>)),</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>          <span class="fu">tabPanel</span>(<span class="st">"Nadia Conti's Illegal Activities"</span>, </span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>            <span class="fu">visNetworkOutput</span>(<span class="st">"illegalNetworkPlot"</span>),</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>            <span class="fu">plotlyOutput</span>(<span class="st">"betweennessPlot"</span>),</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>            <span class="fu">plotlyOutput</span>(<span class="st">"timelinePlot"</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>          )</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shinyServer</span>(<span class="cf">function</span>(input, output, session) {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="do">### Communication Pattern </span><span class="al">###</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  output<span class="sc">$</span>commPlot <span class="ot">&lt;-</span> <span class="fu">renderPlotly</span>({</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    comm_count <span class="ot">&lt;-</span> communication_edges <span class="sc">%&gt;%</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">count</span>(Sender, Receiver) <span class="sc">%&gt;%</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">arrange</span>(<span class="fu">desc</span>(n))</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(comm_count[<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>,], <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(<span class="fu">paste</span>(Sender, <span class="st">"→"</span>, Receiver), <span class="sc">-</span>n), <span class="at">y =</span> n)) <span class="sc">+</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Top Communication Pairs"</span>, <span class="at">x =</span> <span class="st">"Sender → Receiver"</span>, <span class="at">y =</span> <span class="st">"Message Count"</span>) <span class="sc">+</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplotly</span>(p)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="do">### Network Analysis </span><span class="al">###</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  output<span class="sc">$</span>networkPlot <span class="ot">&lt;-</span> <span class="fu">renderVisNetwork</span>({</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    ego_graph <span class="ot">&lt;-</span> mc3_graph <span class="sc">%&gt;%</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">dist =</span> <span class="fu">node_distance_from</span>(nadia_id)) <span class="sc">%&gt;%</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(dist <span class="sc">&lt;=</span> <span class="dv">2</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    nodes <span class="ot">&lt;-</span> ego_graph <span class="sc">%&gt;%</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>      <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">id =</span> <span class="fu">row_number</span>(),</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>             <span class="at">label =</span> name,</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>             <span class="at">group =</span> sub_type,</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>             <span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"Type:"</span>, sub_type)) <span class="sc">%&gt;%</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(id, label, group, title)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    edges <span class="ot">&lt;-</span> ego_graph <span class="sc">%&gt;%</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>      <span class="fu">activate</span>(edges) <span class="sc">%&gt;%</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(from, to)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">visNetwork</span>(nodes, edges) <span class="sc">%&gt;%</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>      <span class="fu">visOptions</span>(<span class="at">highlightNearest =</span> <span class="cn">TRUE</span>, <span class="at">nodesIdSelection =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  <span class="do">### Nadia's Illegal Activities </span><span class="al">###</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>  filtered_data <span class="ot">&lt;-</span> <span class="fu">reactive</span>({</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    timeline_df <span class="sc">%&gt;%</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(timestamp <span class="sc">&gt;=</span> input<span class="sc">$</span>dateRange[<span class="dv">1</span>],</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>             timestamp <span class="sc">&lt;=</span> input<span class="sc">$</span>dateRange[<span class="dv">2</span>],</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>             event_type <span class="sc">%in%</span> input<span class="sc">$</span>eventType)</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Ego network with evidence hover</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>  output<span class="sc">$</span>illegalNetworkPlot <span class="ot">&lt;-</span> <span class="fu">renderVisNetwork</span>({</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    ego_graph <span class="ot">&lt;-</span> mc3_graph <span class="sc">%&gt;%</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>      <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">dist =</span> <span class="fu">node_distance_from</span>(nadia_id)) <span class="sc">%&gt;%</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(dist <span class="sc">&lt;=</span> <span class="dv">2</span>)</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>    nodes <span class="ot">&lt;-</span> ego_graph <span class="sc">%&gt;%</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>      <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">id =</span> <span class="fu">row_number</span>(),</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>             <span class="at">label =</span> name,</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>             <span class="at">group =</span> sub_type,</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>             <span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"Node:"</span>, name, <span class="st">"&lt;br&gt;Type:"</span>, sub_type)) <span class="sc">%&gt;%</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(id, label, group, title)</span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>    edges <span class="ot">&lt;-</span> ego_graph <span class="sc">%&gt;%</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>      <span class="fu">activate</span>(edges) <span class="sc">%&gt;%</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(from, to)</span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>    <span class="fu">visNetwork</span>(nodes, edges) <span class="sc">%&gt;%</span></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>      <span class="fu">visOptions</span>(<span class="at">highlightNearest =</span> <span class="cn">TRUE</span>, <span class="at">nodesIdSelection =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Betweenness graph</span></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>  output<span class="sc">$</span>betweennessPlot <span class="ot">&lt;-</span> <span class="fu">renderPlotly</span>({</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>    ego_graph <span class="ot">&lt;-</span> mc3_graph <span class="sc">%&gt;%</span></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>      <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span></span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">dist =</span> <span class="fu">node_distance_from</span>(nadia_id)) <span class="sc">%&gt;%</span></span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(dist <span class="sc">&lt;=</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">betweenness =</span> <span class="fu">centrality_betweenness</span>())</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>    df <span class="ot">&lt;-</span> ego_graph <span class="sc">%&gt;%</span></span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>      <span class="fu">activate</span>(nodes) <span class="sc">%&gt;%</span></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as_tibble</span>()</span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>    p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> name, <span class="at">y =</span> betweenness)) <span class="sc">+</span></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">size =</span> betweenness), <span class="at">color =</span> <span class="st">"tomato"</span>) <span class="sc">+</span></span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>      <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>      <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Betweenness of Nodes"</span>) <span class="sc">+</span></span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme_minimal</span>()</span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplotly</span>(p)</span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Timeline</span></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>  output<span class="sc">$</span>timelinePlot <span class="ot">&lt;-</span> <span class="fu">renderPlotly</span>({</span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>    p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="fu">filtered_data</span>(), <span class="fu">aes</span>(<span class="at">x =</span> timestamp, <span class="at">y =</span> event_type, <span class="at">text =</span> evidence)) <span class="sc">+</span></span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> event_type, <span class="at">shape =</span> confirmed_flag), <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>      <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Timeline of Nadia Conti's Activities"</span>) <span class="sc">+</span></span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme_minimal</span>()</span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplotly</span>(p, <span class="at">tooltip =</span> <span class="st">"text"</span>)</span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>  output<span class="sc">$</span>download_filtered <span class="ot">&lt;-</span> <span class="fu">downloadHandler</span>(</span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>    <span class="at">filename =</span> <span class="cf">function</span>() { <span class="fu">paste0</span>(<span class="st">"filtered_timeline_"</span>, <span class="fu">Sys.Date</span>(), <span class="st">".csv"</span>) },</span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>    <span class="at">content =</span> <span class="cf">function</span>(file) {</span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>      <span class="fu">write.csv</span>(<span class="fu">filtered_data</span>(), file, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
 </section>
 
 </main> <!-- /main -->
