@@ -4,7 +4,7 @@ description: "Mini-Challenge 3"
 author: "Tai Qiu Yan"
 date: "June 10, 2025"
 date-modified: "last-modified"
-format: html
+format: docx
 editor: visual
 execute:
   eval: true

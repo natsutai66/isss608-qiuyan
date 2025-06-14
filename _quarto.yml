@@ -45,7 +45,10 @@ website:
             href: "In-class_Ex/In-class_Ex_04/In-class_Ex_04.html"
           - text: "In-Class Exercise 6"
             href: "https://public.tableau.com/views/Inclassexercise6_17480707380260/Dashboard1?:language=en-US&publish=yes&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link"
-      
+          - text: "In-Class Exercise 8 - SG pools"
+            href: "https://public.tableau.com/app/profile/qiuyan.tai/viz/SGPools_17498850307560/Sheet12?publish=yes"
+          - text: "In-Class Exercise 8 - Property"
+            href: "https://public.tableau.com/app/profile/qiuyan.tai/viz/Property_17498860128960/Sheet1?publish=yes"
             
       - text: "Take Home Exercise"
         menu:
