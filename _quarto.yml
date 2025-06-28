@@ -43,6 +43,8 @@ website:
             href: "Hands-on_Ex/Hands-on_Ex09/Hands-on_Ex09_part4.html"
           - text: "Hands-on Exercise 9 part 5"
             href: "Hands-on_Ex/Hands-on_Ex09/Hands-on_Ex09_part5.html"
+          - text: "Hands-on Exercise 10"
+            href: "Hands-on_Ex/Hands-on_Ex10/Hands-on_Ex10.html"
             
 
       - text: "In-Class Exercise"
@@ -59,6 +61,11 @@ website:
             href: "https://public.tableau.com/app/profile/qiuyan.tai/viz/SGPools_17498850307560/Sheet12?publish=yes"
           - text: "In-Class Exercise 8 - Property"
             href: "https://public.tableau.com/app/profile/qiuyan.tai/viz/Property_17498860128960/Sheet1?publish=yes"
+          - text: "In-Class Exercise 9 - Singapore Population 2024"
+            href: "https://public.tableau.com/app/profile/qiuyan.tai/viz/SingaporePopulation2024/SingaporePopulation2024?publish=yes"
+          - text: "In-Class Exercise 9 - Be Property Wise or Otherwise"
+            href: "https://public.tableau.com/app/profile/qiuyan.tai/viz/BePropertyWiseorOtherwise/BePropertyWiseorOtherwise?publish=yes"
+            
             
       - text: "Take Home Exercise"
         menu:
