@@ -65,6 +65,10 @@ website:
             href: "https://public.tableau.com/app/profile/qiuyan.tai/viz/SingaporePopulation2024/SingaporePopulation2024?publish=yes"
           - text: "In-Class Exercise 9 - Be Property Wise or Otherwise"
             href: "https://public.tableau.com/app/profile/qiuyan.tai/viz/BePropertyWiseorOtherwise/BePropertyWiseorOtherwise?publish=yes"
+          - text: "In-Class Exercise 10 - Coffee Chain"
+            href: "https://public.tableau.com/app/profile/qiuyan.tai/viz/CoffeeChain_17510925637040/Dashboard1?publish=yes"
+          - text: "In-Class Exercise 10 - SGStock"
+            href: "In-class_Ex/In-class_Ex_10/In-class_Ex_10.html"
             
             
       - text: "Take Home Exercise"
