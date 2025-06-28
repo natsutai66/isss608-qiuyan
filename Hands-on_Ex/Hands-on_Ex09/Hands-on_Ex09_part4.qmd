@@ -191,7 +191,6 @@ parallelPlot(wh,
              histoVisibility = histoVisibility)
 ```
 
-
 # 6 References
 
 -   [*ggparcoord()*](http://ggobi.github.io/ggally/reference/ggparcoord.html) of [**GGally**](http://ggobi.github.io/ggally/index.html) package

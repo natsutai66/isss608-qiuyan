@@ -40,8 +40,6 @@ Show the code
 
 -   [reactablefmtr](https://kcuilla.github.io/reactablefmtr/index.html) provides various features to streamline and enhance the styling of interactive reactable tables with easy-to-use and highly-customizable functions and themes.
 
-
-
 ```{r}
 pacman::p_load(lubridate, ggthemes, reactable,
 reactablefmtr, gt, gtExtras, tidyverse, gganimate, ggalt, svglite)
